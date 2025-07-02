@@ -29,9 +29,6 @@ export default function Home() {
         <ProjectCardsSection />
       </div>
 
-      <div className="border-b border-gray-100">
-        <ProjectCardsSection />
-      </div>
       <section className="py-12 px-5 lg:py-20 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
         <div className="max-w-md mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
           <h2 className="text-2xl font-bold text-emerald-800 lg:text-3xl">
