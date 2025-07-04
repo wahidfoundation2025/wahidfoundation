@@ -87,6 +87,7 @@ export default function Headers() {
                 key={item.href}
                 href={item.href}
                 className="text-gray-700 hover:text-emerald-600"
+                onClick={() => setIsOpen(false)}
               >
                 {item.label}
               </Link>
@@ -97,12 +98,14 @@ export default function Headers() {
                 <Link
                   href="/login"
                   className="block text-center border border-emerald-200 rounded px-4 py-2 text-emerald-700 hover:bg-emerald-50"
+                  onClick={() => setIsOpen(false)}
                 >
                   Login
                 </Link>
                 <Link
-                  href="/register"
+                  href="/signup"
                   className="block text-center rounded px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700"
+                  onClick={() => setIsOpen(false)}
                 >
                   Sign Up
                 </Link>
