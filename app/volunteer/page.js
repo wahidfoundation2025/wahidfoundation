@@ -1,8 +1,16 @@
 "use client";
 import Head from "next/head";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Heart, Users, GraduationCap, Calendar } from "lucide-react";
+
+// Map icon string names to Lucide components
+const ICON_MAP = {
+  GraduationCap,
+  Heart,
+  Users,
+  Calendar,
+};
 
 const Volunteer = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +22,18 @@ const Volunteer = () => {
     message: ""
   });
   const [loading, setLoading] = useState(false);
+  const [opportunities, setOpportunities] = useState([]);
+  const [oppLoading, setOppLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("https://wahidfoundationadmin.vercel.app/api/volunteer-positions")
+      .then(res => res.json())
+      .then(data => {
+        setOpportunities(data);
+        setOppLoading(false);
+      })
+      .catch(() => setOppLoading(false));
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,8 +44,7 @@ const Volunteer = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      // Replace with your actual API endpoint
-      const res = await fetch("/api/volunteer", {
+      const res = await fetch("https://wahidfoundationadmin.vercel.app/api/volunteer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)
@@ -49,35 +68,7 @@ const Volunteer = () => {
     setLoading(false);
   };
 
-  const volunteerOpportunities = [
-    {
-      title: "Education Mentor",
-      description: "Help children with their studies and inspire the next generation.",
-      commitment: "4 hours/week",
-      icon: <GraduationCap className="h-6 w-6 text-emerald-700" />
-    },
-    {
-      title: "Healthcare Assistant",
-      description: "Support medical camps and health awareness programs in rural areas.",
-      commitment: "Weekend availability",
-      icon: <Heart className="h-6 w-6 text-emerald-700" />
-    },
-    {
-      title: "Livelihood Trainer",
-      description: "Teach vocational skills to help people become self-sufficient.",
-      commitment: "6 hours/week",
-      icon: <Users className="h-6 w-6 text-emerald-700" />
-    },
-    {
-      title: "Event Coordinator",
-      description: "Help organize fundraising and awareness events for our causes.",
-      commitment: "As needed",
-      icon: <Calendar className="h-6 w-6 text-emerald-700" />
-    }
-  ];
-
   return (
-
     <div className="bg-white text-gray-100 ">
       <Head>
         <title>Volunteer with Wahid Foundation | Make a Difference</title>
@@ -96,16 +87,25 @@ const Volunteer = () => {
         <div className="mb-12">
           <h2 className="text-2xl font-semibold text-emerald-700 mb-6">Current Volunteer Opportunities</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {volunteerOpportunities.map((opportunity, index) => (
-              <div key={index} className="rounded-lg border bg-white p-5 shadow-sm flex flex-col gap-2">
-                <div className="flex items-center gap-2 mb-2">
-                  {opportunity.icon}
-                  <span className="font-semibold text-emerald-700">{opportunity.title}</span>
-                </div>
-                <div className="text-sm text-gray-500 mb-1">Time commitment: {opportunity.commitment}</div>
-                <div className="text-gray-700">{opportunity.description}</div>
-              </div>
-            ))}
+            {oppLoading ? (
+              <div className="col-span-2 text-center text-gray-500">Loading opportunities...</div>
+            ) : opportunities.length === 0 ? (
+              <div className="col-span-2 text-center text-gray-500">No opportunities available right now.</div>
+            ) : (
+              opportunities.map((opportunity, index) => {
+                const Icon = ICON_MAP[opportunity.icon] || GraduationCap;
+                return (
+                  <div key={opportunity._id || index} className="rounded-lg border bg-white p-5 shadow-sm flex flex-col gap-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className="h-6 w-6 text-emerald-700" />
+                      <span className="font-semibold text-emerald-700">{opportunity.title}</span>
+                    </div>
+                    <div className="text-sm text-gray-500 mb-1">Time commitment: {opportunity.commitment}</div>
+                    <div className="text-gray-700">{opportunity.description}</div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 
@@ -205,8 +205,7 @@ const Volunteer = () => {
           </a>
         </div>
       </div>
-      </div>
-
+    </div>
   );
 };
 
