@@ -1,46 +1,35 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { GraduationCap, Heart, Users, Calculator, ArrowRight, ChevronRight } from "lucide-react";
+
+// Map icon string to Lucide icon component
+const ICON_MAP = {
+  GraduationCap,
+  Heart,
+  Users,
+  Calculator,
+};
 
 const Impact = () => {
   const [showAllStories, setShowAllStories] = useState(false);
   const [activeTab, setActiveTab] = useState("education");
-  const stories = [
-    {
-      id: 1,
-      icon: GraduationCap,
-      quote: "Wahid Foundation's scholarship helped me complete my engineering degree. Today, I work at a leading tech company and support my entire family.",
-      name: "Ahmed Khan",
-      location: "Lucknow, Uttar Pradesh",
-      initials: "AK",
-    },
-    {
-      id: 2,
-      icon: Heart,
-      quote: "The medical camp organized by Wahid Foundation saved my mother's life. We couldn't afford the treatment, but they made it possible.",
-      name: "Fatima Begum",
-      location: "Hyderabad, Telangana",
-      initials: "FB",
-    },
-    {
-      id: 3,
-      icon: Users,
-      quote: "With the seed funding from Wahid Foundation, I started my small tailoring business. Now I employ 5 other women from my community.",
-      name: "Sana Khan",
-      location: "Mumbai, Maharashtra",
-      initials: "SK",
-    },
-    {
-      id: 4,
-      icon: GraduationCap,
-      quote: "I was about to drop out of school when Wahid Foundation stepped in. Today, I'm pursuing my dream of becoming a doctor.",
-      name: "Mohammed Ali",
-      location: "Delhi",
-      initials: "MA",
-    },
-  ];
+  const [stories, setStories] = useState([]);
+  const [loadingStories, setLoadingStories] = useState(true);
+
+  useEffect(() => {
+    // Replace with your actual API endpoint
+    fetch("https://wahidfoundationadmin.vercel.app/api/impact-stories")
+      .then(res => res.json())
+      .then(data => {
+        setStories(data);
+        setLoadingStories(false);
+      })
+      .catch(() => setLoadingStories(false));
+  }, []);
+
   const visibleStories = showAllStories ? stories : stories.slice(0, 2);
+
   const tabContent = {
     education: {
       color: "blue",
@@ -98,6 +87,7 @@ const Impact = () => {
 
   return (
     <div className="flex flex-col bg-white">
+      {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-emerald-600 to-emerald-700 text-white">
         <div
           className="absolute inset-0 opacity-10 bg-center bg-cover"
@@ -155,22 +145,22 @@ const Impact = () => {
           <div className="overflow-x-auto pb-2 -mx-5 px-5 lg:mx-0 lg:px-0 lg:overflow-visible lg:pb-0">
             <div className="inline-flex h-12 lg:h-16 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-600 lg:grid lg:w-full lg:grid-cols-4">
               {Object.keys(tabContent).map((tab) => (
-               <label
-  key={tab}
-  className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-2 lg:px-10 lg:py-3 text-sm lg:text-base font-medium cursor-pointer transition-all ${
-    activeTab === tab ? "bg-white text-emerald-600 shadow-sm" : "hover:bg-gray-200"
-  }`}
->
-  <input
-    type="radio"
-    name="impact-tab"
-    value={tab}
-    checked={activeTab === tab}
-    onChange={() => setActiveTab(tab)}
-    className="hidden"
-  />
-  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-</label>
+                <label
+                  key={tab}
+                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-2 lg:px-10 lg:py-3 text-sm lg:text-base font-medium cursor-pointer transition-all ${
+                    activeTab === tab ? "bg-white text-emerald-600 shadow-sm" : "hover:bg-gray-200"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="impact-tab"
+                    value={tab}
+                    checked={activeTab === tab}
+                    onChange={() => setActiveTab(tab)}
+                    className="hidden"
+                  />
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </label>
               ))}
             </div>
           </div>
@@ -235,32 +225,41 @@ const Impact = () => {
             <p className="text-gray-600 lg:text-lg lg:max-w-2xl lg:mx-auto">Real stories of transformation from our beneficiaries</p>
           </div>
           <div className="space-y-4 lg:space-y-8 lg:grid lg:grid-cols-2 lg:gap-8 xl:gap-12">
-            {visibleStories.map((story) => (
-              <div
-                key={story.id}
-                className="border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 rounded-lg"
-              >
-                <div className="p-6 lg:p-10">
-                  <div className="flex items-start gap-4 lg:gap-6">
-                    <div className="bg-emerald-100 w-12 h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <story.icon className="h-6 w-6 lg:h-8 lg:w-8 text-emerald-600" />
-                    </div>
-                    <div className="space-y-2 lg:space-y-4">
-                      <p className="text-gray-700 lg:text-lg leading-relaxed">"{story.quote}"</p>
-                      <div className="flex items-center gap-2 lg:gap-4">
-                        <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm lg:text-lg font-bold">
-                          {story.initials}
+            {loadingStories ? (
+              <div className="col-span-2 text-center text-gray-500">Loading stories...</div>
+            ) : visibleStories.length === 0 ? (
+              <div className="col-span-2 text-center text-gray-500">No stories available right now.</div>
+            ) : (
+              visibleStories.map((story) => {
+                const Icon = ICON_MAP[story.icon] || GraduationCap;
+                return (
+                  <div
+                    key={story._id || story.id}
+                    className="border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 rounded-lg"
+                  >
+                    <div className="p-6 lg:p-10">
+                      <div className="flex items-start gap-4 lg:gap-6">
+                        <div className="bg-emerald-100 w-12 h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <Icon className="h-6 w-6 lg:h-8 lg:w-8 text-emerald-600" />
                         </div>
-                        <div>
-                          <p className="font-semibold text-gray-900 lg:text-lg">{story.name}</p>
-                          <p className="text-sm lg:text-base text-gray-600">{story.location}</p>
+                        <div className="space-y-2 lg:space-y-4">
+                          <p className="text-gray-700 lg:text-lg leading-relaxed">"{story.quote}"</p>
+                          <div className="flex items-center gap-2 lg:gap-4">
+                            <div className="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-emerald-600 flex items-center justify-center text-white text-sm lg:text-lg font-bold">
+                              {story.initials}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-gray-900 lg:text-lg">{story.name}</p>
+                              <p className="text-sm lg:text-base text-gray-600">{story.location}</p>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
           <div className="lg:flex lg:justify-center lg:mt-12">
             <button
@@ -294,5 +293,4 @@ const Impact = () => {
     </div>
   );
 };
-
 export default Impact;
