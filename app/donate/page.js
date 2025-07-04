@@ -57,7 +57,7 @@ export default function DonatePage() {
     async function fetchProjects() {
       try {
         const res = await fetch(
-          `https://wahidfoundationadmin.vercel.app/api/projects?status=Active`
+          `https://wahidfoundationadmin.vercel.app/api/projects`
         );
         const data = await res.json();
         console.log("Fetched projects data:", data);
@@ -238,7 +238,7 @@ export default function DonatePage() {
           <select
             value={selectedProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200"
+            className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200 text-black"
           >
             {projects.map((project) => (
               <option key={project._id} value={project._id}>
