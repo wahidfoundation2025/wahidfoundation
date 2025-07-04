@@ -1,16 +1,23 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import ProjectCardsSection from '../components/Project'; // Assuming you have this already
+import { useState } from 'react';
+import ProjectCardsSection from '../components/Project';
 import { Filter, Search } from 'lucide-react';
 
 const Projects = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [donationTypeFilter, setDonationTypeFilter] = useState('all');
 
   const categories = ['all', 'Education', 'Women Empowerment', 'Healthcare', 'Rural Empowerment', 'Economic Empowerment'];
   const donationTypes = ['all', 'general', 'zakat', 'sadqa', 'interest_earnings'];
+
+  // Handle Clear Filters
+  const handleClearFilters = () => {
+    setSearchInput('');
+    setCategoryFilter('all');
+    setDonationTypeFilter('all');
+  };
 
   return (
     <div className="min-h-screen bg-emerald-50 text-gray-900">
@@ -25,14 +32,14 @@ const Projects = () => {
 
       {/* Filter Section */}
       <section className="bg-white max-w-6xl mx-auto p-6 rounded-xl shadow mb-12">
-        {/* Search */}
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          {/* Search */}
           <div className="relative flex-1">
             <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search projects by name, description, or location..."
               className="w-full pl-10 pr-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
@@ -80,11 +87,7 @@ const Projects = () => {
 
           {/* Clear Filters */}
           <button
-            onClick={() => {
-              setSearchTerm('');
-              setCategoryFilter('all');
-              setDonationTypeFilter('all');
-            }}
+            onClick={handleClearFilters}
             className="py-2 px-4 border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-50"
           >
             Clear All Filters
@@ -95,7 +98,7 @@ const Projects = () => {
       {/* Project Cards */}
       <section className="max-w-7xl mx-auto px-4 pb-20">
         <ProjectCardsSection
-          searchTerm={searchTerm}
+          searchTerm={searchInput}
           categoryFilter={categoryFilter}
           donationTypeFilter={donationTypeFilter}
         />
