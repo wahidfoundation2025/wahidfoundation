@@ -2,18 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 import { MapPin, Users, Calendar } from "lucide-react";
+
 
 const ProjectCardsSection = () => {
   const [projects, setProjects] = useState([]);
+  const { isSignedIn } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchProjects() {
       try {
         const res = await fetch("https://wahidfoundationadmin.vercel.app/api/projects");
-        console.log(res);
         const data = await res.json();
-        console.log(data.projects);
         setProjects(data.projects);
       } catch (error) {
         console.error("Failed to fetch projects", error);
@@ -48,8 +51,17 @@ const ProjectCardsSection = () => {
       : "bg-blue-100 text-blue-800";
   };
 
+  const handleDonateClick = (projectId) => {
+    if (!isSignedIn) {
+      // Redirect to Clerk sign-in page with redirect back
+     router.push(`/login?redirect_url=/donate?project=${projectId}`);
+    } else {
+      router.push(`/donate?project=${projectId}`);
+    }
+  };
+
   return (
-    <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-12">
+    <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 text-gray-900">
       <div className="grid lg:grid-cols-3 gap-8">
         {projects.map((project) => (
           <div
@@ -137,12 +149,12 @@ const ProjectCardsSection = () => {
 
               <div className="flex space-x-2">
                 {project.status !== "Completed" && (
-                  <Link
-                    href={`/donate?project=${project._id}`}
+                  <button
+                    onClick={() => handleDonateClick(project._id)}
                     className="flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
                   >
                     Donate Now
-                  </Link>
+                  </button>
                 )}
                 <Link
                   href={`/projects/${project._id}`}
