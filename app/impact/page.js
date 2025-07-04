@@ -1,17 +1,11 @@
 "use client";
-
-// Import Next.js Link and Lucide icons
 import Link from "next/link";
 import { useState } from "react";
 import { GraduationCap, Heart, Users, Calculator, ArrowRight, ChevronRight } from "lucide-react";
 
 const Impact = () => {
-  // State for toggling stories
   const [showAllStories, setShowAllStories] = useState(false);
-  // State for selected tab
   const [activeTab, setActiveTab] = useState("education");
-
-  // Stories data
   const stories = [
     {
       id: 1,
@@ -46,11 +40,7 @@ const Impact = () => {
       initials: "MA",
     },
   ];
-
-  // Limit stories to 2 unless showAllStories is true
   const visibleStories = showAllStories ? stories : stories.slice(0, 2);
-
-  // Tab content data
   const tabContent = {
     education: {
       color: "blue",
@@ -107,9 +97,7 @@ const Impact = () => {
   };
 
   return (
-    // Main container
     <div className="flex flex-col bg-white">
-      {/* Hero section */}
       <section className="relative bg-gradient-to-br from-emerald-600 to-emerald-700 text-white">
         <div
           className="absolute inset-0 opacity-10 bg-center bg-cover"
@@ -145,7 +133,7 @@ const Impact = () => {
             <div className="lg:flex lg:justify-center">
               <Link
                 href="/donate"
-                className="block w-full lg:w-auto lg:px-12 bg-white text-emerald-600 hover:bg-emerald-50 py-6 lg:py-8 text-lg lg:text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] text-center rounded-lg flex items-center justify-center gap-2"
+                className="block w-full lg:w-auto lg:px-10 bg-white text-emerald-600 hover:bg-emerald-50 py-5 lg:py-4 text-lg lg:text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] text-center rounded-lg flex items-center justify-center gap-2"
               >
                 Start Making Impact
                 <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6" />
@@ -167,22 +155,22 @@ const Impact = () => {
           <div className="overflow-x-auto pb-2 -mx-5 px-5 lg:mx-0 lg:px-0 lg:overflow-visible lg:pb-0">
             <div className="inline-flex h-12 lg:h-16 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-600 lg:grid lg:w-full lg:grid-cols-4">
               {Object.keys(tabContent).map((tab) => (
-                <label
-                  key={tab}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-4 lg:px-8 text-sm lg:text-base font-medium cursor-pointer transition-all ${
-                    activeTab === tab ? "bg-white text-emerald-600 shadow-sm" : "hover:bg-gray-200"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="impact-tab"
-                    value={tab}
-                    checked={activeTab === tab}
-                    onChange={() => setActiveTab(tab)}
-                    className="hidden"
-                  />
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </label>
+               <label
+  key={tab}
+  className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-6 py-2 lg:px-10 lg:py-3 text-sm lg:text-base font-medium cursor-pointer transition-all ${
+    activeTab === tab ? "bg-white text-emerald-600 shadow-sm" : "hover:bg-gray-200"
+  }`}
+>
+  <input
+    type="radio"
+    name="impact-tab"
+    value={tab}
+    checked={activeTab === tab}
+    onChange={() => setActiveTab(tab)}
+    className="hidden"
+  />
+  {tab.charAt(0).toUpperCase() + tab.slice(1)}
+</label>
               ))}
             </div>
           </div>
@@ -277,7 +265,7 @@ const Impact = () => {
           <div className="lg:flex lg:justify-center lg:mt-12">
             <button
               onClick={() => setShowAllStories(!showAllStories)}
-              className="w-full lg:w-auto lg:px-12 mt-6 lg:mt-0 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 py-6 lg:py-8 lg:text-lg font-semibold text-center rounded-lg"
+              className="w-full lg:w-auto lg:px-12 mt-6 lg:mt-0 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 py-4 lg:py-4 lg:text-lg font-semibold text-center rounded-lg"
             >
               {showAllStories ? "Show Less Stories" : "View More Stories"}
             </button>
@@ -295,7 +283,7 @@ const Impact = () => {
           <div className="lg:flex lg:justify-center">
             <Link
               href="/donate"
-              className="block w-full lg:w-auto lg:px-12 bg-white text-emerald-600 hover:bg-emerald-50 py-6 lg:py-8 text-lg lg:text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] text-center rounded-lg flex items-center justify-center gap-2"
+              className="block w-full lg:w-auto lg:px-12 bg-white text-emerald-600 hover:bg-emerald-50 py-6 lg:py-4 text-lg lg:text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 active:scale-[0.98] text-center rounded-lg flex items-center justify-center gap-2"
             >
               Start Giving Now
               <ArrowRight className="h-5 w-5 lg:h-6 lg:w-6 ml-2" />
