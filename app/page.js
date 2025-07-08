@@ -1,10 +1,28 @@
+"use client"
+import { useEffect, useState } from "react";
 import HeroSection from "./components/HeroSection";
 import ImpactStats from "./components/ImpactSection";
 import ProjectCardsSection from "./components/Project";
-
 import Link from "next/link";
 
 export default function Home() {
+  const [quote, setQuote] = useState(null);
+
+  useEffect(() => {
+    async function fetchQuote() {
+      try {
+        const res = await fetch("https://wahidfoundationadmin.vercel.app/api/homequotesection");
+
+        const data = await res.json();
+        console.log(data);
+        setQuote(data);
+      } catch (e) {
+        setQuote(null);
+      }
+    }
+    fetchQuote();
+  }, []);
+
   return (
     <div className="flex flex-col bg-white">
       <HeroSection />
@@ -15,11 +33,11 @@ export default function Home() {
         <div className="max-w-sm mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
           <div className="w-16 h-1 bg-amber-300 rounded-full mx-auto lg:w-24"></div>
           <p className="italic text-amber-900 font-medium text-base leading-relaxed lg:text-xl lg:leading-relaxed">
-            "Whoever saves one life - it is as if he had saved mankind
-            entirely."
+            {quote?.text ||
+              '"Whoever saves one life - it is as if he had saved mankind entirely."'}
           </p>
           <p className="text-sm text-amber-700 lg:text-base">
-            — Surah Al-Ma'idah 5:32
+            {quote?.reference || '— Surah Al-Ma\'idah 5:32'}
           </p>
           <div className="w-16 h-1 bg-amber-300 rounded-full mx-auto lg:w-24"></div>
         </div>
@@ -35,8 +53,7 @@ export default function Home() {
             Ready to Make a Difference?
           </h2>
           <p className="text-gray-600 text-base leading-relaxed lg:text-lg lg:leading-relaxed">
-            Start with just ₹1 per day and join thousands of donors in creating
-            lasting change.
+            Start with just ₹1 per day and join thousands of donors in creating lasting change.
           </p>
           <div className="lg:flex lg:justify-center">
             <Link
