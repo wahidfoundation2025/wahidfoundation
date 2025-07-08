@@ -18,8 +18,11 @@ const ProjectCardsSection = ({
   useEffect(() => {
     async function fetchProjects() {
       try {
-        const res = await fetch("https://wahidfoundationadmin.vercel.app/api/projects");
+        const res = await fetch(
+          "https://wahidfoundationadmin.vercel.app/api/projects"
+        );
         const data = await res.json();
+        console.log("Fetched projects:", data.projects);
         setProjects(data.projects);
       } catch (error) {
         console.error("Failed to fetch projects", error);
@@ -69,9 +72,14 @@ const ProjectCardsSection = ({
     // Search filter
     const matchesSearch =
       !searchTerm ||
-      (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ?? false) ||
-      (project.description?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ?? false) ||
-      (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ?? false);
+      (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
+        false) ||
+      (project.description
+        ?.toLowerCase?.()
+        .includes(searchTerm.toLowerCase?.()) ??
+        false) ||
+      (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
+        false);
 
     // Category filter
     const matchesCategory =
@@ -100,7 +108,9 @@ const ProjectCardsSection = ({
   return (
     <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 text-gray-900">
       {filteredProjects.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">No projects found.</div>
+        <div className="text-center py-10 text-gray-500">
+          No projects found.
+        </div>
       ) : (
         <div className="grid lg:grid-cols-3 gap-8">
           {filteredProjects.map((project) => (
@@ -116,23 +126,38 @@ const ProjectCardsSection = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getCategoryColor(project.category)}`}>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getCategoryColor(
+                      project.category
+                    )}`}
+                  >
                     {project.category || "Uncategorized"}
                   </span>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(project.status)}`}>
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(
+                      project.status
+                    )}`}
+                  >
                     {project.status || "Unknown"}
                   </span>
-                  {project.zakat_eligible && (
+                  {project.donationOptions?.some(
+                    (option) => option.type === "Zakat" && option.isEnabled
+                  ) && (
                     <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800">
                       Zakat Eligible
                     </span>
                   )}
-                  {project.interest_earnings_eligible && (
+                  {project.donationOptions?.some(
+                    (option) =>
+                      option.type === "Interest Earnings" && option.isEnabled
+                  ) && (
                     <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-orange-100 text-orange-800">
                       Interest Earnings
                     </span>
                   )}
-                  {project.sadqa_eligible && (
+                  {project.donationOptions?.some(
+                    (option) => option.type === "Sadqa" && option.isEnabled
+                  ) && (
                     <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-pink-100 text-pink-800">
                       Sadqa
                     </span>
@@ -151,7 +176,8 @@ const ProjectCardsSection = ({
                   {project.title || "Untitled Project"}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1.5">
-                  {(project.description?.slice?.(0, 120) ?? "No description available") + "..."}
+                  {(project.description?.slice?.(0, 120) ??
+                    "No description available") + "..."}
                 </p>
               </div>
 
@@ -159,7 +185,9 @@ const ProjectCardsSection = ({
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Progress</span>
-                    <span className="font-semibold">{project.completion ?? 0}%</span>
+                    <span className="font-semibold">
+                      {project.completion ?? 0}%
+                    </span>
                   </div>
                   <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
                     <div
