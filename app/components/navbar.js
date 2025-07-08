@@ -15,6 +15,8 @@ export default function Headers() {
     { href: "/impact", label: "Our Impact" },
     { href: "/about", label: "About" },
     { href: "/volunteer", label: "Volunteer" },
+    { href: "/terms", label: "Terms & Conditions" },
+    { href: "/policy", label: "Policy" },
   ];
 
   return (

@@ -531,23 +531,6 @@ export default function DonatePage() {
             </div>
           </div>
 
-          {/* Secure Info */}
-          <div className="flex items-start space-x-4 p-4 bg-blue-50 border border-blue-200 rounded-xl shadow-sm max-w-md">
-            <img
-              src="https://cdn.razorpay.com/logo.svg"
-              alt="Razorpay"
-              className="h-8 w-8 object-contain mt-1"
-            />
-            <div>
-              <h3 className="text-sm font-semibold text-blue-800">
-                Secure & Transparent
-              </h3>
-              <p className="text-xs text-blue-700 mt-1">
-                Payments are secured via Razorpay. We maintain full transparency
-                in how your funds are used.
-              </p>
-            </div>
-          </div>
         </div>
       </section>
       <section className="max-w-xl mx-auto mt-12 mb-12 bg-green-50 p-6 rounded-2xl shadow-sm">
