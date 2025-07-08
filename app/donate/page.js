@@ -99,10 +99,10 @@ export default function DonatePage() {
     script.onload = () => {
       const selectedProject = projects.find((p) => p._id === selectedProjectId);
       const options = {
-        key: "rzp_test_YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay Key ID
+        key: "rzp_live_lfzYuYY8Jv6NQG", // Replace with your Razorpay Key ID
         amount: customAmount * 100, // Amount in paise
         currency: "INR",
-        name: "Your Organization Name",
+        name: "Wahid Foundation",
         description: `Donation for ${selectedProject?.title || "General Fund"}`,
         image: "https://cdn.razorpay.com/logo.svg", // Optional: Your logo
         handler: function (response) {
@@ -110,7 +110,7 @@ export default function DonatePage() {
             `Payment successful! Payment ID: ${response.razorpay_payment_id}`
           );
           // Optionally, send payment details to your backend
-          fetch("/api/save-donation", {
+          fetch("https://wahidfoundationadmin.vercel.app/api/save-donation", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
