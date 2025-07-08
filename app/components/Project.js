@@ -64,14 +64,14 @@ const ProjectCardsSection = ({
   // Strict filtering logic
   const filteredProjects = projects.filter((project) => {
     // Exclude projects with status 'Draft'
-    if (project.status === "Draft") return false;
+    if (!project.status || project.status === "Draft") return false;
 
     // Search filter
     const matchesSearch =
       !searchTerm ||
-      project.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.location?.toLowerCase().includes(searchTerm.toLowerCase());
+      (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ?? false) ||
+      (project.description?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ?? false) ||
+      (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ?? false);
 
     // Category filter
     const matchesCategory =
@@ -87,7 +87,6 @@ const ProjectCardsSection = ({
       } else if (donationTypeFilter === "sadqa") {
         matchesDonationType = !!project.sadqa_eligible;
       } else if (donationTypeFilter === "general") {
-        // Not zakat, not interest, not sadqa
         matchesDonationType =
           !project.zakat_eligible &&
           !project.interest_earnings_eligible &&
@@ -111,17 +110,17 @@ const ProjectCardsSection = ({
             >
               <div className="h-48 relative lg:h-56">
                 <img
-                  src={project.mainImage}
-                  alt={project.title}
+                  src={project.mainImage || "/globe.svg"}
+                  alt={project.title || "Project"}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getCategoryColor(project.category)}`}>
-                    {project.category}
+                    {project.category || "Uncategorized"}
                   </span>
                   <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(project.status)}`}>
-                    {project.status}
+                    {project.status || "Unknown"}
                   </span>
                   {project.zakat_eligible && (
                     <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800">
@@ -142,17 +141,17 @@ const ProjectCardsSection = ({
                 <div className="absolute bottom-4 left-4 text-white">
                   <div className="flex items-center space-x-1 text-sm">
                     <MapPin className="h-4 w-4" />
-                    <span>{project.location}</span>
+                    <span>{project.location || "N/A"}</span>
                   </div>
                 </div>
               </div>
 
               <div className="p-6">
                 <h3 className="text-xl text-emerald-800 font-semibold">
-                  {project.title}
+                  {project.title || "Untitled Project"}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1.5">
-                  {project.description?.slice(0, 120)}...
+                  {(project.description?.slice?.(0, 120) ?? "No description available") + "..."}
                 </p>
               </div>
 
@@ -160,7 +159,7 @@ const ProjectCardsSection = ({
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Progress</span>
-                    <span className="font-semibold">{project.completion || 0}%</span>
+                    <span className="font-semibold">{project.completion ?? 0}%</span>
                   </div>
                   <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
                     <div
@@ -170,10 +169,10 @@ const ProjectCardsSection = ({
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-emerald-600 font-semibold">
-                      {formatCurrency(project.collected || 0)}
+                      {formatCurrency(project.collected ?? 0)}
                     </span>
                     <span className="text-gray-600">
-                      of {formatCurrency(project.totalRequired || 0)}
+                      of {formatCurrency(project.totalRequired ?? 0)}
                     </span>
                   </div>
                 </div>
@@ -181,14 +180,14 @@ const ProjectCardsSection = ({
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="flex items-center space-x-1">
                     <Users className="h-4 w-4 text-emerald-600" />
-                    <span>{project.beneficiaries || 0} beneficiaries</span>
+                    <span>{project.beneficiaries ?? 0} beneficiaries</span>
                   </div>
                   <div className="flex items-center space-x-1">
                     <Calendar className="h-4 w-4 text-amber-600" />
                     <span>
                       {project.status === "Completed"
                         ? "Completed"
-                        : `${project.daysLeft || 0} days left`}
+                        : `${project.daysLeft ?? 0} days left`}
                     </span>
                   </div>
                 </div>
