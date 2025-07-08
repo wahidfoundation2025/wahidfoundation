@@ -63,6 +63,9 @@ const ProjectCardsSection = ({
 
   // Strict filtering logic
   const filteredProjects = projects.filter((project) => {
+    // Exclude projects with status 'Draft'
+    if (project.status === "Draft") return false;
+
     // Search filter
     const matchesSearch =
       !searchTerm ||
