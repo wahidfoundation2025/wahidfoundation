@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { MapPin, Mail, Phone, ImageIcon } from "lucide-react";
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -21,6 +21,7 @@ export default function ProjectDetailsPage() {
         );
         const data = await res.json();
         setProject(data);
+
         console.log("Fetched project:", data);
       } catch (error) {
         console.error("Error fetching project:", error);
@@ -31,26 +32,26 @@ export default function ProjectDetailsPage() {
   }, [projectId]);
   if (!project) {
     return (
-     <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-600">
-      <p className="text-lg font-medium mb-6">Loading project details...</p>
-      <div className="flex space-x-2">
-        {[0, 1, 2].map((i) => (
-          <motion.div
-            key={i}
-            className="w-3 h-3 rounded-full bg-emerald-500"
-            animate={{
-              y: [0, -10, 0],
-              opacity: [1, 0.5, 1],
-            }}
-            transition={{
-              duration: 0.6,
-              repeat: Infinity,
-              delay: i * 0.2,
-            }}
-          />
-        ))}
+      <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-600">
+        <p className="text-lg font-medium mb-6">Loading project details...</p>
+        <div className="flex space-x-2">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-3 h-3 rounded-full bg-emerald-500"
+              animate={{
+                y: [0, -10, 0],
+                opacity: [1, 0.5, 1],
+              }}
+              transition={{
+                duration: 0.6,
+                repeat: Infinity,
+                delay: i * 0.2,
+              }}
+            />
+          ))}
+        </div>
       </div>
-    </div>
     );
   }
 
@@ -163,9 +164,14 @@ export default function ProjectDetailsPage() {
         </div>
         <button
           onClick={() => handleDonateClick(projectId)}
-          className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-md font-semibold transition"
+          disabled={project.status === "Completed"}
+          className={`w-full py-2 rounded-md font-semibold transition ${
+            project.status === "complete"
+              ? "bg-gray-400 cursor-not-allowed text-white"
+              : "bg-emerald-600 hover:bg-emerald-700 text-white"
+          }`}
         >
-          Donate
+          {project.status === "Completed" ? "Donation Closed" : "Donate"}
         </button>
       </section>
 
@@ -227,23 +233,24 @@ export default function ProjectDetailsPage() {
           </div>
         </section>
       )}
-     {project.youtubeIframe && (
-  <section className="w-full px-0 my-8">
-    <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-      Project Video
-    </h2>
-    <div className="w-full h-[500px]">
-      <iframe
-        src={`https://www.youtube.com/embed/${project.youtubeIframe.split("youtu.be/")[1].split("?")[0]}`}
-        title="Project Video"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-        className="w-full h-full rounded-xl shadow-lg"
-      ></iframe>
-    </div>
-  </section>
-)}
-
+      {project.youtubeIframe && (
+        <section className="w-full px-0 my-8">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
+            Project Video
+          </h2>
+          <div className="w-full h-[500px]">
+            <iframe
+              src={`https://www.youtube.com/embed/${
+                project.youtubeIframe.split("youtu.be/")[1].split("?")[0]
+              }`}
+              title="Project Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full rounded-xl shadow-lg"
+            ></iframe>
+          </div>
+        </section>
+      )}
     </main>
   );
 }

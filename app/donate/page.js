@@ -57,7 +57,7 @@ export default function DonatePage() {
     async function fetchProjects() {
       try {
         const res = await fetch(
-          `https://wahidfoundationadmin.vercel.app/api/projects`
+          `https://wahidfoundationadmin.vercel.app/api/projects?status=Active` // Fetch only active projects
         );
         const data = await res.json();
         console.log("Fetched projects data:", data);

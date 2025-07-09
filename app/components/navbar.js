@@ -14,6 +14,7 @@ export default function Headers() {
     { href: "/projects", label: "Projects" },
     { href: "/impact", label: "Our Impact" },
     { href: "/about", label: "About" },
+    { href: "/donate", label: "Donate" },
     { href: "/volunteer", label: "Volunteer" },
     { href: "/terms", label: "Terms & Conditions" },
     { href: "/policy", label: "Policy" },
@@ -21,12 +22,11 @@ export default function Headers() {
 
   return (
     <header className="bg-white border-b border-emerald-100 shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-2 py-4 flex items-center justify-between">
         {/* Left: Logo + Nav */}
-        <div className="flex items-center space-x-8">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <Heart className="h-6 w-6 text-emerald-600" />
+        <div className="flex items-center space-x-6">
+          <img src={"/logo.png"} alt="Wahid Foundation Logo" className="h-10 w-auto" />
+          <Link href="/" className="flex items-center space-x-1">
             <span className="text-xl font-bold text-emerald-800">Wahid</span>
           </Link>
 
