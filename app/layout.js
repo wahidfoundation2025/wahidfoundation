@@ -10,7 +10,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata = {
-  title: "Whaid Foundation",
+  title: "Wahid Foundation",
   description: "One People. One Purpose. One Strong Future",
 };
 
