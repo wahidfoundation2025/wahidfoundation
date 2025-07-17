@@ -65,45 +65,47 @@ const ProjectCardsSection = ({
   };
 
   // Strict filtering logic
-  const filteredProjects = projects.filter((project) => {
-    // Exclude projects with status 'Draft'
-    if (!project.status || project.status === "Draft") return false;
+ const filteredProjects = projects.filter((project) => {
+  // Exclude projects with status 'Draft'
+  if (!project.status || project.status === "Draft") return false;
 
-    // Search filter
-    const matchesSearch =
-      !searchTerm ||
-      (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
-        false) ||
-      (project.description
-        ?.toLowerCase?.()
-        .includes(searchTerm.toLowerCase?.()) ??
-        false) ||
-      (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
-        false);
+  // Search filter
+  const matchesSearch =
+    !searchTerm ||
+    (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
+      false) ||
+    (project.description
+      ?.toLowerCase?.()
+      .includes(searchTerm.toLowerCase?.()) ??
+      false) ||
+    (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
+      false);
 
-    // Category filter
-    const matchesCategory =
-      categoryFilter === "all" || project.category === categoryFilter;
+  // ✅ Category filter (updated to handle array)
+  const matchesCategory =
+    categoryFilter === "all" ||
+    (Array.isArray(project.category) &&
+      project.category.includes(categoryFilter));
 
-    // Donation type filter
-    let matchesDonationType = true;
-    if (donationTypeFilter !== "all") {
-      if (donationTypeFilter === "zakat") {
-        matchesDonationType = !!project.zakat_eligible;
-      } else if (donationTypeFilter === "interest_earnings") {
-        matchesDonationType = !!project.interest_earnings_eligible;
-      } else if (donationTypeFilter === "sadqa") {
-        matchesDonationType = !!project.sadqa_eligible;
-      } else if (donationTypeFilter === "general") {
-        matchesDonationType =
-          !project.zakat_eligible &&
-          !project.interest_earnings_eligible &&
-          !project.sadqa_eligible;
-      }
+  // Donation type filter
+  let matchesDonationType = true;
+  if (donationTypeFilter !== "all") {
+    if (donationTypeFilter === "zakat") {
+      matchesDonationType = !!project.zakat_eligible;
+    } else if (donationTypeFilter === "interest_earnings") {
+      matchesDonationType = !!project.interest_earnings_eligible;
+    } else if (donationTypeFilter === "sadqa") {
+      matchesDonationType = !!project.sadqa_eligible;
+    } else if (donationTypeFilter === "general") {
+      matchesDonationType =
+        !project.zakat_eligible &&
+        !project.interest_earnings_eligible &&
+        !project.sadqa_eligible;
     }
+  }
 
-    return matchesSearch && matchesCategory && matchesDonationType;
-  });
+  return matchesSearch && matchesCategory && matchesDonationType;
+});
 
   return (
     <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 text-gray-900">
@@ -126,13 +128,22 @@ const ProjectCardsSection = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getCategoryColor(
-                      project.category
-                    )}`}
-                  >
-                    {project.category || "Uncategorized"}
-                  </span>
+                  {project.category && project.category.length > 0 ? (
+                    project.category.map((cat, index) => (
+                      <span
+                        key={index}
+                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getCategoryColor(
+                          cat
+                        )}`}
+                      >
+                        {cat}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gray-200 text-gray-700">
+                      Uncategorized
+                    </span>
+                  )}
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(
                       project.status
