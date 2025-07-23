@@ -9,6 +9,10 @@ import {
   Info,
   TrendingUp,
 } from "lucide-react";
+import { FaFacebook } from "react-icons/fa";
+import { LuInstagram } from "react-icons/lu";
+import { IoLogoLinkedin } from "react-icons/io5";
+import { RiTwitterXFill } from "react-icons/ri";
 
 const navItems = [
   { path: "/", icon: Home, label: "Home" },
@@ -29,32 +33,51 @@ export default function FooterNav() {
   return (
     <>
       <nav className="bg-emerald-800 hidden w-full border-t border-gray-200 shadow-lg z-50 md:block">
-        <div className="flex flex-row items-start gap-20 py-14 px-40">
-          <div className="flex flex-row gap-2">
-            <img src={"/logo.png"} alt="Wahid Foundation Logo" className="h-10 w-auto" />
-            <Link href="/" className="flex items-center space-x-1">
-              <span className="text-xl font-bold text-white">Wahid</span>
-            </Link>
+        <div className="flex flex-row justify-between items-start py-14 px-40">
+          <div className="flex flex-row items-start gap-20">
+            <div className="flex flex-row gap-2">
+              <img src={"/logo.png"} alt="Wahid Foundation Logo" className="h-10 w-auto" />
+              <Link href="/" className="flex items-center space-x-1">
+                <span className="text-xl font-bold text-white">Wahid</span>
+              </Link>
+            </div>
+
+            <div className="flex flex-col gap-2 items-start">
+              <h1 className="text-lg font-semibold mb-2">Quick Links</h1>
+              {navItems.map((item) => (
+                <Link
+                  href={item.path}
+                  key={item.path}>
+                  <button className="cursor-pointer hover:underline">{item.label}</button>
+                </Link>
+              ))}
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <h1 className="text-lg font-semibold mb-2">Terms</h1>
+              {Others.map((item) => (
+                <Link
+                  href={item.path}
+                  key={item.path}>
+                  <button className="cursor-pointer hover:underline">{item.label}</button>
+                </Link>
+              ))}
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2 items-start">
-            {navItems.map((item) => (
-              <Link
-                href={item.path}
-                key={item.path}>
-                <button className="cursor-pointer hover:underline">{item.label}</button>
-              </Link>
-            ))}
-          </div>
-
-          <div className="flex flex-col gap-2">
-            {Others.map((item) => (
-              <Link
-                href={item.path}
-                key={item.path}>
-                <button className="cursor-pointer hover:underline">{item.label}</button>
-              </Link>
-            ))}
+          <div className="flex flex-row gap-6 items-center">
+            <button className="text-2xl cursor-pointer">
+              <FaFacebook />
+            </button>
+            <button className="text-2xl cursor-pointer">
+              <LuInstagram />
+            </button>
+            <button className="text-2xl cursor-pointer">
+              <IoLogoLinkedin />
+            </button>
+            <button className="text-2xl cursor-pointer">
+              <RiTwitterXFill />
+            </button>
           </div>
         </div>
 
