@@ -172,7 +172,7 @@ const ProjectCardsSection = ({
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl text-emerald-800 font-semibold">
+                <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
                   {project.title || "Untitled Project"}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1.5 min-h-[60px]">
