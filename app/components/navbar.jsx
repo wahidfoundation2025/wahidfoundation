@@ -16,22 +16,22 @@ export default function Headers() {
     { href: "/about", label: "About" },
     { href: "/donate", label: "Donate" },
     { href: "/volunteer", label: "Volunteer" },
-    { href: "/terms", label: "Terms & Conditions" },
-    { href: "/policy", label: "Policy" },
   ];
 
   return (
     <header className="bg-white border-b border-emerald-100 shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-2 py-4 flex items-center justify-between">
+      <div className="container mx-auto px-8 py-4 flex items-center justify-between">
         {/* Left: Logo + Nav */}
         <div className="flex items-center space-x-6">
-          <img src={"/logo.png"} alt="Wahid Foundation Logo" className="h-10 w-auto" />
-          <Link href="/" className="flex items-center space-x-1">
-            <span className="text-xl font-bold text-emerald-800">Wahid</span>
-          </Link>
+          <div className="flex flex-row gap-2 items-center">
+            <img src={"/logo.png"} alt="Wahid Foundation Logo" className="h-10 w-auto" />
+            <Link href="/" className="flex items-center space-x-1">
+              <span className="text-xl font-bold text-emerald-800">Wahid</span>
+            </Link>
+          </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center space-x-6">
+          <nav className="hidden xl:flex items-center space-x-6">
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -45,17 +45,17 @@ export default function Headers() {
         </div>
 
         {/* Right: Auth Actions */}
-        <div className="hidden md:flex items-center space-x-4">
+        <div className="hidden xl:flex items-center space-x-4">
           <SignedOut>
             <Link
               href="/login"
-              className="px-4 py-2 border border-emerald-200 rounded hover:bg-emerald-50 text-emerald-700"
+              className="px-6 py-2 border border-emerald-700 rounded-lg hover:bg-emerald-50 text-emerald-700"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="px-4 py-2 rounded bg-emerald-600 text-white hover:bg-emerald-700"
+              className="px-6 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
             >
               Sign Up
             </Link>
@@ -74,7 +74,7 @@ export default function Headers() {
         {/* Mobile Menu Toggle */}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="md:hidden text-gray-700"
+          className="xl:hidden text-gray-700"
         >
           <Menu className="h-6 w-6" />
         </button>
@@ -82,7 +82,7 @@ export default function Headers() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="md:hidden px-4 pb-4">
+        <div className="xl:hidden px-4 pb-4">
           <nav className="flex flex-col space-y-3">
             {navItems.map((item) => (
               <Link
@@ -99,7 +99,7 @@ export default function Headers() {
               <SignedOut>
                 <Link
                   href="/login"
-                  className="block text-center border border-emerald-200 rounded px-4 py-2 text-emerald-700 hover:bg-emerald-50"
+                  className="block text-center border border-emerald-300 rounded px-4 py-2 text-emerald-700 hover:bg-emerald-50"
                   onClick={() => setIsOpen(false)}
                 >
                   Login

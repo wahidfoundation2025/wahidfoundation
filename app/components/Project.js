@@ -116,7 +116,7 @@ const ProjectCardsSection = ({
           {filteredProjects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-105 lg:transition-all lg:duration-300"
+              className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-102 lg:transition-all lg:duration-300"
             >
               <div className="h-48 relative lg:h-56">
                 <img
@@ -175,7 +175,7 @@ const ProjectCardsSection = ({
                 <h3 className="text-xl text-emerald-800 font-semibold">
                   {project.title || "Untitled Project"}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1.5">
+                <p className="text-sm text-gray-600 mt-1.5 min-h-[60px]">
                   {(project.description?.slice?.(0, 120) ??
                     "No description available") + "..."}
                 </p>
