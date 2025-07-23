@@ -4,6 +4,7 @@ import HeroSection from "./components/HeroSection";
 import ImpactStats from "./components/ImpactSection";
 import ProjectCardsSection from "./components/Project";
 import Link from "next/link";
+import FooterNav from "./components/FooterNav";
 
 export default function Home() {
   const [quote, setQuote] = useState(null);
@@ -26,10 +27,12 @@ export default function Home() {
   return (
     <div className="flex flex-col bg-white">
       <HeroSection />
+
       <div className="border-t border-gray-100">
         <ImpactStats />
       </div>
-      <section className="py-10 px-5 lg:py-16 lg:px-8 bg-gradient-to-br from-amber-50 to-amber-100 text-center border-y border-amber-100">
+
+      <section className="py-10 px-5 lg:py-40 lg:px-8 bg-gradient-to-br from-amber-50 to-amber-100 text-center border-y border-amber-100">
         <div className="max-w-sm mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
           <div className="w-16 h-1 bg-amber-300 rounded-full mx-auto lg:w-24"></div>
           <p className="italic text-amber-900 font-medium text-base leading-relaxed lg:text-xl lg:leading-relaxed">
@@ -47,7 +50,7 @@ export default function Home() {
         <ProjectCardsSection />
       </div>
 
-      <section className="py-12 px-5 lg:py-20 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
+      <section className="py-12 px-5 lg:py-40 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
         <div className="max-w-md mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
           <h2 className="text-2xl font-bold text-emerald-800 lg:text-3xl">
             Ready to Make a Difference?

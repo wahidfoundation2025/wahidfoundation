@@ -58,7 +58,7 @@ const HeroSection = () => {
     <section className="relative bg-white">
       <div className="relative">
         {/* Top CTA */}
-        <div className="bg-emerald-600 text-white px-5 pt-8 pb-10 lg:py-16">
+        <div className="bg-emerald-600 text-white px-5 pt-8 pb-10 lg:py-40">
           <div className="max-w-md mx-auto lg:max-w-4xl space-y-6 lg:space-y-8">
             <h1 className="text-3xl font-bold leading-tight tracking-tight text-center lg:text-5xl lg:leading-tight">
               {hero.title}
@@ -79,9 +79,9 @@ const HeroSection = () => {
         </div>
 
         {/* Stats */}
-        <div className="px-5 py-8 bg-white lg:px-8 lg:py-12">
-          <div className="max-w-md mx-auto lg:max-w-4xl space-y-8 lg:space-y-12">
-            <div className="grid grid-cols-3 gap-4 lg:gap-8 lg:max-w-2xl lg:mx-auto">
+        <div className="px-5 py-8 bg-white lg:px-8 lg:py-32">
+          <div className="mx-auto space-y-8 lg:space-y-12 lg:px-36">
+            <div className="grid grid-cols-3 gap-4 lg:gap-8 lg:mx-auto">
               {Object.values(hero.stats).map((stat, i) => (
                 <div
                   className={`text-center${
@@ -109,7 +109,7 @@ const HeroSection = () => {
                 return (
                   <div
                     key={idx}
-                    className={`rounded-lg shadow-sm hover:shadow-md transition duration-200 active:scale-[0.98] p-5 flex items-center gap-5 lg:flex-col lg:text-center lg:gap-4`}
+                    className={`rounded-2xl shadow-sm hover:shadow-md transition duration-200 active:scale-[0.98] p-8 flex items-center gap-5 lg:flex-col lg:text-center lg:gap-4`}
                     style={{ backgroundColor: bg }}
                   >
                     <div

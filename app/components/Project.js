@@ -108,7 +108,7 @@ const ProjectCardsSection = ({
 });
 
   return (
-    <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-12 text-gray-900">
+    <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-40 text-gray-900">
       {filteredProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.
@@ -118,7 +118,7 @@ const ProjectCardsSection = ({
           {filteredProjects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-105 lg:transition-all lg:duration-300"
+              className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-102 lg:transition-all lg:duration-300"
             >
               <div className="h-48 relative lg:h-56">
                 <img
@@ -183,10 +183,10 @@ const ProjectCardsSection = ({
               </div>
 
               <div className="p-6">
-                <h3 className="text-xl text-emerald-800 font-semibold">
+                <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
                   {project.title || "Untitled Project"}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1.5">
+                <p className="text-sm text-gray-600 mt-1.5 min-h-[60px]">
                   {(project.description?.slice?.(0, 120) ??
                     "No description available") + "..."}
                 </p>
