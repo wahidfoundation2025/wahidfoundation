@@ -29,7 +29,14 @@ export default function FooterNav() {
   return (
     <>
       <nav className="bg-emerald-800 hidden w-full border-t border-gray-200 shadow-lg z-50 md:block">
-        <div className="flex flex-row items-start gap-20 py-14 px-56">
+        <div className="flex flex-row items-start gap-20 py-14 px-40">
+          <div className="flex flex-row gap-2">
+            <img src={"/logo.png"} alt="Wahid Foundation Logo" className="h-10 w-auto" />
+            <Link href="/" className="flex items-center space-x-1">
+              <span className="text-xl font-bold text-white">Wahid</span>
+            </Link>
+          </div>
+
           <div className="flex flex-col gap-2 items-start">
             {navItems.map((item) => (
               <Link
