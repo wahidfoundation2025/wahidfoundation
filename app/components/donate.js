@@ -91,7 +91,7 @@ export default function DonatePage() {
         handler: function (response) {
           alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
           // Optionally, send payment details to your backend
-          fetch("/api/save-donation", {
+          fetch("https://wahidfoundationadmin.vercel.app/api/save-donation", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ProjectCardsSection from '../components/Project';
 import { Filter, Search } from 'lucide-react';
 
@@ -8,11 +8,33 @@ const Projects = () => {
   const [searchInput, setSearchInput] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [donationTypeFilter, setDonationTypeFilter] = useState('all');
+  const [categories, setCategories] = useState([]); // from API
 
-  const categories = ['all', 'Education', 'Women Empowerment', 'Healthcare', 'Rural Empowerment', 'Economic Empowerment'];
   const donationTypes = ['all', 'general', 'zakat', 'sadqa', 'interest_earnings'];
 
-  // Handle Clear Filters
+  // Fetch categories from API
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch('https://wahidfoundationadmin.vercel.app/api/categories');
+        const data = await res.json();
+
+        // API gives array of objects: [{ _id, name, description, ... }, ...]
+        if (Array.isArray(data)) {
+          setCategories(data);
+        } else if (Array.isArray(data.categories)) {
+          // in case it's wrapped
+          setCategories(data.categories);
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories', error);
+      }
+    }
+
+    fetchCategories();
+  }, []);
+
+  // Clear filters
   const handleClearFilters = () => {
     setSearchInput('');
     setCategoryFilter('all');
@@ -25,7 +47,8 @@ const Projects = () => {
       <section className="text-center px-4 py-16">
         <h1 className="text-4xl md:text-5xl font-bold text-emerald-800">Our Projects</h1>
         <p className="text-lg text-gray-600 max-w-2xl mx-auto mt-4">
-          Discover the initiatives we're working on across India. Every project is carefully planned and transparently managed to maximize impact for the communities we serve.
+          Discover the initiatives we're working on across India. Every project is carefully
+          planned and transparently managed to maximize impact for the communities we serve.
         </p>
         <div className="h-1 w-12 bg-amber-500 mt-6 mx-auto" />
       </section>
@@ -53,9 +76,10 @@ const Projects = () => {
               onChange={(e) => setCategoryFilter(e.target.value)}
               className="py-2 px-3 rounded-md border border-gray-300"
             >
+              <option value="all">All Categories</option>
               {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
+                <option key={cat._id} value={cat.name}>
+                  {cat.name}
                 </option>
               ))}
             </select>
