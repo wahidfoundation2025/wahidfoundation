@@ -80,7 +80,7 @@ const HeroSection = () => {
 
         {/* Stats */}
         <div className="px-5 py-8 bg-white lg:px-8 lg:py-32">
-          <div className="mx-auto space-y-8 lg:space-y-12 px-36">
+          <div className="mx-auto space-y-8 lg:space-y-12 lg:px-36">
             <div className="grid grid-cols-3 gap-4 lg:gap-8 lg:mx-auto">
               {Object.values(hero.stats).map((stat, i) => (
                 <div

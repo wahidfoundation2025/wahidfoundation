@@ -45,7 +45,7 @@ export default function ImpactStats() {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 px-36 mx-auto">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-4 lg:px-36 mx-auto">
         {impact.stats?.map((stat, index) => {
           const Icon = ICONS[stat.icon] || Users;
           return (
