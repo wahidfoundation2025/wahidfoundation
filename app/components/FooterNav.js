@@ -80,12 +80,7 @@ export default function FooterNav() {
               <Link href="/volunteer" className="text-white hover:underline">
                 Do you want to join?
               </Link>
-              <Link
-                href="/volunteer#faq"
-                className="text-white hover:underline"
-              >
-                FAQ
-              </Link>
+
             </div>
           </div>
 
