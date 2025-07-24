@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, Heart } from "lucide-react";
-import { SignedIn, SignedOut, UserButton, useUser } from "@clerk/nextjs";
+import { Menu } from "lucide-react";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 
 export default function Headers() {
   const [isOpen, setIsOpen] = useState(false);
@@ -63,10 +63,15 @@ export default function Headers() {
 
           <SignedIn>
             <div className="flex items-center space-x-2">
-              <UserButton afterSignOutUrl="/" />
-              <span className="text-sm text-gray-700">
-                {user?.firstName}
-              </span>
+              {/* ✅ Wrapped profile in a Link */}
+              <Link href="/profile" className="flex items-center space-x-2">
+                <img
+                  src={user?.imageUrl}
+                  alt="Profile"
+                  className="h-10 w-10 rounded-full border hover:ring-2 hover:ring-emerald-400"
+                />
+                <span className="text-sm text-gray-700">{user?.firstName}</span>
+              </Link>
             </div>
           </SignedIn>
         </div>
@@ -114,12 +119,19 @@ export default function Headers() {
               </SignedOut>
 
               <SignedIn>
-                <div className="flex items-center space-x-2 justify-center">
-                  <UserButton afterSignOutUrl="/" />
-                  <span className="text-sm text-gray-700">
-                    {user?.firstName}
-                  </span>
-                </div>
+                {/* ✅ Wrapped profile in a Link for mobile too */}
+                <Link
+                  href="/profile"
+                  className="flex items-center space-x-2 justify-center"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <img
+                    src={user?.imageUrl}
+                    alt="Profile"
+                    className="h-10 w-10 rounded-full border hover:ring-2 hover:ring-emerald-400"
+                  />
+                  <span className="text-sm text-gray-700">{user?.firstName}</span>
+                </Link>
               </SignedIn>
             </div>
           </nav>
