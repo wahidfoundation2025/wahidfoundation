@@ -19,7 +19,7 @@ export default function ProfilePage() {
     async function fetchData() {
       setLoading(true);
       try {
-        const donorsRes = await fetch("https://wahidfoundationadmin.vercel.app/api/donors");
+        const donorsRes = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/donors");
         const donorsList = await donorsRes.json();
         const myDonor = donorsList.find(
           (d) => d.email === user.primaryEmailAddress.emailAddress
@@ -31,7 +31,7 @@ export default function ProfilePage() {
         }
         setDonorData(myDonor);
 
-        const projectsRes = await fetch("https://wahidfoundationadmin.vercel.app/api/projects");
+        const projectsRes = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/projects");
         const projectsJson = await projectsRes.json();
         const allProjects = projectsJson.projects || projectsJson;
 

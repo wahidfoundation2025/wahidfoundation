@@ -1,6 +1,6 @@
 export default async function BlogDetail({ params }) {
   const res = await fetch(
-    `https://wahidfoundationadmin.vercel.app/api/blogs/${params.id}`,
+    `https://wahidfoundationadmin-seven.vercel.app/api/blogs/${params.id}`,
     { cache: "no-store" }
   );
 

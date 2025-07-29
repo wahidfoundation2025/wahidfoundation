@@ -19,7 +19,7 @@ const ProjectCardsSection = ({
     async function fetchProjects() {
       try {
         const res = await fetch(
-          "https://wahidfoundationadmin.vercel.app/api/projects"
+          "https://wahidfoundationadmin-seven.vercel.app/api/projects"
         );
         const data = await res.json();
         console.log("Fetched projects:", data.projects);

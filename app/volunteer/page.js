@@ -26,7 +26,7 @@ const Volunteer = () => {
   const [oppLoading, setOppLoading] = useState(true);
 
   useEffect(() => {
-    fetch("https://wahidfoundationadmin.vercel.app/api/volunteer-positions")
+    fetch("https://wahidfoundationadmin-seven.vercel.app/api/volunteer-positions")
       .then(res => res.json())
       .then(data => {
         setOpportunities(data);
@@ -44,7 +44,7 @@ const Volunteer = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await fetch("https://wahidfoundationadmin.vercel.app/api/volunteer", {
+      const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/volunteer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData)

@@ -11,7 +11,7 @@ export default function BlogsPage() {
     async function fetchBlogs() {
       try {
         const res = await fetch(
-          "https://wahidfoundationadmin.vercel.app/api/blogs"
+          "https://wahidfoundationadmin-seven.vercel.app/api/blogs"
         ); // 👈 adjust to your endpoint if needed
         const data = await res.json();
         setBlogs(data);

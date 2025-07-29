@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
     async function fetchQuote() {
       try {
-        const res = await fetch("https://wahidfoundationadmin.vercel.app/api/homequotesection");
+        const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/homequotesection");
 
         const data = await res.json();
         console.log(data);
