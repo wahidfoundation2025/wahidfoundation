@@ -36,7 +36,7 @@ const HeroSection = () => {
   useEffect(() => {
     async function fetchHero() {
       try {
-        const res = await fetch("https://wahidfoundationadmin.vercel.app/api/homeherosection");
+        const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/homeherosection");
         const data = await res.json();
         setHero(data);
       } catch (e) {

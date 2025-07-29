@@ -17,7 +17,7 @@ export default function ProjectDetailsPage() {
     async function fetchProject() {
       try {
         const res = await fetch(
-          `https://wahidfoundationadmin.vercel.app/api/projects/${projectId}`
+          `https://wahidfoundationadmin-seven.vercel.app/api/projects/${projectId}`
         );
         const data = await res.json();
         setProject(data);
