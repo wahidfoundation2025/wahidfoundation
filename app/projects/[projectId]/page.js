@@ -128,8 +128,8 @@ export default function ProjectDetailsPage() {
         <div className="flex justify-between items-center mb-2">
           <p className="text-sm text-gray-600 font-bold">Total Required</p>
           <p className="text-sm font-semibold text-gray-900">
-            ₹{project.totalRequired.toLocaleString()}
-          </p>
+  ₹{project?.totalRequired ? project.totalRequired.toLocaleString() : "0"}
+</p>
         </div>
         <div className="w-full bg-blue-100 h-2 rounded-full overflow-hidden">
           <div
