@@ -10,6 +10,7 @@ const ProjectCardsSection = ({
   searchTerm = "",
   categoryFilter = "all",
   donationTypeFilter = "all",
+  maxCards, // ✅ Added prop
 }) => {
   const [projects, setProjects] = useState([]);
   const { isSignedIn } = useUser();
@@ -65,57 +66,61 @@ const ProjectCardsSection = ({
   };
 
   // Strict filtering logic
- const filteredProjects = projects.filter((project) => {
-  // Exclude projects with status 'Draft'
-  if (!project.status || project.status === "Draft") return false;
+  const filteredProjects = projects.filter((project) => {
+    if (!project.status || project.status === "Draft") return false;
 
-  // Search filter
-  const matchesSearch =
-    !searchTerm ||
-    (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
-      false) ||
-    (project.description
-      ?.toLowerCase?.()
-      .includes(searchTerm.toLowerCase?.()) ??
-      false) ||
-    (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
-      false);
+    const matchesSearch =
+      !searchTerm ||
+      (project.title?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
+        false) ||
+      (project.description
+        ?.toLowerCase?.()
+        .includes(searchTerm.toLowerCase?.()) ??
+        false) ||
+      (project.location
+        ?.toLowerCase?.()
+        .includes(searchTerm.toLowerCase?.()) ??
+        false);
 
-  // ✅ Category filter (updated to handle array)
-  const matchesCategory =
-    categoryFilter === "all" ||
-    (Array.isArray(project.category) &&
-      project.category.includes(categoryFilter));
+    const matchesCategory =
+      categoryFilter === "all" ||
+      (Array.isArray(project.category) &&
+        project.category.includes(categoryFilter));
 
-  // Donation type filter
-  let matchesDonationType = true;
-  if (donationTypeFilter !== "all") {
-    if (donationTypeFilter === "zakat") {
-      matchesDonationType = !!project.zakat_eligible;
-    } else if (donationTypeFilter === "interest_earnings") {
-      matchesDonationType = !!project.interest_earnings_eligible;
-    } else if (donationTypeFilter === "sadqa") {
-      matchesDonationType = !!project.sadqa_eligible;
-    } else if (donationTypeFilter === "general") {
-      matchesDonationType =
-        !project.zakat_eligible &&
-        !project.interest_earnings_eligible &&
-        !project.sadqa_eligible;
+    let matchesDonationType = true;
+    if (donationTypeFilter !== "all") {
+      if (donationTypeFilter === "zakat") {
+        matchesDonationType = !!project.zakat_eligible;
+      } else if (donationTypeFilter === "interest_earnings") {
+        matchesDonationType = !!project.interest_earnings_eligible;
+      } else if (donationTypeFilter === "sadqa") {
+        matchesDonationType = !!project.sadqa_eligible;
+      } else if (donationTypeFilter === "general") {
+        matchesDonationType =
+          !project.zakat_eligible &&
+          !project.interest_earnings_eligible &&
+          !project.sadqa_eligible;
+      }
     }
-  }
 
-  return matchesSearch && matchesCategory && matchesDonationType;
-});
+    return matchesSearch && matchesCategory && matchesDonationType;
+  });
+
+  // ✅ Limit cards if maxCards prop is provided
+  const displayedProjects =
+    typeof maxCards === "number"
+      ? filteredProjects.slice(0, maxCards)
+      : filteredProjects;
 
   return (
     <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-40 text-gray-900">
-      {filteredProjects.length === 0 ? (
+      {displayedProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.
         </div>
       ) : (
         <div className="grid lg:grid-cols-3 gap-8">
-          {filteredProjects.map((project) => (
+          {displayedProjects.map((project) => (
             <div
               key={project._id}
               className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-102 lg:transition-all lg:duration-300"

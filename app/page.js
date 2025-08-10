@@ -47,7 +47,7 @@ export default function Home() {
       </section>
 
       <div className="border-b border-gray-100">
-        <ProjectCardsSection />
+        <ProjectCardsSection maxCards={3} />
       </div>
 
       <section className="py-12 px-5 lg:py-40 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
