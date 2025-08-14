@@ -569,10 +569,6 @@ export default function DonatePage() {
               {requestCertificate ? "Requested" : "Not requested"}
             </span>
           </div>
-          <div className="flex justify-between items-center bg-white rounded-lg px-4 py-2">
-            <span className="text-gray-500">Yearly Contribution</span>
-            <span className="text-emerald-700 font-bold">₹{impact.Yearly}</span>
-          </div>
         </div>
         <button
           onClick={handlePayment}

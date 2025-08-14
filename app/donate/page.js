@@ -533,7 +533,7 @@ export default function DonatePage() {
 
         </div>
       </section>
-      <section className="max-w-xl mx-auto mt-12 mb-12 bg-green-50 p-6 rounded-2xl shadow-sm">
+      <section className="max-w-xl mx-auto mt-12  bg-green-50 p-6 rounded-2xl shadow-sm">
         <h2 className="text-center text-xl font-semibold text-green-800 mb-6">
           Donation Summary
         </h2>
@@ -565,10 +565,6 @@ export default function DonatePage() {
             <span className="font-medium">
               {requestCertificate ? "Requested" : "Not requested"}
             </span>
-          </div>
-          <div className="flex justify-between items-center bg-white rounded-lg px-4 py-2">
-            <span className="text-gray-500">Yearly Contribution</span>
-            <span className="text-emerald-700 font-bold">₹{impact.Yearly}</span>
           </div>
         </div>
         <button
