@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart, Users, Calendar, ArrowRight } from "lucide-react";
+import ProjectCardsSection from "./Project";
 
 const ICONS = {
   Calendar: Calendar,
@@ -132,14 +133,7 @@ const HeroSection = () => {
             </div>
 
             {/* Secondary CTA */}
-            <div className="pt-2 w-full flex justify-center">
-              <Link
-                href={hero.secondaryCTA?.link || "/projects"}
-                className="w-full max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
-              >
-                {hero.secondaryCTA?.text || "See Our Projects"}
-              </Link>
-            </div>
+           
           </div>
         </div>
       </div>
