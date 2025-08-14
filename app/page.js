@@ -4,6 +4,7 @@ import HeroSection from "./components/HeroSection";
 import ImpactStats from "./components/ImpactSection";
 import ProjectCardsSection from "./components/Project";
 import Link from "next/link";
+import  MobileDonationCategories  from "./components/donationtype";
 import FooterNav from "./components/FooterNav";
 
 export default function Home() {
@@ -27,6 +28,15 @@ export default function Home() {
   return (
     <div className="flex flex-col bg-white">
       <HeroSection />
+       <ProjectCardsSection maxCards={3} />
+        <div className="pt-2 py-4 w-full flex justify-center">
+              <Link
+                href= "/projects"
+                className="w-full max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
+              >
+                 See Our Projects
+              </Link>
+            </div>
 
       <div className="border-t border-gray-100">
         <ImpactStats />
@@ -47,7 +57,7 @@ export default function Home() {
       </section>
 
       <div className="border-b border-gray-100">
-        <ProjectCardsSection maxCards={3} />
+        <MobileDonationCategories />
       </div>
 
       <section className="py-12 px-5 lg:py-40 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">

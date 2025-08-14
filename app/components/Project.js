@@ -113,7 +113,7 @@ const ProjectCardsSection = ({
       : filteredProjects;
 
   return (
-    <section className="container mx-auto px-4 py-8 lg:px-8 lg:py-40 text-gray-900">
+    <section className="container mx-auto  px-4 py-4 lg:px-8 lg:py-1 text-gray-900">
       {displayedProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.

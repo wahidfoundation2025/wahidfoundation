@@ -6,6 +6,7 @@ import { useUser } from "@clerk/nextjs";
 import { useParams } from "next/navigation";
 import { MapPin, Mail, Phone, ImageIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { IoPerson } from "react-icons/io5";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -193,7 +194,12 @@ export default function ProjectDetailsPage() {
               Project Manager
             </h2>
             <div className="space-y-4 text-gray-700 text-sm text-center md:text-left">
+              <div className="flex items-center font-semibold">
+  <span className="mr-2"><IoPerson /></span>
+  {project.projectManager.name}
+</div>
               <p className="flex justify-center md:justify-start items-center space-x-2">
+               
                 <Mail className="w-4 h-4" />
                 <a
                   href={`mailto:${project.projectManager.email}`}
