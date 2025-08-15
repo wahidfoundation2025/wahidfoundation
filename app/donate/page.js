@@ -1,21 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import {
-  Heart,
-  Users,
-  Gift,
-  HandCoins,
-  CircleDollarSign,
-  Repeat,
-  FileBadge,
-  IndianRupee,
-} from "lucide-react";
+import { Heart, Users, Gift, HandCoins, CircleDollarSign, IndianRupee, FileBadge } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 
 export default function DonatePage() {
-
   const { user } = useUser();
   const [isRecurring, setIsRecurring] = useState(false);
   const [donationFrequency, setDonationFrequency] = useState("Monthly");
@@ -24,29 +13,25 @@ export default function DonatePage() {
   const [selectedProjectId, setSelectedProjectId] = useState("");
   const [customAmount, setCustomAmount] = useState(365);
   const [donationType, setDonationType] = useState(null);
+  const [showRecurringConfirm, setShowRecurringConfirm] = useState(false);
   const quickAmounts = [1000, 2500, 5000, 10000, 15000, 25000];
-  const impact = {
-    Daily: (
-      customAmount /
-      (donationFrequency === "Yearly"
-        ? 365
-        : donationFrequency === "Monthly"
-        ? 30
-        : 1)
-    ).toFixed(0),
-    Monthly:
-      donationFrequency === "Monthly"
-        ? customAmount
-        : donationFrequency === "Yearly"
-        ? (customAmount / 12).toFixed(0)
-        : (customAmount * 30).toFixed(0),
-    Yearly:
-      donationFrequency === "Yearly"
-        ? customAmount
-        : donationFrequency === "Monthly"
-        ? (customAmount * 12).toFixed(0)
-        : (customAmount * 365).toFixed(0),
-  };
+  const impact = isRecurring ? {
+    Monthly: donationFrequency === "Monthly"
+      ? customAmount
+      : donationFrequency === "Yearly"
+      ? (customAmount / 12).toFixed(0)
+      : (customAmount * 4).toFixed(0),
+    Weekly: donationFrequency === "Weekly"
+      ? customAmount
+      : donationFrequency === "Monthly"
+      ? (customAmount / 4).toFixed(0)
+      : (customAmount * 13).toFixed(0),
+    Yearly: donationFrequency === "Yearly"
+      ? customAmount
+      : donationFrequency === "Monthly"
+      ? (customAmount * 12).toFixed(0)
+      : (customAmount * 52).toFixed(0),
+  } : {};
   const [donationFor, setDonationFor] = useState("self");
   const [dedicatedTo, setDedicatedTo] = useState("");
   const [message, setMessage] = useState("");
@@ -57,13 +42,13 @@ export default function DonatePage() {
     async function fetchProjects() {
       try {
         const res = await fetch(
-          `https://wahidfoundationadmin-seven.vercel.app/api/projects?status=Active` // Fetch only active projects
+          `https://wahidfoundationadmin-seven.vercel.app/api/projects?status=Active`
         );
         const data = await res.json();
         console.log("Fetched projects data:", data);
         setProjects(data.projects || []);
         if (data.projects?.length > 0) {
-          setSelectedProjectId(data.projects[0]._id); // Default to first project
+          setSelectedProjectId(data.projects[0]._id);
         }
       } catch (error) {
         console.error("Failed to fetch projects:", error);
@@ -73,7 +58,6 @@ export default function DonatePage() {
     fetchProjects();
   }, []);
 
-  // Razorpay Payment Handler
   const handlePayment = () => {
     if (!customAmount || customAmount < 365) {
       alert("Please enter a valid donation amount (minimum ₹365).");
@@ -90,7 +74,15 @@ export default function DonatePage() {
       return;
     }
 
-    // Load Razorpay SDK
+    if (!isRecurring) {
+      setShowRecurringConfirm(true);
+      return;
+    }
+
+    proceedToPayment();
+  };
+
+  const proceedToPayment = () => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
     script.async = true;
@@ -99,17 +91,14 @@ export default function DonatePage() {
     script.onload = () => {
       const selectedProject = projects.find((p) => p._id === selectedProjectId);
       const options = {
-        key: "rzp_live_lfzYuYY8Jv6NQG", // Replace with your Razorpay Key ID
-        amount: customAmount * 100, // Amount in paise
+        key: "rzp_live_lfzYuYY8Jv6NQG",
+        amount: customAmount * 100,
         currency: "INR",
         name: "Wahid Foundation",
         description: `Donation for ${selectedProject?.title || "General Fund"}`,
-        image: "https://cdn.razorpay.com/logo.svg", // Optional: Your logo
+        image: "https://cdn.razorpay.com/logo.svg",
         handler: function (response) {
-          alert(
-            `Payment successful! Payment ID: ${response.razorpay_payment_id}`
-          );
-          // Optionally, send payment details to your backend
+          alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
           fetch("https://wahidfoundationadmin-seven.vercel.app/api/save-donation", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -145,7 +134,7 @@ export default function DonatePage() {
           requestCertificate,
         },
         theme: {
-          color: "#059669", // Emerald-600
+          color: "#059669",
         },
       };
 
@@ -193,8 +182,6 @@ export default function DonatePage() {
                 building a better tomorrow.
               </p>
             </div>
-
-            {/* Quick Stats */}
             <div className="grid grid-cols-3 gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 lg:max-w-2xl lg:mx-auto lg:p-8 lg:gap-8 lg:rounded-2xl">
               <div className="text-center">
                 <div className="text-2xl font-bold mb-1 lg:text-4xl lg:mb-2">
@@ -378,108 +365,50 @@ export default function DonatePage() {
           </div>
         </div>
       </section>
-      <section className="max-w-6xl mx-auto px-4 py-2">
-        <div className="flex flex-col lg:flex-row gap-6">
-          {/* Donation Frequency Card */}
-          <div className="flex-1 p-6 bg-white border rounded-xl shadow-sm space-y-4">
-            <div className="flex items-center space-x-3">
-              <Repeat className="h-6 w-6 text-emerald-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
-                Choose Donation Frequency
-              </h2>
-            </div>
-            <p className="text-sm text-gray-600">
-              Select whether you'd like to make a recurring or one-time donation
-            </p>
-            <label className="flex items-start space-x-3 mt-4 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 scale-125 accent-emerald-600"
-                checked={isRecurring}
-                onChange={() => setIsRecurring(!isRecurring)}
-              />
-              <div>
-                <p className="font-medium text-gray-900">
-                  Make this a recurring donation
-                </p>
-                <p className="text-sm text-gray-600">
-                  Set up automatic donations to provide consistent support
-                </p>
-              </div>
-            </label>
-            {isRecurring && (
-              <div className="mt-4 space-y-3">
-                <label className="block text-sm font-medium text-gray-700">
-                  Select frequency:
-                </label>
-                <div className="space-y-2">
-                  {["Daily", "Weekly", "Monthly"].map((freq) => (
-                    <label key={freq} className="flex items-center space-x-3">
-                      <input
-                        type="radio"
-                        name="frequency"
-                        value={freq}
-                        checked={donationFrequency === freq}
-                        onChange={() => setDonationFrequency(freq)}
-                        className="h-4 w-4 accent-emerald-600"
-                      />
-                      <span className="text-gray-800">{freq}</span>
-                    </label>
-                  ))}
-                </div>
-                <p className="text-sm text-gray-500">
-                  The minimum donation amount is ₹365 regardless of frequency.
-                </p>
-              </div>
-            )}
-          </div>
 
-          {/* Tax Exemption Certificate Card */}
-          <div className="flex-1 p-6 bg-white border rounded-xl shadow-sm space-y-4">
-            <div className="flex items-center space-x-3">
-              <FileBadge className="h-6 w-6 text-emerald-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
-                Tax Exemption Certificate
-              </h2>
-            </div>
-            <p className="text-sm text-gray-600">
-              Request a tax exemption certificate for your donation
-            </p>
-            <label className="flex items-start space-x-3 mt-4 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 scale-125 accent-emerald-600"
-                checked={requestCertificate}
-                onChange={() => setRequestCertificate(!requestCertificate)}
-              />
-              <div>
-                <p className="font-medium text-gray-900">
-                  Generate Tax Exemption Certificate
-                </p>
-                <p className="text-sm text-gray-600">
-                  Request an official tax exemption certificate for your
-                  donation that can be used for tax deductions
-                </p>
-              </div>
-            </label>
-          </div>
-        </div>
-      </section>
+      {/* Choose Amount */}
       <section className="max-w-6xl mx-auto px-4 py-12">
         <div className="flex flex-col lg:flex-row gap-6">
-          {/* Choose Amount */}
           <div className="flex-1 p-6 bg-white border rounded-xl shadow-sm space-y-4">
             <div className="flex items-center space-x-3">
               <IndianRupee className="h-6 w-6 text-emerald-600" />
               <h2 className="text-lg font-semibold text-gray-900">
-                Choose Your {isRecurring ? donationFrequency : "One-Time"}{" "}
-                Amount
+                Choose Your Amount
               </h2>
             </div>
             <p className="text-sm text-gray-600">
-              Select how much you'd like to donate{" "}
-              {isRecurring && `on a ${donationFrequency.toLowerCase()} basis`}.
+              Select how much you'd like to donate
+              {isRecurring && ` on a ${donationFrequency.toLowerCase()} basis`}.
             </p>
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-gray-700">
+                Donation Frequency
+              </label>
+              <div className="flex space-x-4">
+                {["One-Time", "Weekly", "Monthly", "Yearly"].map((freq) => (
+                  <label key={freq} className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      name="frequency"
+                      value={freq}
+                      checked={
+                        freq === "One-Time" ? !isRecurring : donationFrequency === freq
+                      }
+                      onChange={() => {
+                        if (freq === "One-Time") {
+                          setIsRecurring(false);
+                        } else {
+                          setIsRecurring(true);
+                          setDonationFrequency(freq);
+                        }
+                      }}
+                      className="h-4 w-4 accent-emerald-600"
+                    />
+                    <span className="text-gray-800">{freq}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-3 gap-3 text-black">
               {quickAmounts.map((amount) => (
                 <button
@@ -510,29 +439,49 @@ export default function DonatePage() {
                 Minimum donation: ₹365
               </p>
             </div>
-            <div className="mt-6 border-t pt-4">
-              <h3 className="font-semibold text-gray-800 mb-2">
-                Your Contribution Impact
-              </h3>
-              <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
-                <div className="text-center">
-                  <div className="font-bold text-lg">₹{impact.Daily}</div>
-                  <div>Daily</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg">₹{impact.Monthly}</div>
-                  <div>Monthly</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg">₹{impact.Yearly}</div>
-                  <div>Yearly</div>
+            <label className="flex items-start space-x-3 mt-4 cursor-pointer">
+              <input
+                type="checkbox"
+                className="mt-1 scale-125 accent-emerald-600"
+                checked={requestCertificate}
+                onChange={() => setRequestCertificate(!requestCertificate)}
+              />
+              <div>
+                <p className="font-medium text-gray-900">
+                  Generate Tax Exemption Certificate
+                </p>
+                <p className="text-sm text-gray-600">
+                  Request an official tax exemption certificate for your
+                  donation that can be used for tax deductions
+                </p>
+              </div>
+            </label>
+            {isRecurring && (
+              <div className="mt-6 border-t pt-4">
+                <h3 className="font-semibold text-gray-800 mb-2">
+                  Your Contribution Impact
+                </h3>
+                <div className="grid grid-cols-3 gap-4 text-sm text-gray-700">
+                  <div className="text-center">
+                    <div className="font-bold text-lg">₹{impact.Weekly}</div>
+                    <div>Weekly</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-lg">₹{impact.Monthly}</div>
+                    <div>Monthly</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-lg">₹{impact.Yearly}</div>
+                    <div>Yearly</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
-
         </div>
       </section>
+
+      {/* Donation Summary */}
       <section className="max-w-xl mx-auto mt-12  bg-green-50 p-6 rounded-2xl shadow-sm">
         <h2 className="text-center text-xl font-semibold text-green-800 mb-6">
           Donation Summary
@@ -544,9 +493,7 @@ export default function DonatePage() {
           </div>
           <div className="flex justify-between items-center bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500">Donation Frequency</span>
-            <span className="font-medium">
-              {isRecurring ? donationFrequency : "One-Time"}
-            </span>
+            <span className="font-medium">{isRecurring ? donationFrequency : "One-Time"}</span>
           </div>
           <div className="flex justify-between items-center bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500">
@@ -583,6 +530,42 @@ export default function DonatePage() {
           <span>Secure payment powered by Razorpay</span>
         </div>
       </section>
+
+      {/* Recurring Confirmation Popup */}
+      {showRecurringConfirm && (
+       <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              Confirm One-Time Donation
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              You have selected a one-time donation. Would you like to make this a recurring donation for consistent support?
+            </p>
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={() => {
+                  setShowRecurringConfirm(false);
+                  proceedToPayment();
+                }}
+                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300"
+              >
+                Continue with One-Time
+              </button>
+              <button
+                onClick={() => {
+                  setIsRecurring(true);
+                  setDonationFrequency("Monthly");
+                  setShowRecurringConfirm(false);
+                  proceedToPayment();
+                }}
+                className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+              >
+                Make it Recurring
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

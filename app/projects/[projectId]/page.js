@@ -249,7 +249,7 @@ export default function ProjectDetailsPage() {
         {/* Section Heading */}
         <div className="mb-6 lg:mb-12 lg:text-center">
           <h2 className="text-2xl font-bold text-emerald-800 mb-2 lg:text-4xl lg:mb-4">
-            Choose Your Donation Type
+            Donation Type
           </h2>
           <p className="text-sm text-gray-600 lg:text-xl lg:max-w-2xl lg:mx-auto">
             Select the category that aligns with your intention and Islamic
@@ -260,30 +260,40 @@ export default function ProjectDetailsPage() {
 
         {/* Cards */}
         {donationCategories.length > 0 ? (
-          <div className="flex justify-center gap-6 flex-wrap mb-6 lg:mb-12">
-            {donationCategories.map((category, index) => (
-              <div
-                key={index}
-                className={`${category.bgColor} border-0 rounded-lg shadow-sm hover:shadow-md transition-shadow lg:hover:shadow-xl lg:hover:scale-105 lg:transition-all lg:duration-300 w-64`}
-              >
-                <div className="text-center p-4 lg:p-6">
-                  <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mx-auto mb-3 shadow-sm lg:w-20 lg:h-20 lg:mb-4">
-                    <category.icon
-                      className={`h-7 w-7 ${category.color} lg:h-10 lg:w-10`}
-                    />
+          <>
+            <div className="flex justify-center gap-6 flex-wrap mb-6 lg:mb-12">
+              {donationCategories.map((category, index) => (
+                <div
+                  key={index}
+                  className={`${category.bgColor} border-0 rounded-lg shadow-sm hover:shadow-md transition-shadow lg:hover:shadow-xl lg:hover:scale-105 lg:transition-all lg:duration-300 w-64`}
+                >
+                  <div className="text-center p-4 lg:p-6">
+                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mx-auto mb-3 shadow-sm lg:w-20 lg:h-20 lg:mb-4">
+                      <category.icon
+                        className={`h-7 w-7 ${category.color} lg:h-10 lg:w-10`}
+                      />
+                    </div>
+                    <h3 className="text-lg text-gray-800 lg:text-xl font-semibold">
+                      {category.title}
+                    </h3>
                   </div>
-                  <h3 className="text-lg text-gray-800 lg:text-xl font-semibold">
-                    {category.title}
-                  </h3>
+                  <div className="text-center space-y-3 p-4 pt-0 lg:p-6 lg:pt-0 lg:space-y-4">
+                    <p className="text-xs text-gray-600 leading-relaxed lg:text-sm lg:leading-relaxed">
+                      {category.description}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-center space-y-3 p-4 pt-0 lg:p-6 lg:pt-0 lg:space-y-4">
-                  <p className="text-xs text-gray-600 leading-relaxed lg:text-sm lg:leading-relaxed">
-                    {category.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            <div className="text-center">
+              <Link
+                href={`/donate?project=${projectId}`}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 inline-block"
+              >
+                Donate Now
+              </Link>
+            </div>
+          </>
         ) : (
           <p className="text-center text-gray-600">
             No donation options available for this project.
