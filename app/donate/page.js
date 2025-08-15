@@ -533,7 +533,7 @@ export default function DonatePage() {
 
       {/* Recurring Confirmation Popup */}
       {showRecurringConfirm && (
-       <div className="fixed inset-0 bg-transparent flex items-center justify-center z-50">
+   <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">
               Confirm One-Time Donation
