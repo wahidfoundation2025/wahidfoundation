@@ -10,26 +10,49 @@ const ProjectCardsSection = ({
   searchTerm = "",
   categoryFilter = "all",
   donationTypeFilter = "all",
-  maxCards, // ✅ Added prop
+  maxCards,
 }) => {
   const [projects, setProjects] = useState([]);
   const { isSignedIn } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    async function fetchProjects() {
+    async function fetchData() {
       try {
-        const res = await fetch(
-          "https://wahidfoundationadmin-seven.vercel.app/api/projects"
-        );
-        const data = await res.json();
-        console.log("Fetched projects:", data.projects);
-        setProjects(data.projects);
+        const [projectsRes, donationsRes] = await Promise.all([
+          fetch("https://wahidfoundationadmin-seven.vercel.app/api/projects"),
+          fetch("https://wahidfoundationadmin-seven.vercel.app/api/donations/summary"),
+        ]);
+
+        const projectsData = await projectsRes.json();
+        const donationsData = await donationsRes.json();
+
+        // Create a lookup map for donation summaries
+        const donationsMap = {};
+        if (donationsData?.data) {
+          donationsData.data.forEach((d) => {
+            donationsMap[d._id] = {
+              totalCollected: d.totalCollected,
+              totalDonors: d.totalDonors,
+            };
+          });
+        }
+
+        // Merge donation info into projects
+        const mergedProjects = projectsData.projects.map((p) => ({
+          ...p,
+          donationSummary: donationsMap[p._id] || {
+            totalCollected: 0,
+            totalDonors: 0,
+          },
+        }));
+
+        setProjects(mergedProjects);
       } catch (error) {
-        console.error("Failed to fetch projects", error);
+        console.error("Failed to fetch projects/donations", error);
       }
     }
-    fetchProjects();
+    fetchData();
   }, []);
 
   const formatCurrency = (amount) => {
@@ -65,7 +88,16 @@ const ProjectCardsSection = ({
     }
   };
 
-  // Strict filtering logic
+  const formatNumber  = (num) => {
+  if (num >= 1_000_000) {
+    return Math.floor(num / 1_000_000) + "M";
+  } else if (num >= 1_000) {
+    return Math.floor(num / 1_000) + "K";
+  }
+  return num.toString();
+};
+
+
   const filteredProjects = projects.filter((project) => {
     if (!project.status || project.status === "Draft") return false;
 
@@ -77,9 +109,7 @@ const ProjectCardsSection = ({
         ?.toLowerCase?.()
         .includes(searchTerm.toLowerCase?.()) ??
         false) ||
-      (project.location
-        ?.toLowerCase?.()
-        .includes(searchTerm.toLowerCase?.()) ??
+      (project.location?.toLowerCase?.().includes(searchTerm.toLowerCase?.()) ??
         false);
 
     const matchesCategory =
@@ -106,14 +136,13 @@ const ProjectCardsSection = ({
     return matchesSearch && matchesCategory && matchesDonationType;
   });
 
-  // ✅ Limit cards if maxCards prop is provided
   const displayedProjects =
     typeof maxCards === "number"
       ? filteredProjects.slice(0, maxCards)
       : filteredProjects;
 
   return (
-    <section className="container mx-auto  px-4 py-4 lg:px-8 lg:py-1 text-gray-900">
+    <section className="container mx-auto px-4 py-4 lg:px-8 lg:py-1 text-gray-900">
       {displayedProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.
@@ -125,6 +154,7 @@ const ProjectCardsSection = ({
               key={project._id}
               className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-102 lg:transition-all lg:duration-300"
             >
+              {/* Image & Labels */}
               <div className="h-48 relative lg:h-56">
                 <img
                   src={project.mainImage || "/globe.svg"}
@@ -133,7 +163,7 @@ const ProjectCardsSection = ({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
                 <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-                  {project.category && project.category.length > 0 ? (
+                  {project.category?.length > 0 ? (
                     project.category.map((cat, index) => (
                       <span
                         key={index}
@@ -156,28 +186,6 @@ const ProjectCardsSection = ({
                   >
                     {project.status || "Unknown"}
                   </span>
-                  {project.donationOptions?.some(
-                    (option) => option.type === "Zakat" && option.isEnabled
-                  ) && (
-                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-800">
-                      Zakat Eligible
-                    </span>
-                  )}
-                  {project.donationOptions?.some(
-                    (option) =>
-                      option.type === "Interest Earnings" && option.isEnabled
-                  ) && (
-                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-orange-100 text-orange-800">
-                      Interest Earnings
-                    </span>
-                  )}
-                  {project.donationOptions?.some(
-                    (option) => option.type === "Sadqa" && option.isEnabled
-                  ) && (
-                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-pink-100 text-pink-800">
-                      Sadqa
-                    </span>
-                  )}
                 </div>
                 <div className="absolute bottom-4 left-4 text-white">
                   <div className="flex items-center space-x-1 text-sm">
@@ -187,6 +195,7 @@ const ProjectCardsSection = ({
                 </div>
               </div>
 
+              {/* Title & Description */}
               <div className="p-6">
                 <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
                   {project.title || "Untitled Project"}
@@ -197,45 +206,80 @@ const ProjectCardsSection = ({
                 </p>
               </div>
 
+              {/* Stats */}
               <div className="p-6 pt-0 space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Progress</span>
-                    <span className="font-semibold">
-                      {project.completion ?? 0}%
-                    </span>
-                  </div>
-                  <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
-                    <div
-                      className="h-full bg-emerald-600 transition-all"
-                      style={{ width: `${project.completion || 0}%` }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-emerald-600 font-semibold">
-                      {formatCurrency(project.collected ?? 0)}
-                    </span>
-                    <span className="text-gray-600">
-                      of {formatCurrency(project.totalRequired ?? 0)}
-                    </span>
-                  </div>
-                </div>
+                {project.totalRequired > 0 ? (
+                  <>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Progress</span>
+                        <span className="font-semibold">
+                          {project.completion ?? 0}%
+                        </span>
+                      </div>
+                      <div className="relative h-2 w-full overflow-hidden rounded-full bg-gray-200">
+                        <div
+                          className="h-full bg-emerald-600 transition-all"
+                          style={{ width: `${project.completion || 0}%` }}
+                        ></div>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-emerald-600 font-semibold">
+                          {formatCurrency(project.collected ?? 0)}
+                        </span>
+                        <span className="text-gray-600">
+                          of {formatCurrency(project.totalRequired ?? 0)}
+                        </span>
+                      </div>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex items-center space-x-1">
-                    <Users className="h-4 w-4 text-emerald-600" />
-                    <span>{project.beneficiaries ?? 0} beneficiaries</span>
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    <Calendar className="h-4 w-4 text-amber-600" />
-                    <span>
-                      {project.status === "Completed"
-                        ? "Completed"
-                        : `${project.daysLeft ?? 0} days left`}
-                    </span>
-                  </div>
-                </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+  <div className="flex items-center space-x-1">
+    <Users className="h-4 w-4 text-emerald-600" />
+    <span>
+      {formatNumber(project.beneficiaries ?? 0)} beneficiaries
+    </span>
+  </div>
 
+  <div className="flex items-center space-x-1">
+    <Calendar className="h-4 w-4 text-amber-600" />
+    <span>
+      {project.status === "Completed"
+        ? "Completed"
+        : `${project.daysLeft ?? 0} days left`}
+    </span>
+  </div>
+</div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex items-center justify-between bg-white p-4">
+                      {/* Total Collected */}
+                      <div className="flex flex-col items-center text-center font-bold">
+                        <span className="text-xs uppercase tracking-wide text-gray-500">
+                          Total Collected
+                        </span>
+                        <span className="text-lg text-emerald-600">
+                          {formatCurrency(
+                            project.donationSummary?.totalCollected ?? 0
+                          )}
+                        </span>
+                      </div>
+
+                      {/* Total Donors */}
+                      <div className="flex flex-col items-center text-center font-bold">
+                        <span className="text-xs uppercase tracking-wide text-gray-500">
+                          Total Donors
+                        </span>
+                        <span className="text-lg text-gray-800">
+                          {project.donationSummary?.totalDonors ?? 0}
+                        </span>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Buttons */}
                 <div className="flex space-x-2">
                   {project.status !== "Completed" && (
                     <button
