@@ -44,6 +44,7 @@ export default function DonatePage() {
   const name = user?.fullName || "Anonymous";
   const email = user?.emailAddresses[0]?.emailAddress || "";
 
+
   useEffect(() => {
     async function fetchProject() {
       if (!projectId) return;
