@@ -5,7 +5,7 @@ import ImpactStats from "./components/ImpactSection";
 import ProjectCardsSection from "./components/Project";
 import Link from "next/link";
 import  MobileDonationCategories  from "./components/donationtype";
-import FooterNav from "./components/FooterNav";
+import FooterNav from "./components/FooterNav"; 
 
 export default function Home() {
   const [quote, setQuote] = useState(null);
