@@ -88,14 +88,16 @@ const ProjectCardsSection = ({
     }
   };
 
-  const formatNumber  = (num) => {
-  if (num >= 1_000_000) {
-    return Math.floor(num / 1_000_000) + "M";
-  } else if (num >= 1_000) {
-    return Math.floor(num / 1_000) + "K";
-  }
-  return num.toString();
-};
+  const formatNumber = (num) => {
+    if (num >= 1_000_000) {
+      return Math.floor(num / 1_000_000) + "M";
+    } else if (num >= 1_000) {
+      return Math.floor(num / 1_000) + "K";
+    }
+    return num.toString();
+  };
+
+  console.log(projects);
 
 
   const filteredProjects = projects.filter((project) => {
@@ -118,19 +120,23 @@ const ProjectCardsSection = ({
         project.category.includes(categoryFilter));
 
     let matchesDonationType = true;
+
     if (donationTypeFilter !== "all") {
-      if (donationTypeFilter === "zakat") {
-        matchesDonationType = !!project.zakat_eligible;
-      } else if (donationTypeFilter === "interest_earnings") {
-        matchesDonationType = !!project.interest_earnings_eligible;
-      } else if (donationTypeFilter === "sadqa") {
-        matchesDonationType = !!project.sadqa_eligible;
-      } else if (donationTypeFilter === "general") {
-        matchesDonationType =
-          !project.zakat_eligible &&
-          !project.interest_earnings_eligible &&
-          !project.sadqa_eligible;
-      }
+      matchesDonationType = project.donationOptions?.some(option => {
+        if (!option.isEnabled) return false;
+
+        if (donationTypeFilter === "zakat") {
+          return option.type.toLowerCase() === "zakat";
+        } else if (donationTypeFilter === "interest_earnings") {
+          return option.type.toLowerCase() === "interest earnings";
+        } else if (donationTypeFilter === "sadqa") {
+          return option.type.toLowerCase() === "sadqa";
+        } else if (donationTypeFilter === "general") {
+          return option.type.toLowerCase() === "general donation";
+        }
+
+        return false;
+      });
     }
 
     return matchesSearch && matchesCategory && matchesDonationType;
@@ -148,7 +154,7 @@ const ProjectCardsSection = ({
           No projects found.
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
           {displayedProjects.map((project) => (
             <div
               key={project._id}
@@ -234,22 +240,22 @@ const ProjectCardsSection = ({
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
-  <div className="flex items-center space-x-1">
-    <Users className="h-4 w-4 text-emerald-600" />
-    <span>
-      {formatNumber(project.beneficiaries ?? 0)} beneficiaries
-    </span>
-  </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-4 w-4 text-emerald-600" />
+                        <span>
+                          {formatNumber(project.beneficiaries ?? 0)} beneficiaries
+                        </span>
+                      </div>
 
-  <div className="flex items-center space-x-1">
-    <Calendar className="h-4 w-4 text-amber-600" />
-    <span>
-      {project.status === "Completed"
-        ? "Completed"
-        : `${project.daysLeft ?? 0} days left`}
-    </span>
-  </div>
-</div>
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="h-4 w-4 text-amber-600" />
+                        <span>
+                          {project.status === "Completed"
+                            ? "Completed"
+                            : `${project.daysLeft ?? 0} days left`}
+                        </span>
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <>

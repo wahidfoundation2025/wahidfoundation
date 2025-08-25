@@ -134,7 +134,7 @@ const Projects = () => {
       </section>
 
       {/* Project Cards */}
-      <section className="max-w-7xl mx-auto px-4 pb-20">
+      <section className="w-full pb-20">
         <ProjectCardsSection
           searchTerm={searchInput}
           categoryFilter={categoryFilter}
