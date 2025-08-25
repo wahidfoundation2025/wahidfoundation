@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Home, BarChart4, Heart, Info, TrendingUp } from "lucide-react";
-import { FaFacebook } from "react-icons/fa";
+import { FaFacebook, FaYoutube } from "react-icons/fa";
 import { LuInstagram } from "react-icons/lu";
 import { IoLogoLinkedin } from "react-icons/io5";
 import { RiTwitterXFill } from "react-icons/ri";
@@ -61,7 +61,7 @@ export default function FooterNav() {
   return (
     <>
       <nav className="bg-emerald-800 w-full border-t border-gray-200 shadow-lg z-50">
-        <div className="md:pb-0 pb-12 flex flex-col lg:flex-row justify-between items-start py-8 px-6 md:px-12 xl:px-40 gap-8 md:gap-4">
+        <div className="md:pb-0 pb-10 flex flex-col lg:flex-row justify-between items-start py-8 px-6 md:px-12 xl:px-40 gap-8 md:gap-4">
           {/* Left Side: Logo + Links */}
           <div className="flex md:flex-row flex-col items-start gap-4 sm:gap-10 xl:gap-20 w-full lg:w-auto">
             {/* Logo */}
@@ -126,7 +126,7 @@ export default function FooterNav() {
           </div>
 
           {/* Social Icons */}
-          <div className="flex flex-row gap-4 items-center lg:self-start sm:self-end self-center">
+          <div className="flex flex-row gap-4 items-center lg:self-start lg:my-0 my-2 self-center">
             {footerData?.socialLinks?.facebook && (
               <a
                 href={footerData.socialLinks.facebook}
@@ -165,6 +165,16 @@ export default function FooterNav() {
                 className="text-2xl text-white hover:text-gray-200"
               >
                 <RiTwitterXFill />
+              </a>
+            )}
+            {footerData?.socialLinks?.youtube && (
+              <a
+                href={footerData.socialLinks.youtube}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-2xl text-white hover:text-gray-200"
+              >
+                <FaYoutube />
               </a>
             )}
           </div>
