@@ -28,8 +28,10 @@ export default function Home() {
   return (
     <div className="flex flex-col bg-white">
       <HeroSection />
+
       <ProjectCardsSection maxCards={3} />
-      <div className="pt-2 py-4 w-full flex justify-center">
+
+      <div className="py-10 w-full flex justify-center">
         <Link
           href="/projects"
           className="w-full max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
