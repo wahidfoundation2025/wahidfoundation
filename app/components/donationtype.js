@@ -74,7 +74,7 @@ export default function MobileDonationCategories() {
                   {category.description}
                 </p>
                 <Link
-                  href={`/donations/${category.title}`}
+                  href={`/projects/${category.title}`}
                   className={`w-full inline-flex items-center justify-center px-4 py-2 text-white rounded-md text-xs h-8 ${category.buttonColor} lg:h-11 lg:text-base lg:font-semibold`}
                 >
                   Donate Now

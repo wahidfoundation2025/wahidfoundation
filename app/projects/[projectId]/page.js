@@ -49,11 +49,11 @@ export default function ProjectDetailsPage() {
           donationOptions: Array.isArray(data.donationOptions)
             ? data.donationOptions
             : [
-                { type: "General Donation", isEnabled: false },
-                { type: "Zakat", isEnabled: false },
-                { type: "Sadqa", isEnabled: false },
-                { type: "Interest Earnings", isEnabled: false },
-              ],
+              { type: "General Donation", isEnabled: false },
+              { type: "Zakat", isEnabled: false },
+              { type: "Sadqa", isEnabled: false },
+              { type: "Interest Earnings", isEnabled: false },
+            ],
         });
       } catch (error) {
         console.error("Error fetching project:", error);
@@ -112,9 +112,9 @@ export default function ProjectDetailsPage() {
 
   const percentageRaised = project.totalRequired
     ? Math.min(
-        Math.round((project.collected / project.totalRequired) * 100),
-        100
-      )
+      Math.round((project.collected / project.totalRequired) * 100),
+      100
+    )
     : 0;
 
   const donationCategories = [
@@ -285,6 +285,7 @@ export default function ProjectDetailsPage() {
                 </div>
               ))}
             </div>
+
             <div className="text-center">
               <Link
                 href={`/donate?project=${projectId}`}
@@ -350,11 +351,10 @@ export default function ProjectDetailsPage() {
           <div className="flex border-b border-gray-200 mb-6">
             {project.impact?.length > 0 && (
               <button
-                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${
-                  activeTab === "impact"
+                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "impact"
                     ? "border-b-2 border-emerald-600 text-emerald-600"
                     : "text-gray-600 hover:text-emerald-600"
-                }`}
+                  }`}
                 onClick={() => setActiveTab("impact")}
               >
                 Project Impact
@@ -362,11 +362,10 @@ export default function ProjectDetailsPage() {
             )}
             {project.updates?.length > 0 && (
               <button
-                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${
-                  activeTab === "updates"
+                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "updates"
                     ? "border-b-2 border-emerald-600 text-emerald-600"
                     : "text-gray-600 hover:text-emerald-600"
-                }`}
+                  }`}
                 onClick={() => setActiveTab("updates")}
               >
                 Project Updates
@@ -502,9 +501,8 @@ export default function ProjectDetailsPage() {
             <iframe
               src={
                 project.youtubeIframe.includes("youtu.be")
-                  ? `https://www.youtube.com/embed/${
-                      project.youtubeIframe.split("youtu.be/")[1].split("?")[0]
-                    }`
+                  ? `https://www.youtube.com/embed/${project.youtubeIframe.split("youtu.be/")[1].split("?")[0]
+                  }`
                   : project.youtubeIframe
               }
               title="Project Video"

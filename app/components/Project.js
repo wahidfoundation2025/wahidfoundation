@@ -158,7 +158,7 @@ const ProjectCardsSection = ({
           {displayedProjects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-102 lg:transition-all lg:duration-300"
+              className="overflow-hidden bg-white border-none rounded-xl shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-xl lg:hover:scale-101 lg:transition-all lg:duration-300"
             >
               {/* Image & Labels */}
               <div className="h-48 relative lg:h-56">
@@ -185,6 +185,7 @@ const ProjectCardsSection = ({
                       Uncategorized
                     </span>
                   )}
+
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(
                       project.status
@@ -193,6 +194,7 @@ const ProjectCardsSection = ({
                     {project.status || "Unknown"}
                   </span>
                 </div>
+
                 <div className="absolute bottom-4 left-4 text-white">
                   <div className="flex items-center space-x-1 text-sm">
                     <MapPin className="h-4 w-4" />
@@ -286,7 +288,7 @@ const ProjectCardsSection = ({
                 )}
 
                 {/* Buttons */}
-                <div className="flex space-x-2">
+                <div className="responsive_flex flex flex-row gap-2">
                   {project.status !== "Completed" && (
                     <button
                       onClick={() => handleDonateClick(project._id)}
