@@ -151,7 +151,7 @@ const ProjectCardsSection = ({
           No projects found.
         </div>
       ) : (
-        <div className={`${displayedProjects.length > 2 ? "sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]  [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))] " : "[grid-template-columns:repeat(auto-fit,minmax(330px,400px))]"} ` + " w-full grid md:gap-8 gap-4"}>
+        <div className={`${displayedProjects.length > 2 ? "sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] " : "lg:[grid-template-columns:repeat(auto-fit,minmax(300px,400px))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"} ` + " [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))] w-full grid md:gap-8 gap-4"}>
           {displayedProjects.map((project) => (
             <div
               key={project._id}
