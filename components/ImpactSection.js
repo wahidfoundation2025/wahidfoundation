@@ -35,7 +35,7 @@ export default function ImpactStats() {
   }
 
   return (
-    <section className="lg:py-32 py-10 lg:px-8 p-4 bg-slate-50">
+    <section className="lg:py-32 py-20 lg:px-8 p-4 bg-slate-50">
       <div className="text-center mb-8">
         <h2 className="text-2xl lg:text-4xl font-bold text-emerald-800 mb-2">
           {impact.title}

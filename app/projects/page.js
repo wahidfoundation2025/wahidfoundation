@@ -128,10 +128,10 @@ const Projects = () => {
             {/* Clear Filters */}
             <button
               onClick={handleClearFilters}
-              className="flex-1 py-2 px-4 border bg-gray-800 rounded-xl text-white font-semibold hover:bg-black cursor-pointer transition"
+              className="flex-1 py-2 px-4 border bg-gray-800 rounded-xl font-semibold hover:bg-black cursor-pointer transition"
             >
-              <span className='md:block hidden'>Clear All Filters</span>
-              <span className='md:hidden block'>Clear</span>
+              <span className='md:block hidden text-white'>Clear All Filters</span>
+              <span className='md:hidden text-white block'>Clear</span>
             </button>
           </div>
         </div>

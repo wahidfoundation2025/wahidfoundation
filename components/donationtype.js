@@ -38,7 +38,7 @@ export default function MobileDonationCategories() {
   ];
 
   return (
-    <section className="py-8 px-4 bg-white sm:py-16 sm:px-8">
+    <section className="py-10 px-4 bg-white sm:py-16 sm:px-8">
       <div className="sm:max-w-6xl sm:mx-auto">
         {/* Heading */}
         <div className="mb-6 sm:mb-12 sm:text-center">
@@ -106,7 +106,7 @@ export default function MobileDonationCategories() {
           </p>
           <Link
             href="/donate"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-md px-4 py-2 text-sm w-full inline-flex items-center justify-center sm:w-auto sm:px-12 sm:py-6 sm:text-lg sm:font-semibold"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl px-4 py-2 text-sm w-full inline-flex items-center justify-center sm:w-auto sm:px-12 sm:py-4 sm:text-lg sm:font-semibold"
           >
             Begin with ₹1/Day
           </Link>
