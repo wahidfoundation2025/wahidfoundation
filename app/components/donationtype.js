@@ -52,7 +52,7 @@ export default function MobileDonationCategories() {
         </div>
 
         {/* Categories */}
-        <div className="space-y-4 mb-6 lg:grid lg:grid-cols-2 xl:grid-cols-4 lg:gap-6 lg:space-y-0 lg:mb-12">
+        <div className="gap-4 lg:gap-6 mb-6 grid sm:grid-cols-2 grid-cols-1 lg:space-y-0 lg:mb-12">
           {categories.map((category, index) => (
             <div
               key={index}
