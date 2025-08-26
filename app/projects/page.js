@@ -1,13 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import ProjectCardsSection from '../components/Project';
+import ProjectCardsSection from '../../components/Project';
 import { Filter, Search } from 'lucide-react';
+import { useSearchParams } from "next/navigation";
 
 const Projects = () => {
+  const searchParams = useSearchParams();
+  const title = searchParams.get("title");
+
   const [searchInput, setSearchInput] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [donationTypeFilter, setDonationTypeFilter] = useState('all');
+  const [donationTypeFilter, setDonationTypeFilter] = useState(title ? title : 'all');
   const [categories, setCategories] = useState([]); // from API
 
   const [showFilters, setShowFilters] = useState(false);

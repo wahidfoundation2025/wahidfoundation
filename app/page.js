@@ -1,11 +1,10 @@
 "use client"
 import { useEffect, useState } from "react";
-import HeroSection from "./components/HeroSection";
-import ImpactStats from "./components/ImpactSection";
-import ProjectCardsSection from "./components/Project";
+import HeroSection from "../components/HeroSection";
+import ImpactStats from "../components/ImpactSection";
+import ProjectCardsSection from "../components/Project";
 import Link from "next/link";
-import MobileDonationCategories from "./components/donationtype";
-import FooterNav from "./components/FooterNav";
+import MobileDonationCategories from "../components/donationtype";
 
 export default function Home() {
   const [quote, setQuote] = useState(null);
@@ -16,7 +15,6 @@ export default function Home() {
         const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/homequotesection");
 
         const data = await res.json();
-        console.log(data);
         setQuote(data);
       } catch (e) {
         setQuote(null);
@@ -34,7 +32,7 @@ export default function Home() {
       <div className="py-10 w-full flex justify-center">
         <Link
           href="/projects"
-          className="w-full max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
+          className="w-full mx-4 max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
         >
           See Our Projects
         </Link>

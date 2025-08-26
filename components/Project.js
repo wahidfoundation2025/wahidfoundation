@@ -97,9 +97,6 @@ const ProjectCardsSection = ({
     return num.toString();
   };
 
-  console.log(projects);
-
-
   const filteredProjects = projects.filter((project) => {
     if (!project.status || project.status === "Draft") return false;
 
@@ -148,17 +145,17 @@ const ProjectCardsSection = ({
       : filteredProjects;
 
   return (
-    <section className="mx-auto px-4 py-4 sm:px-12 lg:py-1 text-gray-900">
+    <section className="flex justify-center w-full px-4 py-4 sm:px-12 text-gray-900">
       {displayedProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.
         </div>
       ) : (
-        <div className="grid gap-8 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
+        <div className="w-full grid gap-8 [grid-template-columns:repeat(auto-fill,minmax(330px,1fr))]">
           {displayedProjects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden bg-white border-none rounded-xl shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-xl lg:hover:scale-101 lg:transition-all lg:duration-300"
+              className="overflow-hidden bg-white border-none rounded-xl shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-xl lg:hover:scale-101 lg:transition-all lg:duration-300 flex flex-col"
             >
               {/* Image & Labels */}
               <div className="h-48 relative lg:h-56">
@@ -215,7 +212,7 @@ const ProjectCardsSection = ({
               </div>
 
               {/* Stats */}
-              <div className="p-6 pt-0 space-y-4">
+              <div className="p-6 pt-0 space-y-4 flex flex-col flex-grow">
                 {project.totalRequired > 0 ? (
                   <>
                     <div className="space-y-2">
@@ -288,7 +285,7 @@ const ProjectCardsSection = ({
                 )}
 
                 {/* Buttons */}
-                <div className="responsive_flex flex flex-row gap-2">
+                <div className="responsive_flex flex flex-row gap-2 mt-auto">
                   {project.status !== "Completed" && (
                     <button
                       onClick={() => handleDonateClick(project._id)}
