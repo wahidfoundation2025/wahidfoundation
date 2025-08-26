@@ -148,13 +148,13 @@ const ProjectCardsSection = ({
       : filteredProjects;
 
   return (
-    <section className="container mx-auto px-4 py-4 lg:px-8 lg:py-1 text-gray-900">
+    <section className="mx-auto px-4 py-4 sm:px-12 lg:py-1 text-gray-900">
       {displayedProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
+        <div className="grid gap-8 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
           {displayedProjects.map((project) => (
             <div
               key={project._id}
@@ -244,7 +244,7 @@ const ProjectCardsSection = ({
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div className="flex items-center space-x-1">
                         <Users className="h-4 w-4 text-emerald-600" />
-                        <span>
+                        <span className="max-w-[106px] truncate">
                           {formatNumber(project.beneficiaries ?? 0)} beneficiaries
                         </span>
                       </div>

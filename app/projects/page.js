@@ -73,9 +73,9 @@ const Projects = () => {
 
             <button
               onClick={() => setShowFilters((prev) => !prev)}
-              className='px-3 bg-white hover:bg-gray-300 transition rounded-full cursor-pointer'
+              className='md:hidden block px-3 bg-white hover:bg-gray-300 transition rounded-full cursor-pointer'
             >
-              <Filter className="md:hidden block text-gray-600" />
+              <Filter className="text-gray-600" />
             </button>
           </div>
 
@@ -124,7 +124,7 @@ const Projects = () => {
             {/* Clear Filters */}
             <button
               onClick={handleClearFilters}
-              className="flex-1 py-2 px-4 border bg-gray-800 rounded-xl text-gray-300 font-semibold hover:bg-black cursor-pointer transition"
+              className="flex-1 py-2 px-4 border bg-gray-800 rounded-xl text-white font-semibold hover:bg-black cursor-pointer transition"
             >
               <span className='md:block hidden'>Clear All Filters</span>
               <span className='md:hidden block'>Clear</span>
