@@ -60,7 +60,7 @@ const Projects = () => {
       </section>
 
       {/* Filter Section */}
-      <section className="bg-white sm:mx-10 mx-3 sm:p-6 p-4 rounded-xl shadow mb-12">
+      <section className="bg-white sm:mx-10 mx-3 sm:p-6 p-4 rounded-xl shadow mb-4">
         <div className="flex flex-col gap-4 lg:flex-row md:items-center md:justify-between">
           {/* Search */}
           <div className='flex flex-row gap-2 lg:min-w-auto min-w-full'>

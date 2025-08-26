@@ -151,7 +151,7 @@ const ProjectCardsSection = ({
           No projects found.
         </div>
       ) : (
-        <div className="w-full grid sm:gap-8 gap-4 [grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]">
+        <div className="w-full grid sm:gap-8 gap-4 [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,400px))]">
           {displayedProjects.map((project) => (
             <div
               key={project._id}
