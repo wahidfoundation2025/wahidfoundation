@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Home, BarChart4, Heart, Info, TrendingUp } from "lucide-react";
+import { Home, BarChart4, Heart, Info, TrendingUp, Mail, Phone, MapPin } from "lucide-react";
 import { FaFacebook, FaYoutube } from "react-icons/fa";
 import { LuInstagram } from "react-icons/lu";
 import { IoLogoLinkedin } from "react-icons/io5";
@@ -98,7 +98,7 @@ export default function FooterNav() {
             {/* Terms */}
             <div className="flex flex-col gap-2 items-start">
               <h1 className="text-lg font-semibold mb-2 text-white">Terms</h1>
-              {(footerData?.termsLinks?.length > 0 ? footerData.termsLinks : Others).map(
+              {(footerData?.termsLinks?.length > 0 ? footerData.termsLinks : []).map(
                 (item) => (
                   <Link
                     href={item.path}
@@ -125,66 +125,95 @@ export default function FooterNav() {
             </div>
           </div>
 
-          {/* Social Icons */}
-          <div className="flex flex-row gap-4 items-center lg:self-start lg:my-0 my-2 self-center">
-            {footerData?.socialLinks?.facebook && (
-              <a
-                href={footerData.socialLinks.facebook}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-white hover:text-gray-200"
-              >
-                <FaFacebook />
-              </a>
-            )}
-            {footerData?.socialLinks?.instagram && (
-              <a
-                href={footerData.socialLinks.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-white hover:text-gray-200"
-              >
-                <LuInstagram />
-              </a>
-            )}
-            {footerData?.socialLinks?.linkedin && (
-              <a
-                href={footerData.socialLinks.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-white hover:text-gray-200"
-              >
-                <IoLogoLinkedin />
-              </a>
-            )}
-            {footerData?.socialLinks?.twitter && (
-              <a
-                href={footerData.socialLinks.twitter}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-white hover:text-gray-200"
-              >
-                <RiTwitterXFill />
-              </a>
-            )}
-            {footerData?.socialLinks?.youtube && (
-              <a
-                href={footerData.socialLinks.youtube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl text-white hover:text-gray-200"
-              >
-                <FaYoutube />
-              </a>
-            )}
+          {/* Social Icons + Contact Info */}
+          <div className="flex flex-col items-start gap-6 lg:self-start lg:my-0 my-2 self-center">
+            {/* Social Icons */}
+            <div className="flex flex-row gap-4 items-center">
+              {footerData?.socialLinks?.facebook && (
+                <a
+                  href={footerData.socialLinks.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-2xl text-white hover:text-gray-200"
+                >
+                  <FaFacebook />
+                </a>
+              )}
+              {footerData?.socialLinks?.instagram && (
+                <a
+                  href={footerData.socialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-2xl text-white hover:text-gray-200"
+                >
+                  <LuInstagram />
+                </a>
+              )}
+              {footerData?.socialLinks?.linkedin && (
+                <a
+                  href={footerData.socialLinks.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-2xl text-white hover:text-gray-200"
+                >
+                  <IoLogoLinkedin />
+                </a>
+              )}
+              {footerData?.socialLinks?.twitter && (
+                <a
+                  href={footerData.socialLinks.twitter}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-2xl text-white hover:text-gray-200"
+                >
+                  <RiTwitterXFill />
+                </a>
+              )}
+              {footerData?.socialLinks?.youtube && (
+                <a
+                  href={footerData.socialLinks.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-2xl text-white hover:text-gray-200"
+                >
+                  <FaYoutube />
+                </a>
+              )}
+            </div>
+
+            {/* Contact Info */}
+            <div className="text-white text-sm space-y-3">
+              <p className="flex items-center gap-2">
+                <Mail className="w-5 h-5" />
+                <a href="mailto:info@wahid.org.in" className="hover:underline">
+                  info@wahid.org.in
+                </a>
+              </p>
+              <p className="flex items-center gap-2">
+                <Phone className="w-5 h-5" />
+                <a href="tel:+919480389296" className="hover:underline">
+                  +91 9480389296
+                </a>
+              </p>
+              <p className="flex items-start gap-2">
+                <MapPin className="w-5 h-5 mt-0.5" />
+                <span>
+                  Paramount Avenue, 63/1, 3rd floor,
+                  <br /> Mosque road cross, Frazer town,
+                  <br /> Bangalore 560005
+                </span>
+              </p>
+            </div>
           </div>
         </div>
 
         <p className="text-center py-4 text-white text-sm md:text-base">
-          {footerData?.copyrightText || `All rights reserved - &copy; ${new Date().getFullYear()}`}
+          {footerData?.copyrightText ||
+            `All rights reserved - © ${new Date().getFullYear()}`}
         </p>
       </nav>
 
+      {/* Bottom Mobile Nav */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50 md:hidden">
         <ul className="flex justify-around items-center h-16">
           {navItems.map((item) => {
@@ -194,8 +223,9 @@ export default function FooterNav() {
               <li key={item.path} className="flex-1">
                 <Link
                   href={item.path}
-                  className={`flex flex-col items-center pt-2 pb-1 px-1 transition-colors ${isActive ? "text-emerald-600" : "text-gray-500"
-                    }`}
+                  className={`flex flex-col items-center pt-2 pb-1 px-1 transition-colors ${
+                    isActive ? "text-emerald-600" : "text-gray-500"
+                  }`}
                 >
                   <Icon className="w-6 h-6 mb-1" />
                   <span className="text-xs">{item.label}</span>
