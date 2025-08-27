@@ -88,15 +88,14 @@ const ProjectCardsSection = ({
     }
   };
 
-  const formatNumber  = (num) => {
-  if (num >= 1_000_000) {
-    return Math.floor(num / 1_000_000) + "M";
-  } else if (num >= 1_000) {
-    return Math.floor(num / 1_000) + "K";
-  }
-  return num.toString();
-};
-
+  const formatNumber = (num) => {
+    if (num >= 1_000_000) {
+      return Math.floor(num / 1_000_000) + "M";
+    } else if (num >= 1_000) {
+      return Math.floor(num / 1_000) + "K";
+    }
+    return num.toString();
+  };
 
   const filteredProjects = projects.filter((project) => {
     if (!project.status || project.status === "Draft") return false;
@@ -118,19 +117,23 @@ const ProjectCardsSection = ({
         project.category.includes(categoryFilter));
 
     let matchesDonationType = true;
+
     if (donationTypeFilter !== "all") {
-      if (donationTypeFilter === "zakat") {
-        matchesDonationType = !!project.zakat_eligible;
-      } else if (donationTypeFilter === "interest_earnings") {
-        matchesDonationType = !!project.interest_earnings_eligible;
-      } else if (donationTypeFilter === "sadqa") {
-        matchesDonationType = !!project.sadqa_eligible;
-      } else if (donationTypeFilter === "general") {
-        matchesDonationType =
-          !project.zakat_eligible &&
-          !project.interest_earnings_eligible &&
-          !project.sadqa_eligible;
-      }
+      matchesDonationType = project.donationOptions?.some(option => {
+        if (!option.isEnabled) return false;
+
+        if (donationTypeFilter === "zakat") {
+          return option.type.toLowerCase() === "zakat";
+        } else if (donationTypeFilter === "interest_earnings") {
+          return option.type.toLowerCase() === "interest earnings";
+        } else if (donationTypeFilter === "sadqa") {
+          return option.type.toLowerCase() === "sadqa";
+        } else if (donationTypeFilter === "general") {
+          return option.type.toLowerCase() === "general donation";
+        }
+
+        return false;
+      });
     }
 
     return matchesSearch && matchesCategory && matchesDonationType;
@@ -142,17 +145,17 @@ const ProjectCardsSection = ({
       : filteredProjects;
 
   return (
-    <section className="container mx-auto px-4 py-4 lg:px-8 lg:py-1 text-gray-900">
+    <section className="flex justify-center w-full px-4 py-4 sm:px-12 text-gray-900">
       {displayedProjects.length === 0 ? (
         <div className="text-center py-10 text-gray-500">
           No projects found.
         </div>
       ) : (
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className={`${displayedProjects.length > 2 ? "sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] " : "lg:[grid-template-columns:repeat(auto-fit,minmax(300px,400px))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"} ` + " [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))] w-full grid md:gap-8 gap-4"}>
           {displayedProjects.map((project) => (
             <div
               key={project._id}
-              className="overflow-hidden bg-white border-none rounded-lg shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-2xl lg:hover:scale-102 lg:transition-all lg:duration-300"
+              className="overflow-hidden bg-white border-none rounded-xl shadow-sm hover:shadow-xl transition-shadow lg:hover:shadow-xl lg:hover:scale-101 lg:transition-all lg:duration-300 flex flex-col"
             >
               {/* Image & Labels */}
               <div className="h-48 relative lg:h-56">
@@ -179,6 +182,7 @@ const ProjectCardsSection = ({
                       Uncategorized
                     </span>
                   )}
+
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${getStatusColor(
                       project.status
@@ -187,6 +191,7 @@ const ProjectCardsSection = ({
                     {project.status || "Unknown"}
                   </span>
                 </div>
+
                 <div className="absolute bottom-4 left-4 text-white">
                   <div className="flex items-center space-x-1 text-sm">
                     <MapPin className="h-4 w-4" />
@@ -207,7 +212,7 @@ const ProjectCardsSection = ({
               </div>
 
               {/* Stats */}
-              <div className="p-6 pt-0 space-y-4">
+              <div className="p-6 pt-0 space-y-4 flex flex-col flex-grow">
                 {project.totalRequired > 0 ? (
                   <>
                     <div className="space-y-2">
@@ -234,22 +239,22 @@ const ProjectCardsSection = ({
                     </div>
 
                     <div className="grid grid-cols-2 gap-4 text-sm">
-  <div className="flex items-center space-x-1">
-    <Users className="h-4 w-4 text-emerald-600" />
-    <span>
-      {formatNumber(project.beneficiaries ?? 0)} beneficiaries
-    </span>
-  </div>
+                      <div className="flex items-center space-x-1">
+                        <Users className="h-4 w-4 text-emerald-600" />
+                        <span className="max-w-[106px] truncate">
+                          {formatNumber(project.beneficiaries ?? 0)} beneficiaries
+                        </span>
+                      </div>
 
-  <div className="flex items-center space-x-1">
-    <Calendar className="h-4 w-4 text-amber-600" />
-    <span>
-      {project.status === "Completed"
-        ? "Completed"
-        : `${project.daysLeft ?? 0} days left`}
-    </span>
-  </div>
-</div>
+                      <div className="flex items-center space-x-1">
+                        <Calendar className="h-4 w-4 text-amber-600" />
+                        <span>
+                          {project.status === "Completed"
+                            ? "Completed"
+                            : `${project.daysLeft ?? 0} days left`}
+                        </span>
+                      </div>
+                    </div>
                   </>
                 ) : (
                   <>
@@ -280,7 +285,7 @@ const ProjectCardsSection = ({
                 )}
 
                 {/* Buttons */}
-                <div className="flex space-x-2">
+                <div className="responsive_flex flex flex-row gap-2 mt-auto">
                   {project.status !== "Completed" && (
                     <button
                       onClick={() => handleDonateClick(project._id)}

@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import DonateClient from "../../components/donate";
+import DonateClient from "../../../components/donate";
 
 export default function DonatePage() {
   return (

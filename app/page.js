@@ -1,11 +1,10 @@
 "use client"
 import { useEffect, useState } from "react";
-import HeroSection from "./components/HeroSection";
-import ImpactStats from "./components/ImpactSection";
-import ProjectCardsSection from "./components/Project";
+import HeroSection from "../components/HeroSection";
+import ImpactStats from "../components/ImpactSection";
+import ProjectCardsSection from "../components/Project";
 import Link from "next/link";
-import  MobileDonationCategories  from "./components/donationtype";
-import FooterNav from "./components/FooterNav";
+import MobileDonationCategories from "../components/donationtype";
 
 export default function Home() {
   const [quote, setQuote] = useState(null);
@@ -16,7 +15,6 @@ export default function Home() {
         const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/homequotesection");
 
         const data = await res.json();
-        console.log(data);
         setQuote(data);
       } catch (e) {
         setQuote(null);
@@ -28,21 +26,23 @@ export default function Home() {
   return (
     <div className="flex flex-col bg-white">
       <HeroSection />
-       <ProjectCardsSection maxCards={3} />
-        <div className="pt-2 py-4 w-full flex justify-center">
-              <Link
-                href= "/projects"
-                className="w-full max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
-              >
-                 See Our Projects
-              </Link>
-            </div>
+
+      <ProjectCardsSection maxCards={3} />
+
+      <div className="py-10 w-full flex justify-center">
+        <Link
+          href="/projects"
+          className="w-full mx-4 max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
+        >
+          See Our Projects
+        </Link>
+      </div>
 
       <div className="border-t border-gray-100">
         <ImpactStats />
       </div>
 
-      <section className="py-10 px-5 lg:py-40 lg:px-8 bg-gradient-to-br from-amber-50 to-amber-100 text-center border-y border-amber-100">
+      <section className="py-20 px-5 lg:py-40 lg:px-8 bg-gradient-to-br from-amber-50 to-amber-100 text-center border-y border-amber-100">
         <div className="max-w-sm mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
           <div className="w-16 h-1 bg-amber-300 rounded-full mx-auto lg:w-24"></div>
           <p className="italic text-amber-900 font-medium text-base leading-relaxed lg:text-xl lg:leading-relaxed">
@@ -60,7 +60,7 @@ export default function Home() {
         <MobileDonationCategories />
       </div>
 
-      <section className="py-12 px-5 lg:py-40 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
+      <section className="py-20 px-5 lg:py-40 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
         <div className="max-w-md mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
           <h2 className="text-2xl font-bold text-emerald-800 lg:text-3xl">
             Ready to Make a Difference?

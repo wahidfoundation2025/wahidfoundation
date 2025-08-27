@@ -25,3 +25,10 @@ body {
   color: var(--foreground);
   font-family: "Poppins", Helvetica, sans-serif;
 }
+
+@media screen and (max-width: 400px) {
+  .responsive_flex {
+    display: flex;
+    flex-direction: column;
+  }
+}
