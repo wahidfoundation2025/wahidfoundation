@@ -63,35 +63,56 @@ export default function DonatePage({ searchParams }) {
   }, [projectId]);
 
   // Razorpay Payment Handler
-  const handlePayment = () => {
-    if (!customAmount || customAmount < 365) {
-      alert("Please enter a valid donation amount (minimum ₹365).");
-      return;
-    }
+ const handlePayment = () => {
+  if (!customAmount || customAmount < 365) {
+    alert("Please enter a valid donation amount (minimum ₹365).");
+    return;
+  }
 
-    if (!donationType) {
-      alert("Please select a donation type.");
-      return;
-    }
+  if (!donationType) {
+    alert("Please select a donation type.");
+    return;
+  }
 
-    // Load Razorpay SDK
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
+  // Load Razorpay SDK
+  const script = document.createElement("script");
+  script.src = "https://checkout.razorpay.com/v1/checkout.js";
+  script.async = true;
+  document.body.appendChild(script);
 
-    script.onload = () => {
-      const options = {
-        key: "rzp_live_RAFWaRQHfL5rbR", // Replace with your Razorpay Key ID
-        amount: customAmount * 100, // Amount in paise
-        currency: "INR",
-        name: "Wahid Org",
-        description: `Donation for ${project?.title || "General Fund"}`,
-        image: "https://cdn.razorpay.com/logo.svg", // Optional: Your logo
-        handler: function (response) {
-          alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
-          // Optionally, send payment details to your backend
-          fetch("https://wahidfoundationadmin-seven.vercel.app/api/save-donation", {
+  script.onload = () => {
+    const options = {
+      key: "rzp_live_RAFWaRQHfL5rbR", // Razorpay Key ID (safe to expose)
+      amount: customAmount * 100, // in paise
+      currency: "INR",
+      name: "Wahid Org",
+      description: `Donation for ${project?.title || "General Fund"}`,
+      image: "https://cdn.razorpay.com/logo.svg",
+      handler: async function (response) {
+        alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+
+        try {
+          // 1️⃣ Capture payment through backend
+          const captureRes = await fetch("/api/capture-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paymentId: response.razorpay_payment_id,
+              amount: customAmount,
+            }),
+          });
+
+          const captureData = await captureRes.json();
+          if (!captureRes.ok) {
+            console.error("Payment capture failed:", captureData);
+            alert("Payment capture failed! Please contact support.");
+            return;
+          }
+
+          console.log("Payment captured:", captureData);
+
+          // 2️⃣ Save donation in DB
+          await fetch("https://wahidfoundationadmin-seven.vercel.app/api/save-donation", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -110,34 +131,39 @@ export default function DonatePage({ searchParams }) {
             .then((res) => res.json())
             .then((data) => console.log("Donation saved:", data))
             .catch((err) => console.error("Failed to save donation:", err));
-        },
-        prefill: {
-          name: name,
-          email: email,
-        },
-        notes: {
-          projectId,
-          donationType,
-          donationFor,
-          dedicatedTo,
-          message,
-          isRecurring,
-          donationFrequency,
-          requestCertificate,
-        },
-        theme: {
-          color: "#059669", // Emerald-600
-        },
-      };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+        } catch (err) {
+          console.error("Error during capture or save:", err);
+        }
+      },
+      prefill: {
+        name: name,
+        email: email,
+      },
+      notes: {
+        projectId,
+        donationType,
+        donationFor,
+        dedicatedTo,
+        message,
+        isRecurring,
+        donationFrequency,
+        requestCertificate,
+      },
+      theme: {
+        color: "#059669",
+      },
     };
 
-    script.onerror = () => {
-      alert("Failed to load Razorpay SDK. Please try again later.");
-    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
+
+  script.onerror = () => {
+    alert("Failed to load Razorpay SDK. Please try again later.");
+  };
+};
+
 
   if (!project) {
     return (
