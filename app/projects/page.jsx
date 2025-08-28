@@ -3,11 +3,9 @@
 import { useEffect, useState } from 'react';
 import ProjectCardsSection from '../../components/Project';
 import { Filter, Search } from 'lucide-react';
-import { useSearchParams } from "next/navigation";
 
-const Projects = () => {
-  const searchParams = useSearchParams();
-  const title = searchParams.get("title");
+function Projects({ searchParams }) {
+  const title = searchParams.title;
 
   const [searchInput, setSearchInput] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
