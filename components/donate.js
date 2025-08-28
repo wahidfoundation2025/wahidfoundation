@@ -83,10 +83,10 @@ export default function DonatePage() {
 
     script.onload = () => {
       const options = {
-        key: "rzp_test_WhouHvDDral4fy", // Replace with your Razorpay Key ID
+        key: "rzp_live_RAFWaRQHfL5rbR", // Replace with your Razorpay Key ID
         amount: customAmount * 100, // Amount in paise
         currency: "INR",
-        name: "Your Organization Name",
+        name: "Wahid Org",
         description: `Donation for ${project?.title || "General Fund"}`,
         image: "https://cdn.razorpay.com/logo.svg", // Optional: Your logo
         handler: function (response) {

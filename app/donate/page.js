@@ -91,7 +91,7 @@ export default function DonatePage() {
     script.onload = () => {
       const selectedProject = projects.find((p) => p._id === selectedProjectId);
       const options = {
-        key: "rzp_live_lfzYuYY8Jv6NQG",
+        key: "rzp_live_RAFWaRQHfL5rbR",
         amount: customAmount * 100,
         currency: "INR",
         name: "Wahid Foundation",
