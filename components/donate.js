@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import { Heart, Users, Gift, HandCoins, CircleDollarSign, Repeat, FileBadge, IndianRupee } from "lucide-react";
 import { useUser } from '@clerk/nextjs';
 
-export default function DonatePage() {
-  const searchParams = useSearchParams();
+export default function DonatePage({ searchParams }) {
   const { user } = useUser();
-  const projectId = searchParams.get("project");
+  const projectId = searchParams?.project;
+
   const [isRecurring, setIsRecurring] = useState(false);
   const [donationFrequency, setDonationFrequency] = useState("Monthly");
   const [requestCertificate, setRequestCertificate] = useState(false);
