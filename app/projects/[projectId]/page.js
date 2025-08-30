@@ -20,6 +20,7 @@ import { motion } from "framer-motion";
 import { IoPerson } from "react-icons/io5";
 import Link from "next/link";
 import { FaHeart } from "react-icons/fa6";
+import { PiBookOpenTextFill } from "react-icons/pi";
 
 export default function ProjectDetailsPage() {
   const router = useRouter();
@@ -435,17 +436,27 @@ export default function ProjectDetailsPage() {
                   key={idx}
                   className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {update.version || "Update"}
-                  </h3>
-                  <p className="text-sm text-gray-600">
+                  <div className="flex sm:flex-row flex-col gap-2 items-start justify-between">
+                    <div className="flex flex-row gap-2 items-start">
+                      <div className="p-2 rounded-full bg-emerald-200">
+                        <PiBookOpenTextFill className="text-emerald-500" />
+                      </div>
+
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {update.version || "Update"}
+                      </h3>
+                    </div>
+
+                    <p className="sm:text-sm text-xs text-gray-500 sm:mt-0 mt-2 self-end sm:self-baseline">
+                      Date:{" "}
+                      {update.date
+                        ? new Date(update.date).toLocaleDateString()
+                        : "Unknown"}
+                    </p>
+                  </div>
+
+                  <p className="text-sm text-gray-600 mt-3">
                     {update.content || "No content available."}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Date:{" "}
-                    {update.date
-                      ? new Date(update.date).toLocaleDateString()
-                      : "Unknown"}
                   </p>
                 </div>
               ))}
