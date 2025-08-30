@@ -23,7 +23,6 @@ import { FaHeart } from "react-icons/fa6";
 import { PiBookOpenTextFill } from "react-icons/pi";
 
 export default function ProjectDetailsPage() {
-  const router = useRouter();
   const params = useParams();
   const projectId = params?.projectId;
   const { isSignedIn } = useUser();
@@ -105,16 +104,6 @@ export default function ProjectDetailsPage() {
       </div>
     );
   }
-
-  const handleDonateClick = (projectId, donationType) => {
-    if (!isSignedIn) {
-      router.push(
-        `/login?redirect_url=/donate?project=${projectId}&type=${donationType}`
-      );
-    } else {
-      router.push(`/donate?project=${projectId}&type=${donationType}`);
-    }
-  };
 
   const percentageRaised = project.totalRequired
     ? Math.min(
@@ -280,13 +269,13 @@ export default function ProjectDetailsPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-700">Donation Type</p>
                 <div className="space-y-2 text-sm text-gray-900">
-                  {["General Donation", "Zakat", "Sadqa", "Interest Earnings (Not Available)"].map((category) => (
+                  {["General Donation", "Zakat", "Sadqa", "Interest Earnings"].map((category) => (
                     <label key={category} className="flex items-center gap-2">
                       <input
                         type="radio"
                         name="donationType"
                         value={category}
-                        disabled={category === "Interest Earnings (Not Available)"}
+                        disabled={!donationCategories.find((cat)=> cat.title === category )}
                         checked={checkedDonationType ? checkedDonationType === category : checkedCategory === category}
                         onChange={(e) => setCheckedDonationType(e.target.value)}
                       />
@@ -323,12 +312,23 @@ export default function ProjectDetailsPage() {
               </div>
 
               {/* Button */}
-              <button
-                onClick={handleDonateClick}
-                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300"
+              <Link
+                href={{
+                  pathname: !isSignedIn ? "/login" : "/donate",
+                  query: {
+                    project: projectId,
+                    type: checkedDonationType || checkedCategory, // fallback
+                    amount,
+                    frequency,
+                  },
+                }}
               >
-                Donate
-              </button>
+                <button
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300"
+                >
+                  Donate
+                </button>
+              </Link>
             </div>
           </>
         ) : (

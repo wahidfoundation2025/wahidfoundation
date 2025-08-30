@@ -63,7 +63,6 @@ export default function DonatePage() {
           `https://wahidfoundationadmin-seven.vercel.app/api/projects?donation_type=${category}&page=1&limit=6`
         );
         const data = await res.json();
-        console.log("Fetched projects data:", data);
         setProjects(data.projects || []);
         if (data.projects?.length > 0) {
           setSelectedProjectId(data.projects[1]._id); // Default to first project
