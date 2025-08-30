@@ -30,9 +30,9 @@ export default function ProjectDetailsPage() {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("impact"); // State for tabbed interface
 
-  const [checkedDonationType, setCheckedDonationType] = useState("");
-  const [amount, setAmount] = useState();
-  const [frequency, setFrequency] = useState();
+  const [checkedDonationType, setCheckedDonationType] = useState();
+  const [amount, setAmount] = useState("");
+  const [frequency, setFrequency] = useState("One Time");
 
   useEffect(() => {
     async function fetchProject() {
@@ -279,19 +279,19 @@ export default function ProjectDetailsPage() {
               <div className="space-y-2">
                 <p className="text-sm font-medium text-gray-700">Donation Type</p>
                 <div className="space-y-2 text-sm text-gray-900">
-                  <>
-                    {["General Donation", "Zakat", "Sadqa", "Interest Earnings (Not Available)"].map((category) => (
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="donationType"
-                          defaultChecked={checkedCategory === category}
-                          disabled={category === "Interest Earnings (Not Available)"}
-                        />
-                        {category}
-                      </label>
-                    ))}
-                  </>
+                  {["General Donation", "Zakat", "Sadqa", "Interest Earnings (Not Available)"].map((category) => (
+                    <label key={category} className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="donationType"
+                        value={category}
+                        disabled={category === "Interest Earnings (Not Available)"}
+                        checked={checkedDonationType ? checkedDonationType === category : checkedCategory === category}
+                        onChange={(e) => setCheckedDonationType(e.target.value)}
+                      />
+                      {category}
+                    </label>
+                  ))}
                 </div>
               </div>
 
@@ -312,8 +312,9 @@ export default function ProjectDetailsPage() {
                 <p className="text-sm font-medium text-gray-700">Frequency</p>
                 <select
                   value={frequency}
-                  onClick={(e) => setFrequency(e.target.value)}
-                  className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  onChange={(e) => setFrequency(e.target.value)}
+                  className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                >
                   <option>One Time</option>
                   <option>Monthly</option>
                   <option>Yearly</option>
@@ -321,7 +322,10 @@ export default function ProjectDetailsPage() {
               </div>
 
               {/* Button */}
-              <button onClick={handleDonateClick} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300">
+              <button
+                onClick={handleDonateClick}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300"
+              >
                 Donate
               </button>
             </div>
@@ -377,7 +381,7 @@ export default function ProjectDetailsPage() {
                   }`}
                 onClick={() => setActiveTab("manager")}
               >
-                Project Updates
+                Project Manager
               </button>
             )}
           </div>
@@ -419,7 +423,7 @@ export default function ProjectDetailsPage() {
 
 
           {activeTab === "about" && (
-            <p className="text-gray-700 whitespace-pre-line text-center md:text-left">
+            <p className="text-gray-700 text-sm whitespace-pre-line text-center md:text-left">
               {project.description || "No description available."}
             </p>
           )}
