@@ -277,29 +277,30 @@ const ProjectCardsSection = ({
                 )}
 
                 {/* Buttons */}
-                <div className="responsive_flex flex flex-row gap-2 mt-auto">
-                  {project.status !== "Completed" && (
-                    <Link href={{
-                      pathname: !isSignedIn ? "/login" : "/donate",
-                      query: {
-                        project: project._id
-                      }
-                    }}
-                    >
-                      <button
-                        className="flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
-                      >
-                        Donate Now
-                      </button>
-                    </Link>
-                  )}
-                  <Link
-                    href={`/projects/${project._id}`}
-                    className="flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
-                  >
-                    View Details
-                  </Link>
-                </div>
+                <div className="responsive_flex flex flex-col sm:flex-row gap-2 mt-auto">
+  {project.status !== "Completed" && (
+    <Link
+      href={{
+        pathname: !isSignedIn ? "/login" : "/donate",
+        query: { project: project._id }
+      }}
+      className="w-full"
+    >
+      <button
+        className="w-full text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
+      >
+        Donate Now
+      </button>
+    </Link>
+  )}
+  <Link
+    href={`/projects/${project._id}`}
+    className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
+  >
+    View Details
+  </Link>
+</div>
+
               </div>
             </div>
           ))}
