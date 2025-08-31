@@ -58,7 +58,7 @@ const Impact = () => {
       link: "/projects?category=Healthcare",
     },
     women: {
-      color: "pink",
+      color: "purple",
       title: "Women Empowerment Impact",
       subtitle: "Empowering women, transforming communities",
       stats: [

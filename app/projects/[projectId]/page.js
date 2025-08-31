@@ -275,7 +275,7 @@ export default function ProjectDetailsPage() {
                         type="radio"
                         name="donationType"
                         value={category}
-                        disabled={!donationCategories.find((cat)=> cat.title === category )}
+                        disabled={!donationCategories.find((cat) => cat.title === category)}
                         checked={checkedDonationType ? checkedDonationType === category : checkedCategory === category}
                         onChange={(e) => setCheckedDonationType(e.target.value)}
                       />
@@ -338,51 +338,71 @@ export default function ProjectDetailsPage() {
         )}
       </section>
 
+      <section className="text-black sm:max-w-2xl w-full mx-auto p-3 rounded-2xl bg-emerald-100 border border-emerald-400">
+        <h3 className="mb-3 font-semibold">Project Manager</h3>
+
+        <div className="flex sm:flex-row flex-col gap-2 items-start sm:items-center justify-between text-gray-700 text-sm text-center md:text-left">
+          <div className="flex items-center font-medium justify-center md:justify-start">
+            <span className="mr-2">
+              <IoPerson />
+            </span>
+            {project.projectManager.name || "Unknown"}
+          </div>
+          <p className="flex justify-center md:justify-start items-center space-x-2">
+            <Mail className="w-4 h-4" />
+            <a
+              href={`mailto:${project.projectManager.email || ""}`}
+              className="text-blue-600 hover:underline"
+            >
+              {project.projectManager.email || "No email provided"}
+            </a>
+          </p>
+          <p className="flex justify-center md:justify-start items-center space-x-2">
+            <Phone className="w-4 h-4" />
+            <a
+              href={`tel:${project.projectManager.phone || ""}`}
+              className="text-blue-600 hover:underline"
+            >
+              {project.projectManager.phone || "No phone provided"}
+            </a>
+          </p>
+        </div>
+      </section>
+
       {(project.impact?.length > 0 || project.updates?.length > 0) && (
         <section className="px-4 lg:max-w-6xl lg:mx-auto">
-          <div className="flex border-b border-gray-200 mb-6">
+          <div className="flex bg-gray-100 mb-6 rounded-2xl p-1">
             {project.impact?.length > 0 && (
               <button
-                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "impact"
-                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "impact"
+                  ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
                   : "text-gray-600 hover:text-emerald-600"
                   }`}
                 onClick={() => setActiveTab("impact")}
               >
-                Project Impact
+                Impact
               </button>
             )}
             {project.description && (
               <button
-                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "about"
-                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "about"
+                  ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
                   : "text-gray-600 hover:text-emerald-600"
                   }`}
                 onClick={() => setActiveTab("about")}
               >
-                About the Project
+                About
               </button>
             )}
             {project.updates?.length > 0 && (
               <button
-                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "updates"
-                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "updates"
+                  ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
                   : "text-gray-600 hover:text-emerald-600"
                   }`}
                 onClick={() => setActiveTab("updates")}
               >
-                Project Updates
-              </button>
-            )}
-            {project.projectManager && (
-              <button
-                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "manager"
-                  ? "border-b-2 border-emerald-600 text-emerald-600"
-                  : "text-gray-600 hover:text-emerald-600"
-                  }`}
-                onClick={() => setActiveTab("manager")}
-              >
-                Project Manager
+                Updates
               </button>
             )}
           </div>
@@ -394,21 +414,26 @@ export default function ProjectDetailsPage() {
                   key={idx}
                   className="bg-gray-50 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-300"
                 >
-                  {impact.icon && (
-                    <img
-                      src={impact.icon}
-                      alt={impact.title || "Impact"}
-                      className="w-12 h-12 object-cover rounded-full mb-3 mx-auto"
-                    />
-                  )}
-                  <h3 className="text-lg font-semibold text-gray-800 text-center">
-                    {impact.title || "Untitled Impact"}
-                  </h3>
-                  <p className="text-sm text-gray-600 text-center">
+                  <div className="flex flex-row gap-3 items-start">
+                    {impact.icon && (
+                      <img
+                        src={impact.icon}
+                        alt={impact.title || "Impact"}
+                        className="w-12 h-12 object-cover rounded-full mb-3 mx-auto"
+                      />
+                    )}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-800 text-left">
+                        {impact.title || "Untitled Impact"}
+                      </h3>
+                      <p className="text-xs text-gray-500 text-left my-2">
+                        Type: {impact.type || "Unknown"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-sm text-gray-600 text-left">
                     {impact.description || "No description available."}
-                  </p>
-                  <p className="text-xs text-gray-500 text-center mt-2">
-                    Type: {impact.type || "Unknown"}
                   </p>
                 </div>
               ))}
@@ -424,7 +449,7 @@ export default function ProjectDetailsPage() {
 
 
           {activeTab === "about" && (
-            <p className="text-gray-700 text-sm whitespace-pre-line text-center md:text-left">
+            <p className="text-gray-700 text-sm whitespace-pre-line">
               {project.description || "No description available."}
             </p>
           )}
@@ -438,8 +463,8 @@ export default function ProjectDetailsPage() {
                 >
                   <div className="flex sm:flex-row flex-col gap-2 items-start justify-between">
                     <div className="flex flex-row gap-2 items-start">
-                      <div className="p-2 rounded-full bg-emerald-200">
-                        <PiBookOpenTextFill className="text-emerald-500" />
+                      <div className="p-3.5 rounded-full bg-emerald-200">
+                        <PiBookOpenTextFill className="text-emerald-500 text-xl" />
                       </div>
 
                       <h3 className="text-lg font-semibold text-gray-800">
@@ -467,36 +492,6 @@ export default function ProjectDetailsPage() {
             (!project.updates || project.updates.length === 0) && (
               <p className="text-center text-gray-600">No updates available.</p>
             )}
-
-
-          {activeTab === "manager" && (
-            <div className="space-y-4 text-gray-700 text-sm text-center md:text-left">
-              <div className="flex items-center font-semibold justify-center md:justify-start">
-                <span className="mr-2">
-                  <IoPerson />
-                </span>
-                {project.projectManager.name || "Unknown"}
-              </div>
-              <p className="flex justify-center md:justify-start items-center space-x-2">
-                <Mail className="w-4 h-4" />
-                <a
-                  href={`mailto:${project.projectManager.email || ""}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {project.projectManager.email || "No email provided"}
-                </a>
-              </p>
-              <p className="flex justify-center md:justify-start items-center space-x-2">
-                <Phone className="w-4 h-4" />
-                <a
-                  href={`tel:${project.projectManager.phone || ""}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {project.projectManager.phone || "No phone provided"}
-                </a>
-              </p>
-            </div>
-          )}
         </section>
       )}
 
