@@ -277,14 +277,14 @@ const ProjectCardsSection = ({
                 )}
 
                 {/* Buttons */}
-                <div className="responsive_flex flex flex-col sm:flex-row gap-2 mt-auto">
+                <div className="flex flex-col sm:flex-row gap-2 mt-auto">
   {project.status !== "Completed" && (
     <Link
       href={{
         pathname: !isSignedIn ? "/login" : "/donate",
         query: { project: project._id }
       }}
-      className="w-full"
+      className="w-full sm:flex-1"
     >
       <button
         className="w-full text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
