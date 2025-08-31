@@ -3,11 +3,8 @@
 import { useEffect, useState } from "react";
 import { Heart, Users, Gift, HandCoins, CircleDollarSign, IndianRupee, FileBadge } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { useSearchParams } from "next/navigation";
 
-export default function DonatePage() {
-  const searchParams = useSearchParams();
-
+export default function DonatePage({searchParams}) {
   const projectId = searchParams.get("project");
   const type = searchParams.get("type");
   const amount = searchParams.get("amount");
