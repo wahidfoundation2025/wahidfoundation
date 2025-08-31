@@ -80,14 +80,6 @@ const ProjectCardsSection = ({
       : "bg-blue-100 text-blue-800";
   };
 
-  const handleDonateClick = (projectId) => {
-    if (!isSignedIn) {
-      router.push(`/login?redirect_url=/donate?project=${projectId}`);
-    } else {
-      router.push(`/donate?project=${projectId}`);
-    }
-  };
-
   const formatNumber = (num) => {
     if (num >= 1_000_000) {
       return Math.floor(num / 1_000_000) + "M";
@@ -287,12 +279,19 @@ const ProjectCardsSection = ({
                 {/* Buttons */}
                 <div className="responsive_flex flex flex-row gap-2 mt-auto">
                   {project.status !== "Completed" && (
-                    <button
-                      onClick={() => handleDonateClick(project._id)}
-                      className="flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
+                    <Link href={{
+                      pathname: !isSignedIn ? "/login" : "/donate",
+                      query: {
+                        project: project._id
+                      }
+                    }}
                     >
-                      Donate Now
-                    </button>
+                      <button
+                        className="flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
+                      >
+                        Donate Now
+                      </button>
+                    </Link>
                   )}
                   <Link
                     href={`/projects/${project._id}`}
@@ -305,8 +304,9 @@ const ProjectCardsSection = ({
             </div>
           ))}
         </div>
-      )}
-    </section>
+      )
+      }
+    </section >
   );
 };
 

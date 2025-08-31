@@ -19,6 +19,8 @@ import {
 import { motion } from "framer-motion";
 import { IoPerson } from "react-icons/io5";
 import Link from "next/link";
+import { FaHeart } from "react-icons/fa6";
+import { PiBookOpenTextFill } from "react-icons/pi";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
@@ -27,7 +29,10 @@ export default function ProjectDetailsPage() {
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("impact"); // State for tabbed interface
-  const router = useRouter();
+
+  const [checkedDonationType, setCheckedDonationType] = useState();
+  const [amount, setAmount] = useState("");
+  const [frequency, setFrequency] = useState("One Time");
 
   useEffect(() => {
     async function fetchProject() {
@@ -100,16 +105,6 @@ export default function ProjectDetailsPage() {
     );
   }
 
-  const handleDonateClick = (projectId, donationType) => {
-    if (!isSignedIn) {
-      router.push(
-        `/login?redirect_url=/donate?project=${projectId}&type=${donationType}`
-      );
-    } else {
-      router.push(`/donate?project=${projectId}&type=${donationType}`);
-    }
-  };
-
   const percentageRaised = project.totalRequired
     ? Math.min(
       Math.round((project.collected / project.totalRequired) * 100),
@@ -159,6 +154,8 @@ export default function ProjectDetailsPage() {
       (opt) => opt.type === category.title && opt.isEnabled
     )
   );
+
+  const checkedCategory = donationCategories[0].title
 
   return (
     <main className="space-y-8 bg-white pb-16 px-4 lg:px-8">
@@ -261,37 +258,76 @@ export default function ProjectDetailsPage() {
         {/* Cards */}
         {donationCategories.length > 0 ? (
           <>
-            <div className="flex justify-center gap-6 flex-wrap mb-6 lg:mb-12">
-              {donationCategories.map((category, index) => (
-                <div
-                  key={index}
-                  className={`${category.bgColor} border-0 rounded-lg shadow-sm hover:shadow-md transition-shadow lg:hover:shadow-xl lg:hover:scale-105 lg:transition-all lg:duration-300 w-64`}
-                >
-                  <div className="text-center p-4 lg:p-6">
-                    <div className="w-14 h-14 rounded-full bg-white flex items-center justify-center mx-auto mb-3 shadow-sm lg:w-20 lg:h-20 lg:mb-4">
-                      <category.icon
-                        className={`h-7 w-7 ${category.color} lg:h-10 lg:w-10`}
-                      />
-                    </div>
-                    <h3 className="text-lg text-gray-800 lg:text-xl font-semibold">
-                      {category.title}
-                    </h3>
-                  </div>
-                  <div className="text-center space-y-3 p-4 pt-0 lg:p-6 lg:pt-0 lg:space-y-4">
-                    <p className="text-xs text-gray-600 leading-relaxed lg:text-sm lg:leading-relaxed">
-                      {category.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <div className="max-w-sm mx-auto w-full bg-emerald-50 border border-emerald-100 rounded-xl shadow-sm p-6 space-y-6">
+              {/* Title */}
+              <div className="flex items-center gap-2">
+                <FaHeart className="text-emerald-600 w-5 h-5" />
+                <h2 className="text-lg font-semibold text-gray-800">Make a Donation</h2>
+              </div>
 
-            <div className="text-center">
+              {/* Donation Type */}
+              <div className="space-y-2">
+                <p className="text-sm font-medium text-gray-700">Donation Type</p>
+                <div className="space-y-2 text-sm text-gray-900">
+                  {["General Donation", "Zakat", "Sadqa", "Interest Earnings"].map((category) => (
+                    <label key={category} className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="donationType"
+                        value={category}
+                        disabled={!donationCategories.find((cat)=> cat.title === category )}
+                        checked={checkedDonationType ? checkedDonationType === category : checkedCategory === category}
+                        onChange={(e) => setCheckedDonationType(e.target.value)}
+                      />
+                      {category}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Donation Amount */}
+              <div className="space-y-2 text-black">
+                <p className="text-sm font-medium text-gray-700">Donation Amount</p>
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Enter amount (Min: Rs. 365)"
+                  className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                />
+              </div>
+
+              {/* Frequency */}
+              <div className="space-y-2 text-black">
+                <p className="text-sm font-medium text-gray-700">Frequency</p>
+                <select
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
+                  className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
+                >
+                  <option>One Time</option>
+                  <option>Monthly</option>
+                  <option>Yearly</option>
+                </select>
+              </div>
+
+              {/* Button */}
               <Link
-                href={`/donate?project=${projectId}`}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition duration-300 inline-block"
+                href={{
+                  pathname: !isSignedIn ? "/login" : "/donate",
+                  query: {
+                    project: projectId,
+                    type: checkedDonationType || checkedCategory, // fallback
+                    amount,
+                    frequency,
+                  },
+                }}
               >
-                Donate Now
+                <button
+                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300"
+                >
+                  Donate
+                </button>
               </Link>
             </div>
           </>
@@ -302,73 +338,51 @@ export default function ProjectDetailsPage() {
         )}
       </section>
 
-      <section className="flex flex-col md:flex-row justify-center items-start gap-6 px-4 lg:max-w-6xl lg:mx-auto">
-        <div className="bg-gray-50 p-6 rounded-xl shadow max-w-xl w-full flex-1">
-          <h2 className="text-xl font-semibold mb-2 text-gray-800 text-center md:text-left">
-            About the Project
-          </h2>
-          <p className="text-gray-700 whitespace-pre-line text-center md:text-left">
-            {project.description || "No description available."}
-          </p>
-        </div>
-        {project.projectManager && (
-          <div className="bg-gray-50 border rounded-xl p-6 shadow max-w-sm w-full flex-1">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4 text-center md:text-left">
-              Project Manager
-            </h2>
-            <div className="space-y-4 text-gray-700 text-sm text-center md:text-left">
-              <div className="flex items-center font-semibold justify-center md:justify-start">
-                <span className="mr-2">
-                  <IoPerson />
-                </span>
-                {project.projectManager.name || "Unknown"}
-              </div>
-              <p className="flex justify-center md:justify-start items-center space-x-2">
-                <Mail className="w-4 h-4" />
-                <a
-                  href={`mailto:${project.projectManager.email || ""}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {project.projectManager.email || "No email provided"}
-                </a>
-              </p>
-              <p className="flex justify-center md:justify-start items-center space-x-2">
-                <Phone className="w-4 h-4" />
-                <a
-                  href={`tel:${project.projectManager.phone || ""}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {project.projectManager.phone || "No phone provided"}
-                </a>
-              </p>
-            </div>
-          </div>
-        )}
-      </section>
-
       {(project.impact?.length > 0 || project.updates?.length > 0) && (
         <section className="px-4 lg:max-w-6xl lg:mx-auto">
           <div className="flex border-b border-gray-200 mb-6">
             {project.impact?.length > 0 && (
               <button
                 className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "impact"
-                    ? "border-b-2 border-emerald-600 text-emerald-600"
-                    : "text-gray-600 hover:text-emerald-600"
+                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                  : "text-gray-600 hover:text-emerald-600"
                   }`}
                 onClick={() => setActiveTab("impact")}
               >
                 Project Impact
               </button>
             )}
+            {project.description && (
+              <button
+                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "about"
+                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                  : "text-gray-600 hover:text-emerald-600"
+                  }`}
+                onClick={() => setActiveTab("about")}
+              >
+                About the Project
+              </button>
+            )}
             {project.updates?.length > 0 && (
               <button
                 className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "updates"
-                    ? "border-b-2 border-emerald-600 text-emerald-600"
-                    : "text-gray-600 hover:text-emerald-600"
+                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                  : "text-gray-600 hover:text-emerald-600"
                   }`}
                 onClick={() => setActiveTab("updates")}
               >
                 Project Updates
+              </button>
+            )}
+            {project.projectManager && (
+              <button
+                className={`px-4 py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "manager"
+                  ? "border-b-2 border-emerald-600 text-emerald-600"
+                  : "text-gray-600 hover:text-emerald-600"
+                  }`}
+                onClick={() => setActiveTab("manager")}
+              >
+                Project Manager
               </button>
             )}
           </div>
@@ -378,7 +392,7 @@ export default function ProjectDetailsPage() {
               {project.impact.map((impact, idx) => (
                 <div
                   key={idx}
-                  className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="bg-gray-50 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-300"
                 >
                   {impact.icon && (
                     <img
@@ -408,6 +422,13 @@ export default function ProjectDetailsPage() {
               </p>
             )}
 
+
+          {activeTab === "about" && (
+            <p className="text-gray-700 text-sm whitespace-pre-line text-center md:text-left">
+              {project.description || "No description available."}
+            </p>
+          )}
+
           {activeTab === "updates" && project.updates?.length > 0 && (
             <div className="space-y-4">
               {project.updates.map((update, idx) => (
@@ -415,17 +436,27 @@ export default function ProjectDetailsPage() {
                   key={idx}
                   className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <h3 className="text-lg font-semibold text-gray-800">
-                    {update.version || "Update"}
-                  </h3>
-                  <p className="text-sm text-gray-600">
+                  <div className="flex sm:flex-row flex-col gap-2 items-start justify-between">
+                    <div className="flex flex-row gap-2 items-start">
+                      <div className="p-2 rounded-full bg-emerald-200">
+                        <PiBookOpenTextFill className="text-emerald-500" />
+                      </div>
+
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {update.version || "Update"}
+                      </h3>
+                    </div>
+
+                    <p className="sm:text-sm text-xs text-gray-500 sm:mt-0 mt-2 self-end sm:self-baseline">
+                      Date:{" "}
+                      {update.date
+                        ? new Date(update.date).toLocaleDateString()
+                        : "Unknown"}
+                    </p>
+                  </div>
+
+                  <p className="text-sm text-gray-600 mt-3">
                     {update.content || "No content available."}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Date:{" "}
-                    {update.date
-                      ? new Date(update.date).toLocaleDateString()
-                      : "Unknown"}
                   </p>
                 </div>
               ))}
@@ -436,6 +467,36 @@ export default function ProjectDetailsPage() {
             (!project.updates || project.updates.length === 0) && (
               <p className="text-center text-gray-600">No updates available.</p>
             )}
+
+
+          {activeTab === "manager" && (
+            <div className="space-y-4 text-gray-700 text-sm text-center md:text-left">
+              <div className="flex items-center font-semibold justify-center md:justify-start">
+                <span className="mr-2">
+                  <IoPerson />
+                </span>
+                {project.projectManager.name || "Unknown"}
+              </div>
+              <p className="flex justify-center md:justify-start items-center space-x-2">
+                <Mail className="w-4 h-4" />
+                <a
+                  href={`mailto:${project.projectManager.email || ""}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {project.projectManager.email || "No email provided"}
+                </a>
+              </p>
+              <p className="flex justify-center md:justify-start items-center space-x-2">
+                <Phone className="w-4 h-4" />
+                <a
+                  href={`tel:${project.projectManager.phone || ""}`}
+                  className="text-blue-600 hover:underline"
+                >
+                  {project.projectManager.phone || "No phone provided"}
+                </a>
+              </p>
+            </div>
+          )}
         </section>
       )}
 
