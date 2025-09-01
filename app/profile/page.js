@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { FaAnglesLeft, FaAnglesRight } from "react-icons/fa6";
+import { SignOutButton } from "@clerk/nextjs";
 
 export default function ProfilePage() {
   const { user, isLoaded } = useUser();
@@ -166,48 +167,59 @@ export default function ProfilePage() {
     currentPage * rowsPerPage
   );
   return (
-    <div className="min-h-screen flex items-start lg:items-center justify-center pt-6 lg:pt-0 bg-gray-50 text-black">
-      <section className="bg-white w-full max-w-4xl rounded-xl shadow p-6 md:p-8 space-y-6">
+    <div className="min-h-screen sm:px-10 px-3 flex items-start lg:items-center justify-center pt-6 bg-gray-50 text-black">
+      <section className="bg-white w-full max-w-4xl rounded-xl shadow p-6 md:p-8 space-y-6 mb-10">
         {/* Profile */}
-        <div className="flex flex-col md:flex-row md:items-center md:space-x-6 border-b pb-6">
-          <img
-            src={formData.profilePicture || "/placeholder-avatar.png"}
-            alt="Profile"
-            className="w-20 h-20 rounded-full object-cover border-2 border-emerald-600 mb-4 md:mb-0"
-          />
-          <div className="w-full space-y-2">
-            <label className="block text-sm font-medium text-gray-700">Full name</label>
-            <input
-              className="w-full border p-2 rounded"
-              value={formData.name || ""}
-              onChange={(e) => setField("name", e.target.value)}
-              placeholder="Full name"
-            />
+        <div className="flex flex-col gap-3 items-start md:space-x-6 border-b pb-6">
+          <div className="w-full flex flex-row gap-6 sm:mb-4 m-0">
+            <div className="w-full flex-1/5 flex flex-col gap-4 justify-between">
+              <img
+                src={formData.profilePicture || "/placeholder-avatar.png"}
+                alt="Profile"
+                className="w-20 h-20 mx-auto rounded-full object-cover border-2 border-emerald-600 mb-4 md:mb-0"
+              />
 
-            <label className="block text-sm font-medium text-gray-700">Email (from Clerk)</label>
-            <input
-              className="w-full border p-2 rounded bg-gray-50"
-              value={formData.email || ""}
-              readOnly
-              title="Email is managed by Clerk; change in account settings."
-            />
+              <SignOutButton>
+                <button className="px-4 py-2 text-sm bg-red-white border border-red-500 text-red-500 hover:text-white rounded-xl hover:bg-red-600 cursor-pointer transition">
+                  Logout
+                </button>
+              </SignOutButton>
+            </div>
 
-            <label className="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              className="w-full border p-2 rounded"
-              value={formData.phoneNumber || ""}
-              onChange={(e) => setField("phoneNumber", e.target.value)}
-              placeholder="Phone number (optional)"
-            />
+            <div className="w-full flex-4/5 space-y-2">
+              <label className="block text-sm font-medium text-gray-700">Full name</label>
+              <input
+                className="w-full border p-2 rounded"
+                value={formData.name || ""}
+                onChange={(e) => setField("name", e.target.value)}
+                placeholder="Full name"
+              />
 
-            <label className="block text-sm font-medium text-gray-700">PAN card</label>
-            <input
-              className="w-full border p-2 rounded"
-              value={formData.pancardNumber || ""}
-              onChange={(e) => setField("pancardNumber", e.target.value)}
-              placeholder="PAN"
-            />
+              <label className="block text-sm font-medium text-gray-700">Email (from Clerk)</label>
+              <input
+                className="w-full border p-2 rounded bg-gray-50"
+                value={formData.email || ""}
+                readOnly
+                title="Email is managed by Clerk; change in account settings."
+              />
+            </div>
           </div>
+
+          <label className="block text-sm font-medium text-gray-700">Phone</label>
+          <input
+            className="w-full border p-2 mx-0 rounded"
+            value={formData.phoneNumber || ""}
+            onChange={(e) => setField("phoneNumber", e.target.value)}
+            placeholder="Phone number (optional)"
+          />
+
+          <label className="block text-sm font-medium text-gray-700">PAN card</label>
+          <input
+            className="w-full border p-2 mx-0 rounded"
+            value={formData.pancardNumber || ""}
+            onChange={(e) => setField("pancardNumber", e.target.value)}
+            placeholder="PAN"
+          />
         </div>
 
         {/* Address */}
@@ -231,7 +243,7 @@ export default function ProfilePage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 disabled:opacity-50"
+            className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Profile"}
           </button>
