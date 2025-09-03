@@ -39,7 +39,7 @@ export default function ProjectDetailsPage() {
       try {
         if (!projectId) throw new Error("Project ID is missing");
         const res = await fetch(
-          `https://wahidfoundationadmin-seven.vercel.app/api/projects/${projectId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`
         );
         if (!res.ok) throw new Error("Failed to fetch project");
         const data = await res.json();

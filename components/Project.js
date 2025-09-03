@@ -20,8 +20,8 @@ const ProjectCardsSection = ({
     async function fetchData() {
       try {
         const [projectsRes, donationsRes] = await Promise.all([
-          fetch("https://wahidfoundationadmin-seven.vercel.app/api/projects"),
-          fetch("https://wahidfoundationadmin-seven.vercel.app/api/donations/summary"),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/summary`),
         ]);
 
         const projectsData = await projectsRes.json();
@@ -111,7 +111,7 @@ const ProjectCardsSection = ({
     let matchesDonationType = true;
 
     if (donationTypeFilter !== "all") {
-      matchesDonationType = project.donationOptions?.some(option => {
+      matchesDonationType = project.donationOptions?.some((option) => {
         if (!option.isEnabled) return false;
 
         if (donationTypeFilter === "zakat") {
@@ -143,7 +143,16 @@ const ProjectCardsSection = ({
           No projects found.
         </div>
       ) : (
-        <div className={`${displayedProjects.length > 2 ? "sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] " : "lg:[grid-template-columns:repeat(auto-fit,minmax(300px,400px))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"} ` + " [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))] w-full grid md:gap-8 gap-4"}>
+        <div
+          className={
+            `${
+              displayedProjects.length > 2
+                ? "sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] "
+                : "lg:[grid-template-columns:repeat(auto-fit,minmax(300px,400px))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"
+            } ` +
+            " [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))] w-full grid md:gap-8 gap-4"
+          }
+        >
           {displayedProjects.map((project) => (
             <div
               key={project._id}
@@ -234,7 +243,8 @@ const ProjectCardsSection = ({
                       <div className="flex items-center space-x-1">
                         <Users className="h-4 w-4 text-emerald-600" />
                         <span className="max-w-[106px] truncate">
-                          {formatNumber(project.beneficiaries ?? 0)} beneficiaries
+                          {formatNumber(project.beneficiaries ?? 0)}{" "}
+                          beneficiaries
                         </span>
                       </div>
 
@@ -278,36 +288,32 @@ const ProjectCardsSection = ({
 
                 {/* Buttons */}
                 <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-  {project.status !== "Completed" && (
-    <Link
-      href={{
-        pathname: !isSignedIn ? "/login" : "/donate",
-        query: { project: project._id }
-      }}
-      className="w-full sm:flex-1"
-    >
-      <button
-        className="w-full text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
-      >
-        Donate Now
-      </button>
-    </Link>
-  )}
-  <Link
-    href={`/projects/${project._id}`}
-    className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
-  >
-    View Details
-  </Link>
-</div>
-
+                  {project.status !== "Completed" && (
+                    <Link
+                      href={{
+                        pathname: !isSignedIn ? "/login" : "/donate",
+                        query: { project: project._id },
+                      }}
+                      className="w-full sm:flex-1"
+                    >
+                      <button className="w-full text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold">
+                        Donate Now
+                      </button>
+                    </Link>
+                  )}
+                  <Link
+                    href={`/projects/${project._id}`}
+                    className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
+                  >
+                    View Details
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
         </div>
-      )
-      }
-    </section >
+      )}
+    </section>
   );
 };
 

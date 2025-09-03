@@ -19,7 +19,7 @@ const Impact = () => {
 
   useEffect(() => {
     // Replace with your actual API endpoint
-    fetch("https://wahidfoundationadmin-seven.vercel.app/api/impact-stories")
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/impact-stories`)
       .then(res => res.json())
       .then(data => {
         setStories(data);
