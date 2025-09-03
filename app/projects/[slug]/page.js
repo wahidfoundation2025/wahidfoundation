@@ -24,9 +24,10 @@ import { PiBookOpenTextFill } from "react-icons/pi";
 
 export default function ProjectDetailsPage() {
   const params = useParams();
-  const projectId = params?.projectId;
+  const { slug } = params;
   const { isSignedIn } = useUser();
   const [project, setProject] = useState(null);
+  const [projectId, setProjectId] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("impact"); // State for tabbed interface
 
@@ -35,30 +36,33 @@ export default function ProjectDetailsPage() {
   const [frequency, setFrequency] = useState("One Time");
 
   useEffect(() => {
-    async function fetchProject() {
+    if (!slug) return;
+
+    async function fetchData() {
       try {
-        if (!projectId) throw new Error("Project ID is missing");
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`
-        );
-        if (!res.ok) throw new Error("Failed to fetch project");
+        const slugRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/slug/${slug}`);
+        if (!slugRes.ok) throw new Error("Failed to fetch project ID");
+        const { projectId } = await slugRes.json();
+
+        // Then fetch project details
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`);
+        if (!res.ok) throw new Error("Failed to fetch project details");
         const data = await res.json();
+
         setProject({
           ...data,
-          category: Array.isArray(data.category)
-            ? data.category.join(", ")
-            : data.category || "Unknown",
+          category: Array.isArray(data.category) ? data.category.join(", ") : data.category || "Unknown",
           impact: Array.isArray(data.impact) ? data.impact : [],
           scheme: Array.isArray(data.scheme) ? data.scheme : [],
           updates: Array.isArray(data.updates) ? data.updates : [],
           donationOptions: Array.isArray(data.donationOptions)
             ? data.donationOptions
             : [
-              { type: "General Donation", isEnabled: false },
-              { type: "Zakat", isEnabled: false },
-              { type: "Sadqa", isEnabled: false },
-              { type: "Interest Earnings", isEnabled: false },
-            ],
+                { type: "General Donation", isEnabled: false },
+                { type: "Zakat", isEnabled: false },
+                { type: "Sadqa", isEnabled: false },
+                { type: "Interest Earnings", isEnabled: false },
+              ],
         });
       } catch (error) {
         console.error("Error fetching project:", error);
@@ -66,8 +70,9 @@ export default function ProjectDetailsPage() {
       }
     }
 
-    if (projectId) fetchProject();
-  }, [projectId]);
+    fetchData();
+  }, [slug]);
+
 
   if (error) {
     return (
