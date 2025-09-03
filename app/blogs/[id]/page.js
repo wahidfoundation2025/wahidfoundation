@@ -2,7 +2,7 @@ import Head from 'next/head';
 
 export default async function BlogDetail({ params }) {
   const res = await fetch(
-    `https://wahidfoundationadmin-seven.vercel.app/api/blogs/${params.id}`,
+    `${process.env.NEXT_PUBLIC_API_URL}/blogs/${params.id}`,
     { cache: 'no-store' }
   );
 

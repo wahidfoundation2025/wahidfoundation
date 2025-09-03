@@ -60,7 +60,7 @@ export default function DonatePage() {
     async function fetchProjects() {
       try {
         const res = await fetch(
-          `https://wahidfoundationadmin-seven.vercel.app/api/projects?donation_type=${category}&page=1&limit=6`
+          `${process.env.NEXT_PUBLIC_API_URL}/projects?donation_type=${category}&page=1&limit=6`
         );
         const data = await res.json();
         setProjects(data.projects || []);
@@ -112,7 +112,7 @@ export default function DonatePage() {
             `Payment successful! Payment ID: ${response.razorpay_payment_id}`
           );
           // Optionally, send payment details to your backend
-          fetch("https://wahidfoundationadmin-seven.vercel.app/api/save-donation", {
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

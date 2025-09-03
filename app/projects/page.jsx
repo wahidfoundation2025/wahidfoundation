@@ -20,7 +20,7 @@ function Projects({ searchParams }) {
   useEffect(() => {
     async function fetchCategories() {
       try {
-        const res = await fetch('https://wahidfoundationadmin-seven.vercel.app/api/categories');
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/categories`);
         const data = await res.json();
 
         // API gives array of objects: [{ _id, name, description, ... }, ...]

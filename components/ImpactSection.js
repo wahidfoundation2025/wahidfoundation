@@ -16,7 +16,7 @@ export default function ImpactStats() {
   useEffect(() => {
     async function fetchImpact() {
       try {
-        const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/homeimpactsection");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homeimpactsection`);
         const data = await res.json();
         setImpact(data);
       } catch (e) {

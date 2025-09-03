@@ -64,7 +64,7 @@ export default function ProfilePage() {
       setLoadingDonor(true);
       try {
         const email = clerkInitial.email;
-        const res = await fetch(`https://wahidfoundationadmin-seven.vercel.app/api/donors/${email}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donors/${email}`);
 
         if (res.ok) {
           const donorFromDb = await res.json();
@@ -135,8 +135,8 @@ export default function ProfilePage() {
       const email = formData.email;
       const method = donorExists ? "PUT" : "POST";
       const url = donorExists
-        ? `https://wahidfoundationadmin-seven.vercel.app/api/donors/${email}`
-        : `https://wahidfoundationadmin-seven.vercel.app/api/donors/${email}`;
+        ? `${process.env.NEXT_PUBLIC_API_URL}/donors/${email}`
+        : `${process.env.NEXT_PUBLIC_API_URL}/donors/${email}`;
 
       const res = await fetch(url, {
         method,

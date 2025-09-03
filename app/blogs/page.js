@@ -11,8 +11,8 @@ export default function BlogsPage() {
     async function fetchBlogs() {
       try {
         const res = await fetch(
-          "https://wahidfoundationadmin-seven.vercel.app/api/blogs"
-        ); // 👈 adjust to your endpoint if needed
+          `${process.env.NEXT_PUBLIC_API_URL}/blogs`
+        );
         const data = await res.json();
         setBlogs(data);
       } catch (error) {
