@@ -22,27 +22,24 @@ import Link from "next/link";
 import { FaHeart } from "react-icons/fa6";
 import { PiBookOpenTextFill } from "react-icons/pi";
 
-export default function ProjectDetailsPage() {
-  const params = useParams();
-  const projectId = params?.projectId;
+export default function ProjectDetailsPage({ projectId }) {
   const { isSignedIn } = useUser();
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("impact"); // State for tabbed interface
-
   const [checkedDonationType, setCheckedDonationType] = useState();
   const [amount, setAmount] = useState("");
   const [frequency, setFrequency] = useState("One Time");
 
   useEffect(() => {
-    async function fetchProject() {
+    async function fetchData() {
       try {
-        if (!projectId) throw new Error("Project ID is missing");
         const res = await fetch(
-          `https://wahidfoundationadmin-seven.vercel.app/api/projects/${projectId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`
         );
-        if (!res.ok) throw new Error("Failed to fetch project");
+        if (!res.ok) throw new Error("Failed to fetch project details");
         const data = await res.json();
+
         setProject({
           ...data,
           category: Array.isArray(data.category)
@@ -54,11 +51,11 @@ export default function ProjectDetailsPage() {
           donationOptions: Array.isArray(data.donationOptions)
             ? data.donationOptions
             : [
-              { type: "General Donation", isEnabled: false },
-              { type: "Zakat", isEnabled: false },
-              { type: "Sadqa", isEnabled: false },
-              { type: "Interest Earnings", isEnabled: false },
-            ],
+                { type: "General Donation", isEnabled: false },
+                { type: "Zakat", isEnabled: false },
+                { type: "Sadqa", isEnabled: false },
+                { type: "Interest Earnings", isEnabled: false },
+              ],
         });
       } catch (error) {
         console.error("Error fetching project:", error);
@@ -66,7 +63,7 @@ export default function ProjectDetailsPage() {
       }
     }
 
-    if (projectId) fetchProject();
+    fetchData();
   }, [projectId]);
 
   if (error) {
@@ -107,9 +104,9 @@ export default function ProjectDetailsPage() {
 
   const percentageRaised = project.totalRequired
     ? Math.min(
-      Math.round((project.collected / project.totalRequired) * 100),
-      100
-    )
+        Math.round((project.collected / project.totalRequired) * 100),
+        100
+      )
     : 0;
 
   const donationCategories = [
@@ -155,7 +152,7 @@ export default function ProjectDetailsPage() {
     )
   );
 
-  const checkedCategory = donationCategories[0].title
+  const checkedCategory = donationCategories[0].title;
 
   return (
     <main className="space-y-8 bg-white pb-16 px-4 lg:px-8">
@@ -262,21 +259,38 @@ export default function ProjectDetailsPage() {
               {/* Title */}
               <div className="flex items-center gap-2">
                 <FaHeart className="text-emerald-600 w-5 h-5" />
-                <h2 className="text-lg font-semibold text-gray-800">Make a Donation</h2>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Make a Donation
+                </h2>
               </div>
 
               {/* Donation Type */}
               <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">Donation Type</p>
+                <p className="text-sm font-medium text-gray-700">
+                  Donation Type
+                </p>
                 <div className="space-y-2 text-sm text-gray-900">
-                  {["General Donation", "Zakat", "Sadqa", "Interest Earnings"].map((category) => (
+                  {[
+                    "General Donation",
+                    "Zakat",
+                    "Sadqa",
+                    "Interest Earnings",
+                  ].map((category) => (
                     <label key={category} className="flex items-center gap-2">
                       <input
                         type="radio"
                         name="donationType"
                         value={category}
-                        disabled={!donationCategories.find((cat) => cat.title === category)}
-                        checked={checkedDonationType ? checkedDonationType === category : checkedCategory === category}
+                        disabled={
+                          !donationCategories.find(
+                            (cat) => cat.title === category
+                          )
+                        }
+                        checked={
+                          checkedDonationType
+                            ? checkedDonationType === category
+                            : checkedCategory === category
+                        }
                         onChange={(e) => setCheckedDonationType(e.target.value)}
                       />
                       {category}
@@ -287,7 +301,9 @@ export default function ProjectDetailsPage() {
 
               {/* Donation Amount */}
               <div className="space-y-2 text-black">
-                <p className="text-sm font-medium text-gray-700">Donation Amount</p>
+                <p className="text-sm font-medium text-gray-700">
+                  Donation Amount
+                </p>
                 <input
                   type="number"
                   value={amount}
@@ -323,9 +339,7 @@ export default function ProjectDetailsPage() {
                   },
                 }}
               >
-                <button
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300"
-                >
+                <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300">
                   Donate
                 </button>
               </Link>
@@ -374,10 +388,11 @@ export default function ProjectDetailsPage() {
           <div className="flex bg-gray-100 mb-6 rounded-2xl p-1">
             {project.impact?.length > 0 && (
               <button
-                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "impact"
-                  ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
-                  : "text-gray-600 hover:text-emerald-600"
-                  }`}
+                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${
+                  activeTab === "impact"
+                    ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
+                    : "text-gray-600 hover:text-emerald-600"
+                }`}
                 onClick={() => setActiveTab("impact")}
               >
                 Impact
@@ -385,10 +400,11 @@ export default function ProjectDetailsPage() {
             )}
             {project.description && (
               <button
-                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "about"
-                  ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
-                  : "text-gray-600 hover:text-emerald-600"
-                  }`}
+                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${
+                  activeTab === "about"
+                    ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
+                    : "text-gray-600 hover:text-emerald-600"
+                }`}
                 onClick={() => setActiveTab("about")}
               >
                 About
@@ -396,10 +412,11 @@ export default function ProjectDetailsPage() {
             )}
             {project.updates?.length > 0 && (
               <button
-                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${activeTab === "updates"
-                  ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
-                  : "text-gray-600 hover:text-emerald-600"
-                  }`}
+                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${
+                  activeTab === "updates"
+                    ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
+                    : "text-gray-600 hover:text-emerald-600"
+                }`}
                 onClick={() => setActiveTab("updates")}
               >
                 Updates
@@ -446,7 +463,6 @@ export default function ProjectDetailsPage() {
                 No impact details available.
               </p>
             )}
-
 
           {activeTab === "about" && (
             <p className="text-gray-700 text-sm whitespace-pre-line">
@@ -557,8 +573,9 @@ export default function ProjectDetailsPage() {
             <iframe
               src={
                 project.youtubeIframe.includes("youtu.be")
-                  ? `https://www.youtube.com/embed/${project.youtubeIframe.split("youtu.be/")[1].split("?")[0]
-                  }`
+                  ? `https://www.youtube.com/embed/${
+                      project.youtubeIframe.split("youtu.be/")[1].split("?")[0]
+                    }`
                   : project.youtubeIframe
               }
               title="Project Video"

@@ -27,7 +27,7 @@ export default function FooterNav() {
   useEffect(() => {
     const fetchFooterData = async () => {
       try {
-        const res = await fetch("https://wahidfoundationadmin-seven.vercel.app/api/footer");
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/footer`);
         if (!res.ok) {
           throw new Error("Failed to fetch footer data");
         }

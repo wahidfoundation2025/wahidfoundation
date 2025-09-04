@@ -49,7 +49,7 @@ export default function DonatePage({ searchParams }) {
       if (!projectId) return;
       try {
         const res = await fetch(
-          `https://wahidfoundationadmin-seven.vercel.app/api/projects/${projectId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`
         );
         const data = await res.json();
         console.log("Fetched project data:", data);
@@ -112,7 +112,7 @@ export default function DonatePage({ searchParams }) {
           console.log("Payment captured:", captureData);
 
           // 2️⃣ Save donation in DB
-          await fetch("https://wahidfoundationadmin-seven.vercel.app/api/save-donation", {
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
