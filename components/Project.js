@@ -302,7 +302,7 @@ const ProjectCardsSection = ({
                     </Link>
                   )}
                   <Link
-                    href={`/projects/${project._id}`}
+                    href={`/projects/${project.slug}`}
                     className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
                   >
                     View Details
