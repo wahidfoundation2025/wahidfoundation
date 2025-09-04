@@ -161,7 +161,7 @@ const ProjectCardsSection = ({
               {/* Image & Labels */}
               <div className="h-48 relative lg:h-56">
                 <img
-                  src={project.mainImage || "/globe.svg"}
+                  src={project.cardImage || project.mainImage}
                   alt={project.title || "Project"}
                   className="w-full h-full object-cover"
                 />
@@ -294,11 +294,8 @@ const ProjectCardsSection = ({
                         pathname: !isSignedIn ? "/login" : "/donate",
                         query: { project: project._id },
                       }}
-                      className="w-full sm:flex-1"
-                    >
-                      <button className="w-full text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold">
-                        Donate Now
-                      </button>
+                      className="w-full sm:flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
+                    > Donate Now
                     </Link>
                   )}
                   <Link

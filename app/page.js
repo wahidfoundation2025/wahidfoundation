@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import HeroSection from "../components/HeroSection";
 import ImpactStats from "../components/ImpactSection";
-import ProjectCardsSection from "../components/Project";
+import ProjectCardsSection from "../components/ProjectCardsSection";
 import Link from "next/link";
 import MobileDonationCategories from "../components/donationtype";
 
@@ -287,7 +287,7 @@ export default function Home() {
     async function fetchQuote() {
       try {
         const res = await fetch(
-          "https://wahidfoundationadmin-seven.vercel.app/api/homequotesection"
+          `${NEXT_PUBLIC_API_URL}/homequotesection`
         );
 
         const data = await res.json();
@@ -355,7 +355,7 @@ export default function Home() {
             </p>
             <div className="lg:flex lg:justify-center">
               <Link
-                href="/donate"
+                href="/general-sadqa-fund"
                 className="w-full lg:w-auto text-center px-6 lg:px-12 py-3 bg-emerald-600 hover:bg-emerald-700 shadow-lg hover:shadow-xl text-white text-lg font-semibold rounded-md transition-all duration-200 active:scale-[0.98] mt-2 inline-flex items-center justify-center"
               >
                 Donate Now

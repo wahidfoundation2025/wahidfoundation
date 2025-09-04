@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Heart, Users, Calendar, ArrowRight } from "lucide-react";
-import ProjectCardsSection from "./Project";
+import ProjectCardsSection from "./ProjectCardsSection";
 
 const ICONS = {
   Calendar: Calendar,
@@ -13,7 +13,7 @@ const ICONS = {
 
 function lightenHexColor(hex, percent = 0.2) {
   // Remove # if present
-  hex = hex.replace(/^#/, '');
+  hex = hex.replace(/^#/, "");
 
   // Parse r, g, b values
   let r = parseInt(hex.substring(0, 2), 16);
@@ -26,9 +26,9 @@ function lightenHexColor(hex, percent = 0.2) {
   b = Math.round(b + (255 - b) * percent);
 
   // Ensure 2-digit hex format
-  return `#${r.toString(16).padStart(2, '0')}${g
+  return `#${r.toString(16).padStart(2, "0")}${g
     .toString(16)
-    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
 const HeroSection = () => {
@@ -37,7 +37,9 @@ const HeroSection = () => {
   useEffect(() => {
     async function fetchHero() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/homeherosection`);
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/homeherosection`
+        );
         const data = await res.json();
         setHero(data);
       } catch (e) {
@@ -86,8 +88,9 @@ const HeroSection = () => {
             <div className="grid grid-cols-3 gap-4 lg:gap-8 lg:mx-auto">
               {Object.values(hero.stats).map((stat, i) => (
                 <div
-                  className={`text-center${i === 1 ? " border-x border-gray-100" : ""
-                    }`}
+                  className={`text-center${
+                    i === 1 ? " border-x border-gray-100" : ""
+                  }`}
                   key={stat.label}
                 >
                   <div className="text-2xl font-bold text-emerald-600 mb-1.5 sm:text-4xl sm:mb-2">
@@ -120,7 +123,10 @@ const HeroSection = () => {
                       <Icon className="h-6 w-6 text-white lg:h-8 lg:w-8" />
                     </div>
                     <div className="text-left space-y-1 lg:text-center">
-                      <h3 className="font-semibold lg:text-lg" style={{ color: titleColor }}>
+                      <h3
+                        className="font-semibold lg:text-lg"
+                        style={{ color: titleColor }}
+                      >
                         {card.title}
                       </h3>
                       <p className="text-sm text-gray-600 lg:text-base leading-relaxed">
@@ -133,7 +139,6 @@ const HeroSection = () => {
             </div>
 
             {/* Secondary CTA */}
-
           </div>
         </div>
       </div>
