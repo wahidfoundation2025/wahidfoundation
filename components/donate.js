@@ -534,7 +534,7 @@ export default function DonatePage({ searchParams }) {
           </div>
           <div className="flex justify-between items-center bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500">Project</span>
-            <span className="font-semibold text-right">
+            <span className="font-semibold text-right text-ellipsis">
               {project?.title || "—"}
             </span>
           </div>

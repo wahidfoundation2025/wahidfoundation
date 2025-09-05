@@ -7,26 +7,68 @@ import FooterNav from "../components/FooterNav";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
-import { Poppins } from 'next/font/google';
+import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
-  variable: '--font-poppins',
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
 });
 
 export const metadata = {
-  title: "Wahid Foundation",
-  description: "One People. One Purpose. One Strong Future",
+  title:
+    "Wahid Foundation - Transforming Backward and Minority Communities with Zakat & Sadaqa for Education, Healthcare & Empowerment",
+  description:
+    "Wahid Foundation is a non-profit initiative dedicated to channeling Zakat and Sadaqah efficiently for poverty alleviation, quality education, accessible healthcare, and sustainable community development. Join us to empower lives through transparency and impact-driven programs.",
+  keywords: [
+    "Wahid foundation",
+    "zakat",
+    "sadaqah",
+    "donate zakat online",
+    "charity India",
+    "NGO for Muslims",
+    "poverty alleviation",
+    "education support",
+    "healthcare for poor",
+    "sustainable community development",
+    "Islamic charity",
+    "donate online India",
+    "social justice",
+  ],
+  openGraph: {
+    type: "website",
+    site_name: "Wahid Foundation",
+    title:
+      "Wahid Foundation - Empowering Backward and Minority Communities with Zakat & Sadaqa for Education, Healthcare & Socio-Economic Empowerment",
+    description:
+      "Wahid Foundation's Funds transform donations into real impact: poverty alleviation, education, healthcare, and sustainable development. Join our mission to empower backward and minority communities in a centralized way.",
+    url: "https://wahid.org.in/",
+    image:
+      "https://res.cloudinary.com/doxoxzz02/image/upload/v1755268342/Zakath_Fund_zsrpnx.jpg",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title:
+      "Wahid - Transforming Communities with Zakat, Education & Healthcare",
+    description:
+      "Wahid channels Zakat and Sadaqah to create sustainable change in poverty alleviation, education, healthcare, and empowerment. Be part of the impact.",
+    image:
+      "https://res.cloudinary.com/doxoxzz02/image/upload/v1755268342/Zakath_Fund_zsrpnx.jpg",
+  },
 };
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children } ) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}
+        >
           <Headers />
           {children}
           <FooterNav />
