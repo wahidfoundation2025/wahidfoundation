@@ -22,6 +22,8 @@ import Link from "next/link";
 import { FaHeart } from "react-icons/fa6";
 import { PiBookOpenTextFill } from "react-icons/pi";
 
+import ProjectGallery from "./PhotoGallery";
+
 export default function ProjectDetailsPage({ projectId }) {
   const { isSignedIn } = useUser();
   const [project, setProject] = useState(null);
@@ -322,6 +324,7 @@ export default function ProjectDetailsPage({ projectId }) {
                   className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
                 >
                   <option>One Time</option>
+                  <option>Weekly</option>
                   <option>Monthly</option>
                   <option>Yearly</option>
                 </select>
@@ -352,46 +355,79 @@ export default function ProjectDetailsPage({ projectId }) {
         )}
       </section>
 
-      <section className="text-black sm:max-w-2xl w-full mx-auto p-3 rounded-2xl bg-emerald-100 border border-emerald-400">
-        <h3 className="mb-3 font-semibold">Project Manager</h3>
+      <section className="text-black flex flex-col space-y-3 max-w-sm w-full mx-auto p-6 rounded-2xl bg-gray-100">
+        <div className="flex justify-start items-center space-x-3">
+          <span className="mr-2 text-xl">
+            <IoPerson />
+          </span>
+          <h3 className="text-xl">Project Manager</h3>
+        </div>
 
-        <div className="flex sm:flex-row flex-col gap-2 items-start sm:items-center justify-between text-gray-700 text-sm text-center md:text-left">
-          <div className="flex items-center font-medium justify-center md:justify-start">
-            <span className="mr-2">
-              <IoPerson />
+        <div className="flex flex-col gap-2 items-start justify-between text-gray-700 text-sm text-center md:text-left">
+          <div className="flex flex-col items-start font-medium">
+            <span className="text-gray-400 font-normal">Name</span>
+            <span className="text-sm lg:text-md font-semibold">
+              {project.projectManager.name || "Unknown"}
             </span>
-            {project.projectManager.name || "Unknown"}
           </div>
-          <p className="flex justify-center md:justify-start items-center space-x-2">
-            <Mail className="w-4 h-4" />
-            <a
-              href={`mailto:${project.projectManager.email || ""}`}
-              className="text-blue-600 hover:underline"
-            >
-              {project.projectManager.email || "No email provided"}
-            </a>
-          </p>
-          <p className="flex justify-center md:justify-start items-center space-x-2">
-            <Phone className="w-4 h-4" />
-            <a
-              href={`tel:${project.projectManager.phone || ""}`}
-              className="text-blue-600 hover:underline"
-            >
-              {project.projectManager.phone || "No phone provided"}
-            </a>
-          </p>
+          <div className="w-full flex justify-between items-center">
+            <div className="flex flex-col items-start font-medium">
+              <span className="text-gray-400 font-normal">Email</span>
+              <span className="text-sm lg:text-md font-semibold">
+                {project.projectManager.email || "No email provided"}
+              </span>
+            </div>
+            {project.projectManager.email ? (
+              <button className="flex items-center justify-center space-x-2 bg-white border-1 border-gray-200 hover:bg-slate-200 p-2 rounded-lg">
+                <Mail className="w-4 h-4" />
+                <span>
+                  <a
+                    href={`mailto:${project.projectManager.email || ""}`}
+                    className="font-semibold"
+                  >
+                    Email
+                  </a>
+                </span>
+              </button>
+            ) : (
+              ""
+            )}
+          </div>
+          <div className="w-full flex justify-between items-center">
+            <div className="flex flex-col items-start font-medium">
+              <span className="text-gray-400 font-normal">Phone</span>
+              <span className="text-sm lg:text-md font-semibold">
+                {project.projectManager.phone || "No phone number provided"}
+              </span>
+            </div>
+            {project.projectManager.phone ? (
+              <button className="flex items-center justify-center space-x-2 bg-white border-1 border-gray-200 hover:bg-slate-200 p-2 rounded-lg">
+                <Phone className="w-4 h-4" />
+                <span>
+                  <a
+                    href={`tel:${project.projectManager.phone || ""}`}
+                    className="font-semibold"
+                  >
+                    Call
+                  </a>
+                </span>
+              </button>
+            ) : (
+              ""
+            )}
+          </div>
         </div>
       </section>
 
       {(project.impact?.length > 0 || project.updates?.length > 0) && (
-        <section className="px-4 lg:max-w-6xl lg:mx-auto">
-          <div className="flex bg-gray-100 mb-6 rounded-2xl p-1">
+        <section className="px-4 max-w-sm mx-auto">
+          <div className="flex bg-gray-100 mb-6 rounded-lg p-1">
             {project.impact?.length > 0 && (
               <button
-                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${
+                className={`flex-1 px-4 cursor-pointer py-2 my-1 text-sm font-medium ${
                   activeTab === "impact"
-                    ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
-                    : "text-gray-600 hover:text-emerald-600"
+                    ? "bg-white text-blue-600 rounded-sm"
+                    : "text-gray-600 hover:cursor-pointer"
                 }`}
                 onClick={() => setActiveTab("impact")}
               >
@@ -400,10 +436,10 @@ export default function ProjectDetailsPage({ projectId }) {
             )}
             {project.description && (
               <button
-                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${
+                className={`flex-1 px-4 cursor-pointer py-2 my-1 text-sm font-medium ${
                   activeTab === "about"
-                    ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
-                    : "text-gray-600 hover:text-emerald-600"
+                    ? "bg-white text-blue-600 rounded-sm"
+                    : "text-gray-600 hover:cursor-pointer"
                 }`}
                 onClick={() => setActiveTab("about")}
               >
@@ -412,10 +448,10 @@ export default function ProjectDetailsPage({ projectId }) {
             )}
             {project.updates?.length > 0 && (
               <button
-                className={`flex-1 px-4 cursor-pointer py-2 text-sm font-medium lg:text-base lg:px-6 ${
+                className={`flex-1 px-4 cursor-pointer py-2 my-1 text-sm font-medium ${
                   activeTab === "updates"
-                    ? "bg-emerald-500 text-white border-emerald-600 rounded-xl"
-                    : "text-gray-600 hover:text-emerald-600"
+                    ? "bg-white text-blue-600 rounded-sm"
+                    : "text-gray-600 hover:cursor-pointer"
                 }`}
                 onClick={() => setActiveTab("updates")}
               >
@@ -425,32 +461,30 @@ export default function ProjectDetailsPage({ projectId }) {
           </div>
 
           {activeTab === "impact" && project.impact?.length > 0 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
               {project.impact.map((impact, idx) => (
                 <div
                   key={idx}
-                  className="bg-gray-50 p-4 rounded-2xl shadow-sm hover:shadow-md transition-shadow border border-gray-300"
+                  className={`p-5 rounded-2xl shadow-sm
+          ${idx === 0 ? "bg-green-100" : ""}
+          ${idx === 1 ? "bg-blue-100" : ""}
+          ${idx === 2 ? "bg-amber-100" : ""}`}
                 >
-                  <div className="flex flex-row gap-3 items-start">
-                    {impact.icon && (
-                      <img
-                        src={impact.icon}
-                        alt={impact.title || "Impact"}
-                        className="w-12 h-12 object-cover rounded-full mb-3 mx-auto"
-                      />
-                    )}
+                  <div className="flex items-start gap-3">
+                    <div className="p-3 rounded-full bg-white shadow-sm">
+                      <span className="text-xl">🎯</span>
+                    </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800 text-left">
-                        {impact.title || "Untitled Impact"}
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {impact.type || "Impact Type"} Impact
                       </h3>
-                      <p className="text-xs text-gray-500 text-left my-2">
-                        Type: {impact.type || "Unknown"}
+                      <p className="text-sm text-gray-500">
+                        {impact.title || "Impact Title"}
                       </p>
                     </div>
                   </div>
-
-                  <p className="text-sm text-gray-600 text-left">
-                    {impact.description || "No description available."}
+                  <p className="text-sm text-gray-700 mt-2">
+                    {impact.description || "Impact description"}
                   </p>
                 </div>
               ))}
@@ -465,9 +499,81 @@ export default function ProjectDetailsPage({ projectId }) {
             )}
 
           {activeTab === "about" && (
-            <p className="text-gray-700 text-sm whitespace-pre-line">
-              {project.description || "No description available."}
-            </p>
+            <div className="space-y-6">
+              <h3 className="font-semibold text-gray-800">
+                About this Project
+              </h3>
+              <div
+                className="text-gray-700 text-sm px-2 whitespace-pre-line"
+                dangerouslySetInnerHTML={{ __html: project.description }}
+              />
+
+              {/* Timeline */}
+              {project.timeline?.length > 0 && (
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-gray-800">
+                    Project Timeline
+                  </h3>
+                  <div className="space-y-6">
+                    {project.timeline.map((event, idx) => {
+                      let styles = {
+                        icon: "⭕",
+                        bg: "bg-gray-200",
+                        badgeBg: "bg-gray-200",
+                        badgeText: "text-gray-700",
+                      };
+
+                      if (event.completed === "Completed") {
+                        styles = {
+                          icon: "✅",
+                          bg: "bg-green-100",
+                          badgeBg: "bg-green-100",
+                          badgeText: "text-green-700",
+                        };
+                      } else if (event.completed === "In Progress") {
+                        styles = {
+                          icon: "⏳",
+                          bg: "bg-blue-100",
+                          badgeBg: "bg-blue-100",
+                          badgeText: "text-blue-700",
+                        };
+                      }
+
+                      return (
+                        <div key={idx} className="flex items-start gap-3">
+                          <div className="flex flex-col items-center">
+                            <div
+                              className={`w-6 h-6 rounded-full ${styles.bg} flex items-center justify-center`}
+                            >
+                              {styles.icon}
+                            </div>
+                            {/* vertical line unless last item */}
+                            {idx !== project.timeline.length - 1 && (
+                              <div className="w-0.5 bg-gray-300 h-full"></div>
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-medium text-gray-800">
+                              {event.title}
+                            </h4>
+                            <p className="text-sm text-gray-500">
+                              {event.date
+                                ? new Date(event.date).toLocaleDateString()
+                                : "No date"}
+                            </p>
+                            <span
+                              className={`inline-block text-xs mt-1 px-2 py-1 rounded-full ${styles.badgeBg} ${styles.badgeText}`}
+                            >
+                              {event.completed}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {activeTab === "updates" && project.updates?.length > 0 && (
@@ -475,29 +581,27 @@ export default function ProjectDetailsPage({ projectId }) {
               {project.updates.map((update, idx) => (
                 <div
                   key={idx}
-                  className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+                  className="p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow bg-white"
                 >
-                  <div className="flex sm:flex-row flex-col gap-2 items-start justify-between">
-                    <div className="flex flex-row gap-2 items-start">
-                      <div className="p-3.5 rounded-full bg-emerald-200">
-                        <PiBookOpenTextFill className="text-emerald-500 text-xl" />
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-full bg-blue-100">
+                        <span className="text-blue-600 text-xl">
+                          <PiBookOpenTextFill />
+                        </span>
                       </div>
-
                       <h3 className="text-lg font-semibold text-gray-800">
-                        {update.version || "Update"}
+                        {update.version || "Update Title"}
                       </h3>
                     </div>
-
-                    <p className="sm:text-sm text-xs text-gray-500 sm:mt-0 mt-2 self-end sm:self-baseline">
-                      Date:{" "}
+                    <p className="text-sm text-gray-500">
                       {update.date
                         ? new Date(update.date).toLocaleDateString()
-                        : "Unknown"}
+                        : "Date"}
                     </p>
                   </div>
-
-                  <p className="text-sm text-gray-600 mt-3">
-                    {update.content || "No content available."}
+                  <p className="text-sm text-gray-700 mt-3">
+                    {update.content || "Update description"}
                   </p>
                 </div>
               ))}
@@ -546,22 +650,7 @@ export default function ProjectDetailsPage({ projectId }) {
       )}
 
       {project.photoGallery?.length > 0 && (
-        <section className="px-4 lg:max-w-6xl lg:mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center space-x-2">
-            <ImageIcon className="w-5 h-5" />
-            <span>Project Gallery</span>
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {project.photoGallery.map((url, idx) => (
-              <img
-                key={idx}
-                src={url}
-                className="rounded-lg w-full h-40 lg:h-60 object-cover"
-                alt={`Gallery Image ${idx + 1}`}
-              />
-            ))}
-          </div>
-        </section>
+        <ProjectGallery images={project.photoGallery} />
       )}
 
       {project.youtubeIframe && (

@@ -18,8 +18,6 @@ export async function generateMetadata({ params }) {
     { cache: "no-store" }
   ).then((res) => res.json());
 
-  console.log(project);
-
   return {
     title: project.metatitle || project.title,
     description: project.metadescription || project.description,
@@ -28,7 +26,7 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProjectPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const projectId = await getProjectId(slug);
 
   const project = await fetch(
@@ -37,6 +35,8 @@ export default async function ProjectPage({ params }) {
       cache: "no-store",
     }
   ).then((res) => res.json());
+
+  console.log(project);
 
   return (
     <>
@@ -48,7 +48,6 @@ export default async function ProjectPage({ params }) {
           }}
         />
       )}
-
       <ProjectDetailsPage projectId={projectId} />
     </>
   );
