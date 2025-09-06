@@ -1,10 +1,10 @@
-// app/layout.tsx or app/layout.js
-
+// app/layout.js
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import Headers from "../components/navbar";
 import FooterNav from "../components/FooterNav";
 import "./globals.css";
+import Script from "next/script"; // ✅ import Script
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({
@@ -62,10 +62,25 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children } ) {
+export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
+        <head>
+          {/* ✅ Google Analytics with next/script */}
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-MDPL2JC1H2"
+            strategy="afterInteractive"
+          />
+          <Script id="google-analytics" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-MDPL2JC1H2');
+            `}
+          </Script>
+        </head>
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}
         >
