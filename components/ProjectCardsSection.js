@@ -206,10 +206,12 @@ const ProjectCardsSection = ({
                 <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
                   {project.title || "Untitled Project"}
                 </h3>
-                <p className="text-sm text-gray-600 mt-1.5 min-h-[60px]">
-                  {(project.description?.slice?.(0, 120) ??
-                    "No description available") + "..."}
-                </p>
+                <div
+                  className="text-sm text-gray-600 mt-1.5 min-h-[60px] line-clamp-3"
+                  dangerouslySetInnerHTML={{
+                    __html: project.description || "No description available",
+                  }}
+                />
               </div>
 
               {/* Stats */}
@@ -291,11 +293,14 @@ const ProjectCardsSection = ({
                   {project.status !== "Completed" && (
                     <Link
                       href={{
-                        pathname: !isSignedIn ? "/login" : "/donate",
-                        query: { project: project._id },
+                        pathname: !isSignedIn
+                          ? "/login"
+                          : `/donate/${project.slug}`,
                       }}
                       className="w-full sm:flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
-                    > Donate Now
+                    >
+                      {" "}
+                      Donate Now
                     </Link>
                   )}
                   <Link

@@ -48,7 +48,7 @@ export default async function ProjectPage({ params }) {
           }}
         />
       )}
-      <ProjectDetailsPage projectId={projectId} />
+      <ProjectDetailsPage slug={slug} projectId={projectId} />
     </>
   );
 }

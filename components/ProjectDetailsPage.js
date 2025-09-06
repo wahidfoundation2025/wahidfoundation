@@ -24,7 +24,7 @@ import { PiBookOpenTextFill } from "react-icons/pi";
 
 import ProjectGallery from "./PhotoGallery";
 
-export default function ProjectDetailsPage({ projectId }) {
+export default function ProjectDetailsPage({ slug, projectId }) {
   const { isSignedIn } = useUser();
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
@@ -333,9 +333,8 @@ export default function ProjectDetailsPage({ projectId }) {
               {/* Button */}
               <Link
                 href={{
-                  pathname: !isSignedIn ? "/login" : "/donate",
+                  pathname: !isSignedIn ? "/login" : `/donate/${slug}`,
                   query: {
-                    project: projectId,
                     type: checkedDonationType || checkedCategory, // fallback
                     amount,
                     frequency,
