@@ -3,20 +3,19 @@
 import { useEffect, useState } from "react";
 import { Heart, Users, Gift, HandCoins, CircleDollarSign, IndianRupee, FileBadge } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function DonatePage({ searchParams }) {
   const { projectId, type, amount, frequency } = searchParams;
-  // const projectId = searchParams?.project;
-  // const type = searchParams?.type;
-  // const amount = searchParams?.amount;
-  // const frequency = searchParams?.frequency;
+  const { isSignedIn } = useUser();
+  const router = useRouter();
 
   const { user } = useUser();
-  const [isRecurring, setIsRecurring] = useState(false);
+  const [isRecurring, setIsRecurring] = useState(frequency!="One-Time" ? true : false);
   const [donationFrequency, setDonationFrequency] = useState(frequency ?? "One-Time");
   const [requestCertificate, setRequestCertificate] = useState(false);
   const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [selectedProjectId, setSelectedProjectId] = useState(projectId);
   const [customAmount, setCustomAmount] = useState(amount ?? 365);
   const [donationType, setDonationType] = useState(type ?? "Zakat");
   const [showRecurringConfirm, setShowRecurringConfirm] = useState(false);
@@ -71,6 +70,11 @@ export default function DonatePage({ searchParams }) {
   }, []);
 
   const handlePayment = () => {
+    if (!isSignedIn) {
+      router.push("/login");
+      return;
+    }
+
     if (!customAmount || customAmount < 365) {
       alert("Please enter a valid donation amount (minimum ₹365).");
       return;

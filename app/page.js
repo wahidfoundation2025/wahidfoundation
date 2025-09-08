@@ -355,7 +355,7 @@ export default function Home() {
             </p>
             <div className="lg:flex lg:justify-center">
               <Link
-                href="/general-sadqa-fund"
+                href="/projects/general-sadqa-fund"
                 className="w-full lg:w-auto text-center px-6 lg:px-12 py-3 bg-emerald-600 hover:bg-emerald-700 shadow-lg hover:shadow-xl text-white text-lg font-semibold rounded-md transition-all duration-200 active:scale-[0.98] mt-2 inline-flex items-center justify-center"
               >
                 Donate Now

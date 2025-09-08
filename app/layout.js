@@ -1,6 +1,7 @@
 // app/layout.js
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import Headers from "../components/navbar";
 import FooterNav from "../components/FooterNav";
 import "./globals.css";
@@ -84,6 +85,20 @@ export default function RootLayout({ children }) {
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}
         >
+          {/* Google Analytics */}
+          <Script
+            src="https://www.googletagmanager.com/gtag/js?id=G-MDPL2JC1H2"
+            strategy="afterInteractive"
+          />
+          <Script id="ga-setup" strategy="afterInteractive">
+            {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-MDPL2JC1H2');
+            `}
+          </Script>
+
           <Headers />
           {children}
           <FooterNav />
