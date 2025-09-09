@@ -478,8 +478,8 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                 })
                 .map((impact, idx) => {
                   let Icon = ImpactIcon;
-                  if (impact.type === "Indirect") Icon = Layers;
-                  if (impact.type === "Long-term") Icon = Calendar;
+                  if (impact.type === "Indirect") Icon = Users;
+                  if (impact.type === "Long-term") Icon = Building2;
 
                   const bgColors = [
                     "bg-green-100",
