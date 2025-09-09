@@ -6,6 +6,8 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { MapPin, Users, Calendar } from "lucide-react";
 
+import ShareButton from "./ShareButton";
+
 const ProjectCardsSection = ({
   searchTerm = "",
   categoryFilter = "all",
@@ -166,6 +168,11 @@ const ProjectCardsSection = ({
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+
+                <div className="absolute top-2 right-2">
+                  <ShareButton slug={project.slug} />
+                </div>
+
                 <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
                   {project.category?.length > 0 ? (
                     project.category.map((cat, index) => (
