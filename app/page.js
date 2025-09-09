@@ -283,7 +283,21 @@ export default function Home() {
     ],
   };
 
-  
+  useEffect(() => {
+    async function fetchQuote() {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/homequotesection`
+        );
+
+        const data = await res.json();
+        setQuote(data);
+      } catch (e) {
+        setQuote(null);
+      }
+    }
+    fetchQuote();
+  }, []);
 
   return (
     <>

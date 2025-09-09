@@ -15,11 +15,9 @@ import {
   Calendar,
   Target as ImpactIcon,
   Layers,
-  Users,
-  Building2,
   CheckCircle2,
-  Clock,
   AlertCircle,
+  Clock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { IoPerson } from "react-icons/io5";
@@ -473,7 +471,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
           {activeTab === "impact" && project.impact?.length > 0 && (
             <div className="space-y-4">
               {project.impact
-                .slice() 
+                .slice()
                 .sort((a, b) => {
                   const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
                   return (order[a.type] || 99) - (order[b.type] || 99);
@@ -554,18 +552,18 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                     {project.timeline.map((event, idx) => {
                       let styles = {
                         icon: AlertCircle,
-                        badgeText: "text-gray-400",
+                        badgeText: "text-gray-700",
                       };
 
                       if (event.status === "Completed") {
                         styles = {
                           icon: CheckCircle2,
-                          badgeText: "text-green-600",
+                          badgeText: "text-green-700",
                         };
                       } else if (event.status === "In Progress") {
                         styles = {
                           icon: Clock,
-                          badgeText: "text-blue-400",
+                          badgeText: "text-blue-700",
                         };
                       }
 
@@ -575,7 +573,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                             <div
                               className={`w-6 h-6 rounded-full ${styles.badgeText} flex items-center justify-center`}
                             >
-                              <styles.icon />
+                              <styles.icon size={20} />
                             </div>
                             {/* vertical line unless last item */}
                             {idx !== project.timeline.length - 1 && (
