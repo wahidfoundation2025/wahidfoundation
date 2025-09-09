@@ -287,7 +287,7 @@ export default function Home() {
     async function fetchQuote() {
       try {
         const res = await fetch(
-          `${NEXT_PUBLIC_API_URL}/homequotesection`
+          `${process.env.NEXT_PUBLIC_API_URL}/homequotesection`
         );
 
         const data = await res.json();
