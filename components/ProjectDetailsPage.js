@@ -15,6 +15,9 @@ import {
   Calendar,
   Target as ImpactIcon,
   Layers,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { IoPerson } from "react-icons/io5";
@@ -468,17 +471,15 @@ export default function ProjectDetailsPage({ slug, projectId }) {
           {activeTab === "impact" && project.impact?.length > 0 && (
             <div className="space-y-4">
               {project.impact
-                // ✅ Sort impacts in fixed order
-                .slice() // copy to avoid mutating original
+                .slice()
                 .sort((a, b) => {
                   const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
                   return (order[a.type] || 99) - (order[b.type] || 99);
                 })
                 .map((impact, idx) => {
-                  // ✅ Pick correct icon
                   let Icon = ImpactIcon;
-                  if (impact.type === "Indirect") Icon = Layers;
-                  if (impact.type === "Long-term") Icon = Calendar;
+                  if (impact.type === "Indirect") Icon = Users;
+                  if (impact.type === "Long-term") Icon = Building2;
 
                   const bgColors = [
                     "bg-green-100",
@@ -550,24 +551,18 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                   <div className="space-y-6">
                     {project.timeline.map((event, idx) => {
                       let styles = {
-                        icon: "⭕",
-                        bg: "bg-gray-200",
-                        badgeBg: "bg-gray-200",
+                        icon: AlertCircle,
                         badgeText: "text-gray-700",
                       };
 
-                      if (event.completed === "Completed") {
+                      if (event.status === "Completed") {
                         styles = {
-                          icon: "✅",
-                          bg: "bg-green-100",
-                          badgeBg: "bg-green-100",
+                          icon: CheckCircle2,
                           badgeText: "text-green-700",
                         };
-                      } else if (event.completed === "In Progress") {
+                      } else if (event.status === "In Progress") {
                         styles = {
-                          icon: "⏳",
-                          bg: "bg-blue-100",
-                          badgeBg: "bg-blue-100",
+                          icon: Clock,
                           badgeText: "text-blue-700",
                         };
                       }
@@ -576,9 +571,9 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                         <div key={idx} className="flex items-start gap-3">
                           <div className="flex flex-col items-center">
                             <div
-                              className={`w-6 h-6 rounded-full ${styles.bg} flex items-center justify-center`}
+                              className={`w-6 h-6 rounded-full ${styles.badgeText} flex items-center justify-center`}
                             >
-                              {styles.icon}
+                              <styles.icon size={20} />
                             </div>
                             {/* vertical line unless last item */}
                             {idx !== project.timeline.length - 1 && (
@@ -597,7 +592,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                             <span
                               className={`inline-block text-xs mt-1 px-2 py-1 rounded-full ${styles.badgeBg} ${styles.badgeText}`}
                             >
-                              {event.completed}
+                              {event.status}
                             </span>
                           </div>
                         </div>
