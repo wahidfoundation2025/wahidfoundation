@@ -111,11 +111,11 @@ const Impact = () => {
                 <div className="text-xs lg:text-sm text-emerald-100">Lives Changed</div>
               </div>
               <div className="text-center border-x border-white/20">
-                <div className="text-2xl lg:text-4xl font-bold mb-1">14</div>
+                <div className="text-2xl lg:text-4xl font-bold mb-1">112</div>
                 <div className="text-xs lg:text-sm text-emerald-100">States</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl lg:text-4xl font-bold mb-1">112</div>
+                <div className="text-2xl lg:text-4xl font-bold mb-1">14</div>
                 <div className="text-xs lg:text-sm text-emerald-100">Projects</div>
               </div>
             </div>

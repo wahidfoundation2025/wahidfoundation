@@ -23,8 +23,9 @@ import { FaHeart } from "react-icons/fa6";
 import { PiBookOpenTextFill } from "react-icons/pi";
 
 import ProjectGallery from "./PhotoGallery";
+import ShareButton from "./ShareButton";
 
-export default function ProjectDetailsPage({ projectId }) {
+export default function ProjectDetailsPage({ slug, projectId }) {
   const { isSignedIn } = useUser();
   const [project, setProject] = useState(null);
   const [error, setError] = useState(null);
@@ -157,7 +158,7 @@ export default function ProjectDetailsPage({ projectId }) {
   const checkedCategory = donationCategories[0].title;
 
   return (
-    <main className="space-y-8 bg-white pb-16 px-4 lg:px-8">
+    <main className="space-y-8 bg-white pb-16 px-4 py-4 lg:px-8">
       {project.mainImage && (
         <div className="relative h-80 w-full overflow-hidden rounded-xl">
           <img
@@ -186,6 +187,11 @@ export default function ProjectDetailsPage({ projectId }) {
               Go back to Projects
             </Link>
           </div>
+
+          <div className="absolute top-2 right-2">
+            <ShareButton slug={project.slug} />
+          </div>
+
           <div className="absolute bottom-4 left-4 text-white space-y-1 px-4 py-3 rounded-xl max-w-[90%] backdrop-blur-sm bg-black/30">
             <span className="text-xs bg-blue-100 text-blue-800 font-medium px-2 py-0.5 rounded">
               {project.category || "Uncategorized"}
@@ -333,9 +339,8 @@ export default function ProjectDetailsPage({ projectId }) {
               {/* Button */}
               <Link
                 href={{
-                  pathname: !isSignedIn ? "/login" : "/donate",
+                  pathname: !isSignedIn ? "/login" : `/donate/${slug}`,
                   query: {
-                    project: projectId,
                     type: checkedDonationType || checkedCategory, // fallback
                     amount,
                     frequency,
@@ -462,32 +467,60 @@ export default function ProjectDetailsPage({ projectId }) {
 
           {activeTab === "impact" && project.impact?.length > 0 && (
             <div className="space-y-4">
-              {project.impact.map((impact, idx) => (
-                <div
-                  key={idx}
-                  className={`p-5 rounded-2xl shadow-sm
-          ${idx === 0 ? "bg-green-100" : ""}
-          ${idx === 1 ? "bg-blue-100" : ""}
-          ${idx === 2 ? "bg-amber-100" : ""}`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className="p-3 rounded-full bg-white shadow-sm">
-                      <span className="text-xl">🎯</span>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {impact.type || "Impact Type"} Impact
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {impact.title || "Impact Title"}
+              {project.impact
+                // ✅ Sort impacts in fixed order
+                .slice() // copy to avoid mutating original
+                .sort((a, b) => {
+                  const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
+                  return (order[a.type] || 99) - (order[b.type] || 99);
+                })
+                .map((impact, idx) => {
+                  // ✅ Pick correct icon
+                  let Icon = ImpactIcon;
+                  if (impact.type === "Indirect") Icon = Layers;
+                  if (impact.type === "Long-term") Icon = Calendar;
+
+                  const bgColors = [
+                    "bg-green-100",
+                    "bg-blue-100",
+                    "bg-amber-100",
+                  ];
+                  const iconColors = [
+                    "text-green-500",
+                    "text-blue-500",
+                    "text-amber-500",
+                  ];
+
+                  return (
+                    <div
+                      key={idx}
+                      className={`p-5 rounded-2xl shadow-sm ${
+                        bgColors[idx] || ""
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="p-3 rounded-full bg-white shadow-sm">
+                          <Icon
+                            className={`w-6 h-6 ${
+                              iconColors[idx] || "text-gray-700"
+                            }`}
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-semibold text-gray-800">
+                            {impact.type || "Impact Type"} Impact
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            {impact.title || "Impact Title"}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-700 mt-2">
+                        {impact.description || "Impact description"}
                       </p>
                     </div>
-                  </div>
-                  <p className="text-sm text-gray-700 mt-2">
-                    {impact.description || "Impact description"}
-                  </p>
-                </div>
-              ))}
+                  );
+                })}
             </div>
           )}
 
