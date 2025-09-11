@@ -15,8 +15,8 @@ import {
   Calendar,
   Target as ImpactIcon,
   Layers,
-  CheckCircle2,
   AlertCircle,
+  CheckCircle2,
   Clock,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -471,15 +471,17 @@ export default function ProjectDetailsPage({ slug, projectId }) {
           {activeTab === "impact" && project.impact?.length > 0 && (
             <div className="space-y-4">
               {project.impact
-                .slice()
+                // ✅ Sort impacts in fixed order
+                .slice() // copy to avoid mutating original
                 .sort((a, b) => {
                   const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
                   return (order[a.type] || 99) - (order[b.type] || 99);
                 })
                 .map((impact, idx) => {
+                  // ✅ Pick correct icon
                   let Icon = ImpactIcon;
-                  if (impact.type === "Indirect") Icon = Users;
-                  if (impact.type === "Long-term") Icon = Building2;
+                  if (impact.type === "Indirect") Icon = Layers;
+                  if (impact.type === "Long-term") Icon = Calendar;
 
                   const bgColors = [
                     "bg-green-100",
@@ -552,17 +554,23 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                     {project.timeline.map((event, idx) => {
                       let styles = {
                         icon: AlertCircle,
+                        bg: "bg-gray-200",
+                        badgeBg: "bg-gray-200",
                         badgeText: "text-gray-700",
                       };
 
                       if (event.status === "Completed") {
                         styles = {
                           icon: CheckCircle2,
+                          bg: "bg-green-100",
+                          badgeBg: "bg-green-100",
                           badgeText: "text-green-700",
                         };
                       } else if (event.status === "In Progress") {
                         styles = {
                           icon: Clock,
+                          bg: "bg-blue-100",
+                          badgeBg: "bg-blue-100",
                           badgeText: "text-blue-700",
                         };
                       }
@@ -573,7 +581,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                             <div
                               className={`w-6 h-6 rounded-full ${styles.badgeText} flex items-center justify-center`}
                             >
-                              <styles.icon size={20} />
+                              <styles.icon />
                             </div>
                             {/* vertical line unless last item */}
                             {idx !== project.timeline.length - 1 && (
