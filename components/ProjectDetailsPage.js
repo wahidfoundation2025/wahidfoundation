@@ -15,6 +15,9 @@ import {
   Calendar,
   Target as ImpactIcon,
   Layers,
+  AlertCircle,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { IoPerson } from "react-icons/io5";
@@ -550,22 +553,22 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                   <div className="space-y-6">
                     {project.timeline.map((event, idx) => {
                       let styles = {
-                        icon: "⭕",
+                        icon: AlertCircle,
                         bg: "bg-gray-200",
                         badgeBg: "bg-gray-200",
                         badgeText: "text-gray-700",
                       };
 
-                      if (event.completed === "Completed") {
+                      if (event.status === "Completed") {
                         styles = {
-                          icon: "✅",
+                          icon: CheckCircle2,
                           bg: "bg-green-100",
                           badgeBg: "bg-green-100",
                           badgeText: "text-green-700",
                         };
-                      } else if (event.completed === "In Progress") {
+                      } else if (event.status === "In Progress") {
                         styles = {
-                          icon: "⏳",
+                          icon: Clock,
                           bg: "bg-blue-100",
                           badgeBg: "bg-blue-100",
                           badgeText: "text-blue-700",
@@ -576,9 +579,9 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                         <div key={idx} className="flex items-start gap-3">
                           <div className="flex flex-col items-center">
                             <div
-                              className={`w-6 h-6 rounded-full ${styles.bg} flex items-center justify-center`}
+                              className={`w-6 h-6 rounded-full ${styles.badgeText} flex items-center justify-center`}
                             >
-                              {styles.icon}
+                              <styles.icon />
                             </div>
                             {/* vertical line unless last item */}
                             {idx !== project.timeline.length - 1 && (
@@ -597,7 +600,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                             <span
                               className={`inline-block text-xs mt-1 px-2 py-1 rounded-full ${styles.badgeBg} ${styles.badgeText}`}
                             >
-                              {event.completed}
+                              {event.status}
                             </span>
                           </div>
                         </div>

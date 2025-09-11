@@ -1,19 +1,19 @@
 "use client";
-import React, { useState } from "react";
-import { 
-  Star, 
-  Award, 
-  Landmark, 
-  Users, 
-  Heart, 
-  BookOpen, 
+import React, { useState, useEffect } from "react";
+import {
+  Star,
+  Award,
+  Landmark,
+  Users,
+  Heart,
+  BookOpen,
   ArrowRight,
   MapPin,
   Calendar,
   Building2,
   GraduationCap,
   Target,
-  CheckCircle2
+  CheckCircle2,
 } from "lucide-react";
 
 const TABS = [
@@ -24,6 +24,66 @@ const TABS = [
 
 const About = () => {
   const [activeTab, setActiveTab] = useState("journey");
+
+  const [hero, setHero] = useState(null);
+  const [loadingHero, setLoadingHero] = useState(true);
+  const [vision, setVision] = useState(null);
+  const [loadingVision, setLoadingVision] = useState(true);
+  const [values, setValues] = useState(null);
+  const [loadingValues, setLoadingValues] = useState(true);
+  const [story, setStory] = useState(null);
+  const [loadingStory, setLoadingStory] = useState(true);
+
+  const fetchHeroSectionContent = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutherosection`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setHero(data);
+        setLoadingHero(false);
+      })
+      .catch(() => setLoadingHero(false));
+  };
+
+  const fetchVisionSectionContent = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutvisionsection`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setVision(data);
+        setLoadingVision(false);
+      })
+      .catch(() => setLoadingVision(false));
+  };
+
+  const fetchValuesSectionContent = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutvaluesection`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setValues(data);
+        setLoadingValues(false);
+      })
+      .catch(() => setLoadingValues(false));
+  };
+
+  const fetchStorySectionContent = async () => {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutstorysection`)
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setStory(data);
+        setLoadingStory(false);
+      })
+      .catch(() => setLoadingStory(false));
+  };
+
+  useEffect(() => {
+    fetchHeroSectionContent();
+    fetchVisionSectionContent();
+    fetchValuesSectionContent();
+    fetchStorySectionContent();
+  }, []);
 
   return (
     <div className="flex flex-col bg-white">
@@ -107,9 +167,10 @@ const About = () => {
                       Vision
                     </h3>
                     <p className="text-gray-700 lg:text-lg leading-relaxed">
-                      To create an equitable society where every individual, regardless of their
-                      socio-economic background, has access to education, healthcare, and
-                      opportunities for growth and self-sufficiency.
+                      To create an equitable society where every individual,
+                      regardless of their socio-economic background, has access
+                      to education, healthcare, and opportunities for growth and
+                      self-sufficiency.
                     </p>
                   </div>
                 </div>
@@ -127,9 +188,10 @@ const About = () => {
                       Mission
                     </h3>
                     <p className="text-gray-700 lg:text-lg leading-relaxed">
-                      To mobilize microdonations starting from just ₹1 per day to fund sustainable
-                      development projects in education, healthcare, women empowerment, and economic
-                      growth across India, with full transparency and community involvement.
+                      To mobilize microdonations starting from just ₹1 per day
+                      to fund sustainable development projects in education,
+                      healthcare, women empowerment, and economic growth across
+                      India, with full transparency and community involvement.
                     </p>
                   </div>
                 </div>
@@ -272,7 +334,10 @@ const About = () => {
                           2018: The Beginning
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Wahid Foundation was established with a simple yet powerful idea: if every Muslim in India contributed just ₹1 per day, we could create a substantial fund for community development and social welfare.
+                          Wahid Foundation was established with a simple yet
+                          powerful idea: if every Muslim in India contributed
+                          just ₹1 per day, we could create a substantial fund
+                          for community development and social welfare.
                         </p>
                       </div>
                     </div>
@@ -286,7 +351,9 @@ const About = () => {
                           2019: First Steps
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Starting with just 50 donors in Mumbai, we began our journey of community transformation, focusing on education and healthcare initiatives.
+                          Starting with just 50 donors in Mumbai, we began our
+                          journey of community transformation, focusing on
+                          education and healthcare initiatives.
                         </p>
                       </div>
                     </div>
@@ -300,7 +367,9 @@ const About = () => {
                           2020-2023: Growth & Impact
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Expanded across India, funding over 100 projects and impacting more than 25,000 lives through our innovative microdonation model.
+                          Expanded across India, funding over 100 projects and
+                          impacting more than 25,000 lives through our
+                          innovative microdonation model.
                         </p>
                       </div>
                     </div>
@@ -320,7 +389,9 @@ const About = () => {
                           Education Impact
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Established digital education centers in rural areas, providing access to quality education and technology skills to over 5,000 students.
+                          Established digital education centers in rural areas,
+                          providing access to quality education and technology
+                          skills to over 5,000 students.
                         </p>
                       </div>
                     </div>
@@ -334,7 +405,9 @@ const About = () => {
                           Healthcare Reach
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Launched mobile health clinics serving remote tribal areas, providing essential healthcare services to over 10,000 community members.
+                          Launched mobile health clinics serving remote tribal
+                          areas, providing essential healthcare services to over
+                          10,000 community members.
                         </p>
                       </div>
                     </div>
@@ -348,7 +421,9 @@ const About = () => {
                           Women Empowerment
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Trained and supported over 2,000 women entrepreneurs through skill development and micro-finance initiatives.
+                          Trained and supported over 2,000 women entrepreneurs
+                          through skill development and micro-finance
+                          initiatives.
                         </p>
                       </div>
                     </div>
@@ -368,7 +443,9 @@ const About = () => {
                           Expanding Reach
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Planning to extend our impact to 20 states by 2025, focusing on underserved communities and innovative development solutions.
+                          Planning to extend our impact to 20 states by 2025,
+                          focusing on underserved communities and innovative
+                          development solutions.
                         </p>
                       </div>
                     </div>
@@ -382,7 +459,9 @@ const About = () => {
                           New Initiatives
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Launching sustainable livelihood programs and digital literacy campaigns to create lasting change in rural communities.
+                          Launching sustainable livelihood programs and digital
+                          literacy campaigns to create lasting change in rural
+                          communities.
                         </p>
                       </div>
                     </div>
@@ -396,7 +475,9 @@ const About = () => {
                           Community Growth
                         </h3>
                         <p className="text-gray-600 lg:text-lg leading-relaxed">
-                          Aiming to grow our donor community to 100,000 members, making microdonations accessible to everyone who wants to make a difference.
+                          Aiming to grow our donor community to 100,000 members,
+                          making microdonations accessible to everyone who wants
+                          to make a difference.
                         </p>
                       </div>
                     </div>
@@ -415,7 +496,8 @@ const About = () => {
             Join Our Mission
           </h2>
           <p className="text-gray-600 lg:text-xl leading-relaxed lg:max-w-2xl lg:mx-auto">
-            Be part of a movement that's transforming lives across India. Start with just ₹1 per day.
+            Be part of a movement that's transforming lives across India. Start
+            with just ₹1 per day.
           </p>
           <div className="lg:flex lg:justify-center">
             <a
