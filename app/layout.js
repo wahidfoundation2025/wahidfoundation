@@ -34,7 +34,7 @@ export const metadata = {
     "NGO for Muslims",
     "poverty alleviation",
     "education support",
-    "healthcare for poor ",
+    "healthcare for poor",
     "sustainable community development",
     "Islamic charity",
     "donate online India",
