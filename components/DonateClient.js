@@ -1,18 +1,30 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Heart, Users, Gift, HandCoins, CircleDollarSign, IndianRupee, FileBadge } from "lucide-react";
+import {
+  Heart,
+  Users,
+  Gift,
+  HandCoins,
+  CircleDollarSign,
+  IndianRupee,
+} from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 export default function DonatePage({ searchParams }) {
   const { projectId, type, amount, frequency } = searchParams;
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const router = useRouter();
 
-  const { user } = useUser();
-  const [isRecurring, setIsRecurring] = useState(frequency!="One-Time" ? true : false);
-  const [donationFrequency, setDonationFrequency] = useState(frequency ?? "One-Time");
+  const [isRazorpayReady, setIsRazorpayReady] = useState(false);
+
+  const [isRecurring, setIsRecurring] = useState(
+    frequency != "One-Time" ? true : false
+  );
+  const [donationFrequency, setDonationFrequency] = useState(
+    frequency ?? "One-Time"
+  );
   const [requestCertificate, setRequestCertificate] = useState(false);
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(projectId);
@@ -20,23 +32,28 @@ export default function DonatePage({ searchParams }) {
   const [donationType, setDonationType] = useState(type ?? "Zakat");
   const [showRecurringConfirm, setShowRecurringConfirm] = useState(false);
   const quickAmounts = [1000, 2500, 5000, 10000, 15000, 25000];
-  const impact = isRecurring ? {
-    Monthly: donationFrequency === "Monthly"
-      ? customAmount
-      : donationFrequency === "Yearly"
-        ? (customAmount / 12).toFixed(0)
-        : (customAmount * 4).toFixed(0),
-    Weekly: donationFrequency === "Weekly"
-      ? customAmount
-      : donationFrequency === "Monthly"
-        ? (customAmount / 4).toFixed(0)
-        : (customAmount * 13).toFixed(0),
-    Yearly: donationFrequency === "Yearly"
-      ? customAmount
-      : donationFrequency === "Monthly"
-        ? (customAmount * 12).toFixed(0)
-        : (customAmount * 52).toFixed(0),
-  } : {};
+  const impact = isRecurring
+    ? {
+        Monthly:
+          donationFrequency === "Monthly"
+            ? customAmount
+            : donationFrequency === "Yearly"
+            ? (customAmount / 12).toFixed(0)
+            : (customAmount * 4).toFixed(0),
+        Weekly:
+          donationFrequency === "Weekly"
+            ? customAmount
+            : donationFrequency === "Monthly"
+            ? (customAmount / 4).toFixed(0)
+            : (customAmount * 13).toFixed(0),
+        Yearly:
+          donationFrequency === "Yearly"
+            ? customAmount
+            : donationFrequency === "Monthly"
+            ? (customAmount * 12).toFixed(0)
+            : (customAmount * 52).toFixed(0),
+      }
+    : {};
   const [donationFor, setDonationFor] = useState("self");
   const [dedicatedTo, setDedicatedTo] = useState("");
   const [message, setMessage] = useState("");
@@ -44,39 +61,37 @@ export default function DonatePage({ searchParams }) {
   const email = user?.emailAddresses[0]?.emailAddress || "";
 
   useEffect(() => {
-    async function fetchProjects() {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/projects?status=Active`
-        );
-        const data = await res.json();
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects?status=Active`, {
+      next: { revalidate: 3600 },
+    })
+      .then((res) => res.json())
+      .then((data) => {
         setProjects(data.projects || []);
 
-        if (data.projects?.length > 0) {
-          // ✅ If query param projectId matches, set it
-          if (projectId && data.projects.some((p) => p._id === projectId)) {
-            setSelectedProjectId(projectId);
-          } else {
-            // fallback: select first project
-            setSelectedProjectId(data.projects[0]._id);
-          }
+        if (!data.projects?.some((p) => p._id === projectId)) {
+          setSelectedProjectId(data.projects?.[0]?._id || "");
         }
-      } catch (error) {
-        console.error("Failed to fetch projects:", error);
-      }
-    }
+      })
+      .catch((err) => console.error("Failed to fetch projects:", err));
+  }, [projectId]);
 
-    fetchProjects();
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+
+    script.onload = () => setIsRazorpayReady(true);
+    script.onerror = () => console.error("Razorpay SDK failed to load");
+
+    document.body.appendChild(script);
+
+    // remove script on unmount
+    return () => script.remove();
   }, []);
 
   const handlePayment = () => {
     if (!isSignedIn) {
       router.push("/login");
-      return;
-    }
-
-    if (!customAmount || customAmount < 365) {
-      alert("Please enter a valid donation amount (minimum ₹365).");
       return;
     }
 
@@ -90,104 +105,100 @@ export default function DonatePage({ searchParams }) {
       return;
     }
 
+    if (!customAmount || customAmount < 365) {
+      alert("Please enter a valid donation amount (minimum ₹365).");
+      return;
+    }
+
     if (!isRecurring) {
       setShowRecurringConfirm(true);
       return;
     }
 
-    proceedToPayment();
-  };
+    if (!isRazorpayReady) {
+      alert("Payment system is still loading. Please try again in a moment.");
+      return;
+    }
 
-  const proceedToPayment = () => {
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
+    const selectedProject = projects.find((p) => p._id === selectedProjectId);
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
+      amount: customAmount * 100,
+      currency: "INR",
+      name: "Wahid Foundation",
+      description: `Donation for ${selectedProject?.title || "General Fund"}`,
+      handler: async (response) => {
+        console.log("Payment success:", response);
+        alert(
+          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+        );
 
-    script.onload = () => {
-      const selectedProject = projects.find((p) => p._id === selectedProjectId);
-      const options = {
-        key: "rzp_live_RAFWaRQHfL5rbR", // your Razorpay Key ID (safe to expose)
-        amount: customAmount * 100,
-        currency: "INR",
-        name: "Wahid Foundation",
-        description: `Donation for ${selectedProject?.title || "General Fund"}`,
-        image: "https://cdn.razorpay.com/logo.svg",
-        handler: async function (response) {
-          alert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`);
+        try {
+          // 1️⃣ Capture the payment via backend
+          const captureRes = await fetch("/api/capture-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paymentId: response.razorpay_payment_id,
+              amount: customAmount,
+            }),
+          });
 
-          try {
-            // 1️⃣ Capture the payment via backend
-            const captureRes = await fetch("/api/capture-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                paymentId: response.razorpay_payment_id,
-                amount: customAmount,
-              }),
-            });
-
-            const captureData = await captureRes.json();
-            if (!captureRes.ok) {
-              console.error("Capture failed:", captureData);
-              alert("Payment capture failed! Please contact support.");
-              return;
-            }
-
-            console.log("Payment captured:", captureData);
-
-            // 2️⃣ Save donation record in your DB
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                paymentId: response.razorpay_payment_id,
-                amount: customAmount,
-                donationType,
-                donationFrequency: isRecurring ? donationFrequency : "One-Time",
-                projectId: selectedProjectId,
-                name,
-                email,
-                dedicatedTo,
-                message,
-                requestCertificate,
-              }),
-            })
-              .then((res) => res.json())
-              .then((data) => console.log("Donation saved:", data))
-              .catch((err) => console.error("Failed to save donation:", err));
-          } catch (err) {
-            console.error("Error during capture or save:", err);
+          const captureData = await captureRes.json();
+          if (!captureRes.ok) {
+            console.error("Capture failed:", captureData);
+            alert("Payment capture failed! Please contact support.");
+            return;
           }
-        },
-        prefill: {
-          name: name,
-          email: email,
-        },
-        notes: {
-          projectId: selectedProjectId,
-          donationType,
-          donationFor,
-          dedicatedTo,
-          message,
-          isRecurring,
-          donationFrequency,
-          requestCertificate,
-        },
-        theme: {
-          color: "#059669",
-        },
-      };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+          console.log("Payment captured:", captureData);
+
+          // 2️⃣ Save donation record in your DB
+          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              paymentId: response.razorpay_payment_id,
+              amount: customAmount,
+              donationType,
+              donationFrequency: isRecurring ? donationFrequency : "One-Time",
+              projectId: selectedProjectId,
+              name,
+              email,
+              dedicatedTo,
+              message,
+              requestCertificate,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => console.log("Donation saved:", data))
+            .catch((err) => console.error("Failed to save donation:", err));
+        } catch (err) {
+          console.error("Error during capture or save:", err);
+        }
+      },
+      prefill: {
+        name: name,
+        email: email,
+      },
+      notes: {
+        projectId: selectedProjectId,
+        donationType,
+        donationFor,
+        dedicatedTo,
+        message,
+        isRecurring,
+        donationFrequency,
+        requestCertificate,
+      },
+      theme: {
+        color: "#059669",
+      },
     };
 
-    script.onerror = () => {
-      alert("Failed to load Razorpay SDK. Please try again later.");
-    };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
   };
-
 
   if (projects.length === 0) {
     return (
@@ -270,10 +281,7 @@ export default function DonatePage({ searchParams }) {
             className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200 text-black"
           >
             {projects.map((project) => (
-              <option
-                key={project._id}
-                value={project._id}
-              >
+              <option key={project._id} value={project._id}>
                 {project.title}
               </option>
             ))}
@@ -297,10 +305,11 @@ export default function DonatePage({ searchParams }) {
               {donationTypes.map((opt) => (
                 <label
                   key={opt.type}
-                  className={`flex flex-col p-4 rounded-xl border cursor-pointer ${donationType === opt.type
-                    ? "border-emerald-300 bg-emerald-50"
-                    : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
-                    }`}
+                  className={`flex flex-col p-4 rounded-xl border cursor-pointer ${
+                    donationType === opt.type
+                      ? "border-emerald-300 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
+                  }`}
                 >
                   <div className="flex items-center space-x-3">
                     <input
@@ -354,10 +363,11 @@ export default function DonatePage({ searchParams }) {
               ].map((option) => (
                 <label
                   key={option.value}
-                  className={`flex items-center space-x-3 p-3 rounded-xl border cursor-pointer ${donationFor === option.value
-                    ? "border-emerald-300 bg-emerald-50"
-                    : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
-                    }`}
+                  className={`flex items-center space-x-3 p-3 rounded-xl border cursor-pointer ${
+                    donationFor === option.value
+                      ? "border-emerald-300 bg-emerald-50"
+                      : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
+                  }`}
                 >
                   <input
                     type="radio"
@@ -435,7 +445,9 @@ export default function DonatePage({ searchParams }) {
                       name="frequency"
                       value={freq}
                       checked={
-                        freq === "One-Time" ? !isRecurring : donationFrequency === freq
+                        freq === "One-Time"
+                          ? !isRecurring
+                          : donationFrequency === freq
                       }
                       onChange={() => {
                         if (freq === "One-Time") {
@@ -457,10 +469,11 @@ export default function DonatePage({ searchParams }) {
                 <button
                   key={amount}
                   onClick={() => setCustomAmount(amount)}
-                  className={`py-2 px-4 rounded-lg border text-sm font-semibold hover:border-emerald-300 hover:bg-emerald-50 ${customAmount === amount
-                    ? "bg-emerald-100 border-emerald-400"
-                    : "border-gray-300"
-                    }`}
+                  className={`py-2 px-4 rounded-lg border text-sm font-semibold hover:border-emerald-300 hover:bg-emerald-50 ${
+                    customAmount === amount
+                      ? "bg-emerald-100 border-emerald-400"
+                      : "border-gray-300"
+                  }`}
                 >
                   ₹{amount.toLocaleString()}
                 </button>
@@ -531,17 +544,23 @@ export default function DonatePage({ searchParams }) {
         <div className="space-y-3 text-sm text-gray-700">
           <div className="grid grid-cols-2 bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500 truncate">Donation Type</span>
-            <span className="font-medium text-right truncate">{donationType || "—"}</span>
+            <span className="font-medium text-right truncate">
+              {donationType || "—"}
+            </span>
           </div>
           <div className="grid grid-cols-2 bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500 truncate">Donation Frequency</span>
-            <span className="font-medium text-right truncate">{isRecurring ? donationFrequency : "One-Time"}</span>
+            <span className="font-medium text-right truncate">
+              {isRecurring ? donationFrequency : "One-Time"}
+            </span>
           </div>
           <div className="grid grid-cols-2 bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500 truncate">
               {isRecurring ? `${donationFrequency} Amount` : "Amount"}
             </span>
-            <span className="font-medium text-right truncate">₹{customAmount}</span>
+            <span className="font-medium text-right truncate">
+              ₹{customAmount}
+            </span>
           </div>
           <div className="grid grid-cols-2 bg-white rounded-lg px-4 py-2">
             <span className="text-gray-500 truncate">Project</span>
@@ -581,7 +600,8 @@ export default function DonatePage({ searchParams }) {
               Confirm One-Time Donation
             </h3>
             <p className="text-sm text-gray-600 mb-6">
-              You have selected a one-time donation. Would you like to make this a recurring donation for consistent support?
+              You have selected a one-time donation. Would you like to make this
+              a recurring donation for consistent support?
             </p>
             <div className="flex justify-end space-x-3">
               <button

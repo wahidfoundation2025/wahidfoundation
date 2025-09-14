@@ -10,7 +10,6 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-// Map icon string to Lucide icon component
 const ICON_MAP = {
   GraduationCap,
   Heart,
@@ -19,9 +18,6 @@ const ICON_MAP = {
 };
 
 const Impact = () => {
-  const [showAllStories, setShowAllStories] = useState(false);
-  const [activeTab, setActiveTab] = useState(null);
-
   const [hero, setHero] = useState(null);
   const [loadingHero, setLoadingHero] = useState(true);
   const [stories, setStories] = useState([]);
@@ -29,49 +25,50 @@ const Impact = () => {
   const [tabContent, setTabContent] = useState({});
   const [loadingCategories, setLoadingCategories] = useState(true);
 
-  const fetchHeroSectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/impactherosection`)
-      .then((res) => res.json())
-      .then((data) => {
-        setHero(data);
-        setLoadingHero(false);
-      })
-      .catch(() => setLoadingHero(false));
-  };
-
-  const fetchStoriesSectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/impact-stories`)
-      .then((res) => res.json())
-      .then((data) => {
-        setStories(data);
-        setLoadingStories(false);
-      })
-      .catch(() => setLoadingStories(false));
-  };
-
-  const fetchCategoriesSectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/impactcategories`)
-      .then((res) => res.json())
-      .then((data) => {
-        setTabContent(data);
-        if (data?.categories?.length > 0) {
-          // Default active tab is the first category
-          setActiveTab(data.categories[0].key);
-        }
-        setLoadingCategories(false);
-      })
-      .catch(() => setLoadingCategories(false));
-  };
-
-  const fetchContent = async () => {
-    await fetchHeroSectionContent();
-    await fetchCategoriesSectionContent();
-    await fetchStoriesSectionContent();
-  };
+  const [showAllStories, setShowAllStories] = useState(false);
+  const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
+    async function fetchContent() {
+      try {
+        const [heroRes, storiesRes, categoriesRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/impactherosection`, {
+            cache: "force-cache",
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/impact-stories`, {
+            cache: "force-cache",
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/impactcategories`, {
+            cache: "force-cache",
+          }),
+        ]);
+
+        const [heroData, storiesData, categoriesData] = await Promise.all([
+          heroRes.json(),
+          storiesRes.json(),
+          categoriesRes.json(),
+        ]);
+
+        setHero(heroData);
+        setStories(storiesData);
+        setTabContent(categoriesData);
+      } catch (err) {
+        console.error("Failed to fetch about page data:", err);
+      } finally {
+        setLoadingHero(false);
+        setLoadingStories(false);
+        setLoadingCategories(false);
+      }
+    }
+
     fetchContent();
   }, []);
+
+  useEffect(() => {
+    if (tabContent?.categories?.length > 0 && !activeTab) {
+      setActiveTab(tabContent.categories[0].key);
+    }
+  }, [tabContent, activeTab]);
 
   const visibleStories = showAllStories ? stories : stories.slice(0, 2);
 
@@ -345,4 +342,5 @@ const Impact = () => {
     </div>
   );
 };
+
 export default Impact;

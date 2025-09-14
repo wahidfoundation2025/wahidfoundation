@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import HeroSection from "../components/HeroSection";
 import ImpactStats from "../components/ImpactSection";
@@ -6,8 +7,25 @@ import ProjectCardsSection from "../components/ProjectCardsSection";
 import Link from "next/link";
 import MobileDonationCategories from "../components/donationtype";
 
+async function getHeroData() {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/homeherosection`,
+      {
+        cache: "force-cache",
+      }
+    );
+    if (!res.ok) return null;
+    return res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
 export default function Home() {
   const [quote, setQuote] = useState(null);
+  const [heroData, setHeroData] = useState(null);
+
   const schemaData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -284,10 +302,22 @@ export default function Home() {
   };
 
   useEffect(() => {
+    async function fetchHero() {
+      const data = await getHeroData();
+      setHeroData(data);
+    }
+
+    fetchHero();
+  }, []);
+
+  useEffect(() => {
     async function fetchQuote() {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/homequotesection`
+          `${process.env.NEXT_PUBLIC_API_URL}/homequotesection`,
+          {
+            next: { revalidate: 3600 },
+          }
         );
 
         const data = await res.json();
@@ -309,7 +339,7 @@ export default function Home() {
       </head>
 
       <div className="flex flex-col bg-white">
-        <HeroSection />
+        <HeroSection hero={heroData} />
 
         <ProjectCardsSection maxCards={3} />
 

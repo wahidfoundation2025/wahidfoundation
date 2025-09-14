@@ -2,7 +2,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import Headers from "../components/navbar";
-import FooterNav from "../components/FooterNav";
+import FooterNav from "../components/footer/FooterNav";
 import "./globals.css";
 import Script from "next/script";
 

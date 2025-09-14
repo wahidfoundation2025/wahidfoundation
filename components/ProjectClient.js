@@ -1,56 +1,72 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import ProjectCardsSection from "./ProjectCardsSection";
 import { Filter, Search } from "lucide-react";
 
+// Debounce utility
+function useDebounce(value, delay = 400) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 function Projects({ title }) {
   const [searchInput, setSearchInput] = useState("");
+  const debouncedSearch = useDebounce(searchInput);
+
   const [categoryFilter, setCategoryFilter] = useState("all");
-  const [donationTypeFilter, setDonationTypeFilter] = useState(
-    title ? title : "all"
-  );
-  const [categories, setCategories] = useState([]); // from API
+  const [donationTypeFilter, setDonationTypeFilter] = useState(title || "all");
+  const [categories, setCategories] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
 
-  const donationTypes = [
-    "all",
-    "general",
-    "zakat",
-    "sadqa",
-    "interest_earnings",
-  ];
+  const donationTypes = useMemo(
+    () => ["all", "general", "zakat", "sadqa", "interest_earnings"],
+    []
+  );
 
-  // Fetch categories from API
+  // Fetch categories with cleanup
   useEffect(() => {
+    const controller = new AbortController();
+
     async function fetchCategories() {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/categories`
+          `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+          { signal: controller.signal }
         );
         const data = await res.json();
 
-        // API gives array of objects: [{ _id, name, description, ... }, ...]
-        if (Array.isArray(data)) {
-          setCategories(data);
-        } else if (Array.isArray(data.categories)) {
-          // in case it's wrapped
-          setCategories(data.categories);
-        }
+        const cats = Array.isArray(data)
+          ? data
+          : Array.isArray(data.categories)
+          ? data.categories
+          : [];
+
+        setCategories(cats);
       } catch (error) {
-        console.error("Failed to fetch categories", error);
+        if (error.name !== "AbortError") {
+          console.error("Failed to fetch categories", error);
+        }
       }
     }
 
     fetchCategories();
+
+    return () => controller.abort();
   }, []);
 
-  // Clear filters
-  const handleClearFilters = () => {
+  // Clear filters handler
+  const handleClearFilters = useCallback(() => {
     setSearchInput("");
     setCategoryFilter("all");
     setDonationTypeFilter("all");
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-emerald-50 text-gray-900">
@@ -72,7 +88,7 @@ function Projects({ title }) {
         <div className="flex flex-col gap-4 lg:flex-row md:items-center md:justify-between">
           {/* Search */}
           <div className="flex flex-row gap-2 lg:min-w-auto min-w-full">
-            <div className="relative flex-1 ">
+            <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
               <input
                 type="text"
@@ -91,21 +107,18 @@ function Projects({ title }) {
             </button>
           </div>
 
+          {/* Filters */}
           <div
-            className={
-              `${showFilters ? "md:flex flex" : "md:flex hidden"} ` +
-              " flex-col sm:flex-row gap-3 w-full"
-            }
+            className={`${
+              showFilters ? "md:flex flex" : "md:flex hidden"
+            } flex-col sm:flex-row gap-3 w-full`}
           >
             {/* Category Filter */}
             <div className="flex flex-1 items-center gap-2">
               <Filter className="lg:block hidden text-gray-400" />
               <select
                 value={categoryFilter}
-                onChange={(e) => {
-                    setCategoryFilter(e.target.value);
-                    setShowFilters((prev) => !prev);
-                }}
+                onChange={(e) => setCategoryFilter(e.target.value)}
                 className="py-2 px-3 flex-1 rounded-xl border border-gray-300 appearance-none cursor-pointer"
               >
                 <option value="all">All Categories</option>
@@ -118,14 +131,11 @@ function Projects({ title }) {
             </div>
 
             {/* Donation Filter */}
-            <div className="flex flex-1  items-center gap-2">
+            <div className="flex flex-1 items-center gap-2">
               <Filter className="lg:block hidden text-gray-400" />
               <select
                 value={donationTypeFilter}
-                onChange={(e) => {
-                    setDonationTypeFilter(e.target.value);
-                    setShowFilters((prev) => !prev);
-                }}
+                onChange={(e) => setDonationTypeFilter(e.target.value)}
                 className="py-2 px-3 flex-1 rounded-xl border border-gray-300 appearance-none cursor-pointer"
               >
                 {donationTypes.map((type) => (
@@ -161,7 +171,7 @@ function Projects({ title }) {
       {/* Project Cards */}
       <section className="w-full pb-20">
         <ProjectCardsSection
-          searchTerm={searchInput}
+          searchTerm={debouncedSearch}
           categoryFilter={categoryFilter}
           donationTypeFilter={donationTypeFilter}
         />
