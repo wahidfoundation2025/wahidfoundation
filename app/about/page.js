@@ -1,11 +1,14 @@
-// app/about/page.js
+import { cache } from "react";
 import About from "../../components/AboutClient";
+
+const fetchAboutData = cache(getAboutData);
 
 async function getAboutData() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/aboutherosection`,
     {
-      cache: "no-store",
+      // because data is almost always static
+      cache: "force-cache",
     }
   );
   if (!res.ok) throw new Error("Failed to fetch About data");
@@ -13,7 +16,7 @@ async function getAboutData() {
 }
 
 export async function generateMetadata() {
-  const aboutData = await getAboutData();
+  const aboutData = await fetchAboutData();
 
   return {
     title: aboutData.metatitle || aboutData.title || "About Us",
@@ -34,7 +37,7 @@ export async function generateMetadata() {
 }
 
 export default async function AboutPage() {
-  const aboutData = await getAboutData();
+  const aboutData = await fetchAboutData();
 
   return (
     <>
@@ -43,7 +46,7 @@ export default async function AboutPage() {
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(aboutData.schemaMarkup, null, 2),
+              __html: JSON.stringify(aboutData.schemaMarkup),
             }}
           />
         )}

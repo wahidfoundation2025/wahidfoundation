@@ -1,54 +1,25 @@
+// components/HeroSection.jsx
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
 import { Heart, Users, Calendar, ArrowRight } from "lucide-react";
-import ProjectCardsSection from "./ProjectCardsSection";
+import Link from "next/link";
 
-const ICONS = {
-  Calendar: Calendar,
-  Users: Users,
-  Heart: Heart,
-};
+const ICONS = { Calendar, Users, Heart };
 
 function lightenHexColor(hex, percent = 0.2) {
-  // Remove # if present
   hex = hex.replace(/^#/, "");
-
-  // Parse r, g, b values
   let r = parseInt(hex.substring(0, 2), 16);
   let g = parseInt(hex.substring(2, 4), 16);
   let b = parseInt(hex.substring(4, 6), 16);
-
-  // Calculate lighter shade by blending with white
   r = Math.round(r + (255 - r) * percent);
   g = Math.round(g + (255 - g) * percent);
   b = Math.round(b + (255 - b) * percent);
-
-  // Ensure 2-digit hex format
   return `#${r.toString(16).padStart(2, "0")}${g
     .toString(16)
     .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 }
 
-const HeroSection = () => {
-  const [hero, setHero] = useState(null);
-
-  useEffect(() => {
-    async function fetchHero() {
-      try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/homeherosection`
-        );
-        const data = await res.json();
-        setHero(data);
-      } catch (e) {
-        setHero(null);
-      }
-    }
-    fetchHero();
-  }, []);
-
+export default function HeroSection({ hero }) {
   if (!hero) {
     return (
       <section className="relative bg-white min-h-[400px] flex items-center justify-center">
@@ -63,13 +34,12 @@ const HeroSection = () => {
         {/* Top CTA */}
         <div className="bg-emerald-600 text-white px-5 lg:py-40 py-20">
           <div className="max-w-md mx-auto lg:max-w-4xl space-y-6 lg:space-y-8">
-            <h1 className="text-3xl font-bold leading-tight tracking-tight text-center lg:text-5xl lg:leading-tight">
+            <h1 className="text-3xl font-bold text-center lg:text-5xl">
               {hero.title}
             </h1>
-            <p className="text-emerald-50 text-base leading-relaxed lg:text-xl lg:max-w-2xl lg:mx-auto lg:text-center">
+            <p className="text-emerald-50 text-base lg:text-xl lg:max-w-2xl lg:mx-auto lg:text-center">
               {hero.subtitle}
             </p>
-
             <div className="lg:flex lg:justify-center">
               <Link
                 href="/donate"
@@ -85,15 +55,15 @@ const HeroSection = () => {
         {/* Stats */}
         <div className="px-5 py-20 bg-white lg:px-8 lg:py-32">
           <div className="mx-auto space-y-8 lg:space-y-12 xl:px-36">
-            <div className="grid grid-cols-3 gap-4 lg:gap-8 lg:mx-auto">
+            <div className="grid grid-cols-3 gap-4 lg:gap-8">
               {Object.values(hero.stats).map((stat, i) => (
                 <div
+                  key={stat.label}
                   className={`text-center${
                     i === 1 ? " border-x border-gray-100" : ""
                   }`}
-                  key={stat.label}
                 >
-                  <div className="text-2xl font-bold text-emerald-600 mb-1.5 sm:text-4xl sm:mb-2">
+                  <div className="text-2xl font-bold text-emerald-600 sm:text-4xl">
                     {stat.value}
                   </div>
                   <div className="text-xs text-gray-600 font-medium sm:text-sm">
@@ -104,16 +74,16 @@ const HeroSection = () => {
             </div>
 
             {/* Impact Cards */}
-            <div className="gap-4 grid sm:grid-cols-3 grid-cols-1 lg:gap-6 lg:space-y-0">
+            <div className="grid sm:grid-cols-3 gap-4 lg:gap-6">
               {hero.cards?.map((card, idx) => {
                 const Icon = ICONS[card.icon] || Heart;
                 const bg = lightenHexColor(card.themeColor || "#10b981", 0.85);
                 const iconBg = card.themeColor || "#059669";
-                const titleColor = card.themeColor || "#065F46"; // fallback to emerald-800
+                const titleColor = card.themeColor || "#065F46";
                 return (
                   <div
                     key={idx}
-                    className={`rounded-2xl shadow-sm hover:shadow-md transition duration-200 active:scale-[0.98] sm:p-8 p-4 flex sm:flex-col items-center gap-5 lg:text-center lg:gap-4`}
+                    className="rounded-2xl shadow-sm hover:shadow-md transition duration-200 active:scale-[0.98] sm:p-8 p-4 flex sm:flex-col items-center gap-5 lg:text-center lg:gap-4"
                     style={{ backgroundColor: bg }}
                   >
                     <div
@@ -137,13 +107,9 @@ const HeroSection = () => {
                 );
               })}
             </div>
-
-            {/* Secondary CTA */}
           </div>
         </div>
       </div>
     </section>
   );
-};
-
-export default HeroSection;
+}

@@ -1,11 +1,14 @@
 // app/about/page.js
+import { cache } from "react";
 import Impact from "../../components/ImpactClient";
+
+const fetchImpactData = cache(getImpactData);
 
 async function getImpactData() {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}/impactherosection`,
     {
-      cache: "no-store",
+      cache: "force-cache",
     }
   );
   if (!res.ok) throw new Error("Failed to fetch Impact data");
@@ -13,7 +16,7 @@ async function getImpactData() {
 }
 
 export async function generateMetadata() {
-  const impactData = await getImpactData();
+  const impactData = await fetchImpactData();
 
   return {
     title: impactData.metatitle || impactData.title || "Impact",
@@ -34,7 +37,7 @@ export async function generateMetadata() {
 }
 
 export default async function ImpactPage() {
-  const impactData = await getImpactData();
+  const impactData = await fetchImpactData();
 
   return (
     <>
@@ -43,7 +46,7 @@ export default async function ImpactPage() {
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(impactData.schemaMarkup, null, 2),
+              __html: JSON.stringify(impactData.schemaMarkup),
             }}
           />
         )}
