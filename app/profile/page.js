@@ -174,7 +174,7 @@ export default function ProfilePage() {
           <div className="w-full flex flex-row gap-6 sm:mb-4 m-0">
             <div className="w-full flex-1/5 flex flex-col gap-4 justify-between">
               <img
-                src={formData.profilePicture || "/placeholder-avatar.png"}
+                src={formData.profilePicture || "/profile.png"}
                 alt="Profile"
                 className="w-20 h-20 mx-auto rounded-full object-cover border-2 border-emerald-600 mb-4 md:mb-0"
               />
