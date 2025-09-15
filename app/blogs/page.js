@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
+
+// revalidate every minute and not on every request
+const revalidate = 60;
 
 export default function BlogsPage() {
   const [blogs, setBlogs] = useState([]);
@@ -10,9 +14,9 @@ export default function BlogsPage() {
   useEffect(() => {
     async function fetchBlogs() {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/blogs`
-        );
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/blogs`, {
+          next: { revalidate: revalidate },
+        });
         const data = await res.json();
         setBlogs(data);
       } catch (error) {
@@ -49,9 +53,9 @@ export default function BlogsPage() {
               >
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
-                  <img
+                  <Image
                     src={blog.imageUrl || "/placeholder.png"}
-                    alt={blog.title}
+                    alt={blog.title} fill
                     className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                   {blog.category && (
@@ -74,7 +78,7 @@ export default function BlogsPage() {
                   <div
                     className="text-sm text-gray-600 mt-3 line-clamp-3"
                     dangerouslySetInnerHTML={{
-                      __html: blog.content,
+                      __html: JSON.stringify(blog.content),
                     }}
                   ></div>
 

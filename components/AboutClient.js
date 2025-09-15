@@ -2,11 +2,9 @@
 import React, { useState, useEffect } from "react";
 import {
   Star,
-  Award,
   Landmark,
   Users,
   Heart,
-  BookOpen,
   ArrowRight,
   MapPin,
   Calendar,
@@ -16,6 +14,8 @@ import {
   CheckCircle2,
   Medal,
 } from "lucide-react";
+
+import { StorySection } from "./StorySection";
 
 const ICON_MAP = {
   Heart: <Heart />,
@@ -40,55 +40,43 @@ const About = () => {
   const [story, setStory] = useState(null);
   const [loadingStory, setLoadingStory] = useState(true);
 
-  const fetchHeroSectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutherosection`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Hero: ", data);
-        setHero(data);
-        setLoadingHero(false);
-      })
-      .catch(() => setLoadingHero(false));
-  };
-
-  const fetchVisionSectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutvisionsection`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Vision and Mission: ", data);
-        setVision(data);
-        setLoadingVision(false);
-      })
-      .catch(() => setLoadingVision(false));
-  };
-
-  const fetchValuesSectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutvaluesection`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Values: ", data);
-        setValues(data);
-        setLoadingValues(false);
-      })
-      .catch(() => setLoadingValues(false));
-  };
-
-  const fetchStorySectionContent = async () => {
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutstorysection`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Story: ", data);
-        setStory(data);
-        setLoadingStory(false);
-      })
-      .catch(() => setLoadingStory(false));
-  };
-
   useEffect(() => {
-    fetchHeroSectionContent();
-    fetchVisionSectionContent();
-    fetchValuesSectionContent();
-    fetchStorySectionContent();
+    async function fetchContent() {
+      try {
+        const [heroRes, visionRes, valuesRes, storyRes] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutherosection`, {
+            cache: "force-cache",
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutvisionsection`, {
+            cache: "force-cache",
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutvaluesection`, {
+            cache: "force-cache",
+          }),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/aboutstorysection`, {
+            cache: "force-cache",
+          }),
+        ]);
+
+        const [heroData, visionData, valuesData, storyData] = await Promise.all(
+          [heroRes.json(), visionRes.json(), valuesRes.json(), storyRes.json()]
+        );
+
+        setHero(heroData);
+        setVision(visionData);
+        setValues(valuesData);
+        setStory(storyData);
+      } catch (err) {
+        console.error("Failed to fetch about page data:", err);
+      } finally {
+        setLoadingHero(false);
+        setLoadingVision(false);
+        setLoadingValues(false);
+        setLoadingStory(false);
+      }
+    }
+
+    fetchContent();
   }, []);
 
   const availableTabs = [
@@ -239,7 +227,7 @@ const About = () => {
           <div className="grid grid-cols-2 gap-4 lg:gap-8 lg:grid-cols-4">
             {values?.cards?.map((card, idx) => (
               <div
-                key={card?.id}
+                key={card?.id || idx}
                 className="border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl"
               >
                 <div className="p-4 lg:p-8">
@@ -290,9 +278,9 @@ const About = () => {
           {/* Tabs */}
           <div>
             <div className="inline-flex h-12 lg:h-16 items-center justify-center rounded-lg bg-gray-100 p-1 text-gray-600 lg:grid lg:w-full lg:grid-cols-3">
-              {availableTabs.map((tab) => (
+              {availableTabs?.map((tab, idx) => (
                 <button
-                  key={tab.value}
+                  key={tab?.value || idx}
                   className={`rounded-md px-6 py-2 lg:px-10 lg:py-3 text-sm lg:text-base font-medium transition-all ${
                     activeTab === tab.value
                       ? "bg-white text-emerald-600 shadow-sm"
@@ -307,99 +295,13 @@ const About = () => {
 
             <div className="mt-6 lg:mt-12 space-y-6">
               {activeTab === "journey" && (
-                <div className="border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl">
-                  <div className="p-6 lg:p-12 space-y-4 lg:space-y-8">
-                    {story?.journey?.map((item, idx) => (
-                      <div className="flex items-start gap-4 lg:gap-6">
-                        <div
-                          className={`bg-${
-                            idx % 2 === 0 ? "emerald" : "amber"
-                          }-100 w-12 h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center flex-shrink-0`}
-                        >
-                          <span
-                            className={`h-6 w-6 lg:h-8 lg:w-8 text-${
-                              idx % 2 === 0 ? "emerald" : "amber"
-                            }-600 flex items-center justify-center`}
-                          >
-                            {JOURNEY_ICONS[idx]}
-                          </span>
-                        </div>
-                        <div className="space-y-2 lg:space-y-4">
-                          <h3 className="font-semibold lg:text-xl text-gray-900">
-                            {item?.title}
-                          </h3>
-                          <p className="text-gray-600 lg:text-lg leading-relaxed">
-                            {item?.content}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <StorySection items={story?.journey} icons={JOURNEY_ICONS} />
               )}
-
               {activeTab === "impact" && (
-                <div className="border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl">
-                  <div className="p-6 lg:p-12 space-y-4 lg:space-y-8">
-                    {story?.impact?.map((item, idx) => (
-                      <div className="flex items-start gap-4 lg:gap-6">
-                        <div
-                          className={`bg-${
-                            idx % 2 === 0 ? "emerald" : "amber"
-                          }-100 w-12 h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center flex-shrink-0`}
-                        >
-                          <span
-                            className={`h-6 w-6 lg:h-8 lg:w-8 text-${
-                              idx % 2 === 0 ? "emerald" : "amber"
-                            }-600 flex items-center justify-center`}
-                          >
-                            {IMPACT_ICONS[idx]}
-                          </span>
-                        </div>
-                        <div className="space-y-2 lg:space-y-4">
-                          <h3 className="font-semibold lg:text-xl text-gray-900">
-                            {item?.title}
-                          </h3>
-                          <p className="text-gray-600 lg:text-lg leading-relaxed">
-                            {item?.content}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <StorySection items={story?.impact} icons={IMPACT_ICONS} />
               )}
-
               {activeTab === "future" && (
-                <div className="border-0 bg-white shadow-sm hover:shadow-lg transition-all duration-300 rounded-xl">
-                  <div className="p-6 lg:p-12 space-y-4 lg:space-y-8">
-                    {story?.future?.map((item, idx) => (
-                      <div className="flex items-start gap-4 lg:gap-6">
-                        <div
-                          className={`bg-${
-                            idx % 2 === 0 ? "emerald" : "amber"
-                          }-100 w-12 h-12 lg:w-16 lg:h-16 rounded-xl flex items-center justify-center flex-shrink-0`}
-                        >
-                          <span
-                            className={`h-6 w-6 lg:h-8 lg:w-8 text-${
-                              idx % 2 === 0 ? "emerald" : "amber"
-                            }-600 flex items-center justify-center`}
-                          >
-                            {FUTURE_ICONS[idx]}
-                          </span>
-                        </div>
-                        <div className="space-y-2 lg:space-y-4">
-                          <h3 className="font-semibold lg:text-xl text-gray-900">
-                            {item?.title}
-                          </h3>
-                          <p className="text-gray-600 lg:text-lg leading-relaxed">
-                            {item?.content}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <StorySection items={story?.future} icons={FUTURE_ICONS} />
               )}
             </div>
           </div>
