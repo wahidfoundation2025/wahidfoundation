@@ -16,7 +16,8 @@ async function getHeroData() {
       }
     );
     if (!res.ok) return null;
-    return res.json();
+    const data = await res.json();
+    return data;
   } catch (e) {
     return null;
   }
@@ -308,6 +309,7 @@ export default function Home() {
     }
 
     fetchHero();
+    console.log(heroData);
   }, []);
 
   useEffect(() => {

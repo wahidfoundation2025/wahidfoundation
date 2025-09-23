@@ -34,6 +34,26 @@ const formatNumber = (num) => {
   return num?.toString() || "0";
 };
 
+// Skeleton Loader Component
+const ProjectCardSkeleton = () => (
+  <div className="overflow-hidden bg-white rounded-xl shadow-sm animate-pulse flex flex-col">
+    <div className="h-48 lg:h-56 bg-gray-200"></div>
+    <div className="p-6 space-y-3">
+      <div className="h-5 bg-gray-200 rounded w-3/4"></div>
+      <div className="h-4 bg-gray-200 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+    </div>
+    <div className="p-6 pt-0 space-y-3">
+      <div className="h-2 bg-gray-200 rounded w-full"></div>
+      <div className="h-2 bg-gray-200 rounded w-2/3"></div>
+      <div className="flex gap-2">
+        <div className="h-10 bg-gray-200 rounded w-1/2"></div>
+        <div className="h-10 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    </div>
+  </div>
+);
+
 const ProjectCardsSection = ({
   searchTerm = "",
   categoryFilter = "all",
@@ -41,6 +61,7 @@ const ProjectCardsSection = ({
   maxCards,
 }) => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { isSignedIn } = useUser();
 
   useEffect(() => {
@@ -48,6 +69,7 @@ const ProjectCardsSection = ({
 
     async function fetchData() {
       try {
+        setLoading(true);
         const [projectsRes, donationsRes] = await Promise.all([
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
             signal: controller.signal,
@@ -83,6 +105,8 @@ const ProjectCardsSection = ({
         if (!(err instanceof DOMException && err.name === "AbortError")) {
           console.error("Failed to fetch projects/donations", err);
         }
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -139,9 +163,11 @@ const ProjectCardsSection = ({
 
   return (
     <section className="flex justify-center w-full px-4 py-4 sm:px-12 text-gray-900">
-      {displayedProjects.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">
-          No projects found.
+      {loading ? (
+        <div className="grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]">
+          {Array.from({ length: max || 4 }).map((_, i) => (
+            <ProjectCardSkeleton key={i} />
+          ))}
         </div>
       ) : (
         <div
@@ -151,6 +177,7 @@ const ProjectCardsSection = ({
               : "lg:[grid-template-columns:repeat(auto-fit,minmax(300px,400px))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"
           } [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]`}
         >
+          {/* ✅ Render Actual Projects */}
           {displayedProjects.map((project) => (
             <div
               key={project?._id}
@@ -159,10 +186,7 @@ const ProjectCardsSection = ({
               {/* Image & Labels */}
               <div className="h-48 lg:h-56 relative">
                 <Image
-                  src={
-                    project?.cardImage ||
-                    project?.mainImage
-                  }
+                  src={project?.cardImage || project?.mainImage}
                   alt={project?.title || "Project"}
                   fill
                   className="object-cover"
@@ -172,39 +196,6 @@ const ProjectCardsSection = ({
 
                 <div className="absolute top-2 right-2">
                   <ShareButton slug={project?.slug || ""} />
-                </div>
-
-                <div className="absolute top-4 left-4 flex gap-2 flex-wrap">
-                  {project?.category?.length ? (
-                    project.category.map((cat, i) => (
-                      <span
-                        key={i}
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                          categoryColors[cat] || "bg-gray-100 text-gray-800"
-                        }`}
-                      >
-                        {cat}
-                      </span>
-                    ))
-                  ) : (
-                    <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-gray-200 text-gray-700">
-                      Uncategorized
-                    </span>
-                  )}
-
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      statusColors[project?.status] ||
-                      "bg-gray-100 text-gray-800"
-                    }`}
-                  >
-                    {project?.status || "Unknown"}
-                  </span>
-                </div>
-
-                <div className="absolute bottom-4 left-4 text-white text-sm flex items-center gap-1">
-                  <MapPin className="h-4 w-4" />
-                  <span>{project?.location || "N/A"}</span>
                 </div>
               </div>
 
