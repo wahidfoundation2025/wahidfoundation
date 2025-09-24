@@ -200,14 +200,6 @@ export default function DonatePage({ searchParams }) {
     rzp.open();
   };
 
-  if (projects.length === 0) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-white text-gray-900">
-        <p>Loading projects...</p>
-      </main>
-    );
-  }
-
   const selectedProject = projects.find((p) => p._id === selectedProjectId);
   const donationTypes =
     selectedProject?.donationOptions?.filter((opt) => opt.isEnabled) || [];
@@ -280,7 +272,7 @@ export default function DonatePage({ searchParams }) {
             onChange={(e) => setSelectedProjectId(e.target.value)}
             className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200 text-black"
           >
-            {projects.map((project) => (
+            {projects?.map((project) => (
               <option key={project._id} value={project._id}>
                 {project.title}
               </option>
