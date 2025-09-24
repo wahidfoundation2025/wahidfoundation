@@ -4,17 +4,8 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import ProjectCardsSection from "./ProjectCardsSection";
 import { Filter, Search } from "lucide-react";
 
-// Debounce utility
-function useDebounce(value, delay = 400) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debouncedValue;
-}
+import useResponsiveLimit from "../app/hooks/useResponsiveLimit";
+import useDebounce from "../app/hooks/useDebounce";
 
 function Projects({ title }) {
   const [searchInput, setSearchInput] = useState("");
@@ -170,11 +161,18 @@ function Projects({ title }) {
 
       {/* Project Cards */}
       <section className="w-full pb-20">
-        <ProjectCardsSection
-          searchTerm={debouncedSearch}
-          categoryFilter={categoryFilter}
-          donationTypeFilter={donationTypeFilter}
-        />
+        {(() => {
+          const responsiveLimit = useResponsiveLimit();
+          return (
+            <ProjectCardsSection
+              searchTerm={debouncedSearch}
+              categoryFilter={categoryFilter}
+              donationTypeFilter={donationTypeFilter}
+              initialLimit={responsiveLimit}
+              infiniteScroll={true}
+            />
+          );
+        })()}
       </section>
     </div>
   );

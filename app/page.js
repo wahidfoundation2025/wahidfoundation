@@ -6,6 +6,7 @@ import ImpactStats from "../components/ImpactSection";
 import ProjectCardsSection from "../components/ProjectCardsSection";
 import Link from "next/link";
 import MobileDonationCategories from "../components/donationtype";
+import useResponsiveLimit from "./hooks/useResponsiveLimit";
 
 async function getHeroData() {
   try {
@@ -309,7 +310,6 @@ export default function Home() {
     }
 
     fetchHero();
-    console.log(heroData);
   }, []);
 
   useEffect(() => {
@@ -341,9 +341,14 @@ export default function Home() {
       </head>
 
       <div className="flex flex-col bg-white">
+
         <HeroSection hero={heroData} />
 
-        <ProjectCardsSection maxCards={3} />
+        {(() => {
+          const limit = useResponsiveLimit();
+          console.log(limit);
+          return <ProjectCardsSection initialLimit={limit} infiniteScroll={false} />;
+        })()}
 
         <div className="py-10 w-full flex justify-center">
           <Link

@@ -1,26 +1,14 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
-import { MapPin, Users, Calendar } from "lucide-react";
+import { Users, Calendar } from "lucide-react";
 import Image from "next/image";
 
 import ShareButton from "./ShareButton";
 
-const categoryColors = {
-  Education: "bg-blue-100 text-blue-800",
-  "Women Empowerment": "bg-pink-100 text-pink-800",
-  Healthcare: "bg-red-100 text-red-800",
-  "Economic Empowerment": "bg-green-100 text-green-800",
-  "Rural Empowerment": "bg-amber-100 text-amber-800",
-};
-
-const statusColors = {
-  Completed: "bg-green-100 text-green-800",
-  Active: "bg-blue-100 text-blue-800",
-};
-
+// Utils
 const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -34,7 +22,7 @@ const formatNumber = (num) => {
   return num?.toString() || "0";
 };
 
-// Skeleton Loader Component
+// Skeleton Loader
 const ProjectCardSkeleton = () => (
   <div className="overflow-hidden bg-white rounded-xl shadow-sm animate-pulse flex flex-col">
     <div className="h-48 lg:h-56 bg-gray-200"></div>
@@ -54,30 +42,39 @@ const ProjectCardSkeleton = () => (
   </div>
 );
 
-const ProjectCardsSection = ({
+export default function ProjectCardsSection({
   searchTerm = "",
   categoryFilter = "all",
   donationTypeFilter = "all",
-  maxCards,
-}) => {
+  infiniteScroll = false, // homepage=false, projects page=true
+  initialLimit = 4, // how many to load per API call
+}) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const { isSignedIn } = useUser();
+  const loaderRef = useRef(null);
 
+  // Fetch data
   useEffect(() => {
     const controller = new AbortController();
 
     async function fetchData() {
       try {
         setLoading(true);
+
         const [projectsRes, donationsRes] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
-            signal: controller.signal,
-          }),
+          fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/projects?limit=${initialLimit}&page=${page}`,
+            { signal: controller.signal }
+          ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/summary`, {
             signal: controller.signal,
           }),
         ]);
+
+        console.log(`${process.env.NEXT_PUBLIC_API_URL}/projects?limit=${initialLimit}&page=${page}`)
 
         const projectsData = await projectsRes.json();
         const donationsData = await donationsRes.json();
@@ -100,7 +97,13 @@ const ProjectCardsSection = ({
             }))
           : [];
 
-        setProjects(merged);
+        // If page=1, reset list, else append
+        setProjects((prev) => (page === 1 ? merged : [...prev, ...merged]));
+
+        // Stop if no more pages
+        if (page >= (projectsData?.totalPages || 1)) {
+          setHasMore(false);
+        }
       } catch (err) {
         if (!(err instanceof DOMException && err.name === "AbortError")) {
           console.error("Failed to fetch projects/donations", err);
@@ -112,11 +115,26 @@ const ProjectCardsSection = ({
 
     fetchData();
     return () => controller.abort();
-  }, []);
+  }, [page, initialLimit]);
 
-  // normalize maxCards to number
-  const max = typeof maxCards === "string" ? parseInt(maxCards, 10) : maxCards;
+  // Infinite scroll observer
+  useEffect(() => {
+    if (!infiniteScroll || !loaderRef.current) return;
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { threshold: 1 }
+    );
+
+    observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [infiniteScroll, hasMore, loading]);
+
+  // Filtering
   const filteredProjects = useMemo(() => {
     return projects.filter((project) => {
       if (!project?.status || project.status === "Draft") return false;
@@ -153,160 +171,161 @@ const ProjectCardsSection = ({
     });
   }, [projects, searchTerm, categoryFilter, donationTypeFilter]);
 
-  const displayedProjects = useMemo(
-    () =>
-      typeof max === "number"
-        ? filteredProjects.slice(0, max)
-        : filteredProjects,
-    [filteredProjects, max]
-  );
-
   return (
-    <section className="flex justify-center w-full px-4 py-4 sm:px-12 text-gray-900">
-      {loading ? (
+    <section className="flex flex-col items-center w-full px-4 py-4 sm:px-12 text-gray-900">
+      {loading && page === 1 ? (
         <div className="grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]">
-          {Array.from({ length: max || 4 }).map((_, i) => (
-            <ProjectCardSkeleton key={i} />
-          ))}
+          {Array.from({ length: infiniteScroll ? initialLimit : 3 }).map(
+            (_, i) => (
+              <ProjectCardSkeleton key={i} />
+            )
+          )}
         </div>
       ) : (
-        <div
-          className={`grid w-full md:gap-8 gap-4 ${
-            displayedProjects.length > 2
-              ? "sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"
-              : "lg:[grid-template-columns:repeat(auto-fit,minmax(300px,400px))] sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))]"
-          } [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]`}
-        >
-          {/* ✅ Render Actual Projects */}
-          {displayedProjects.map((project) => (
-            <div
-              key={project?._id}
-              className="overflow-hidden bg-white rounded-xl shadow-sm hover:shadow-xl transition lg:hover:scale-105 flex flex-col"
-            >
-              {/* Image & Labels */}
-              <div className="h-48 lg:h-56 relative">
-                <Image
-                  src={project?.cardImage || project?.mainImage}
-                  alt={project?.title || "Project"}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-
-                <div className="absolute top-2 right-2">
-                  <ShareButton slug={project?.slug || ""} />
-                </div>
-              </div>
-
-              {/* Title & Description */}
-              <div className="p-6">
-                <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
-                  {project?.title || "Untitled Project"}
-                </h3>
-                <p
-                  className="text-sm text-gray-600 mt-1.5 min-h-[60px] line-clamp-3"
-                  dangerouslySetInnerHTML={{
-                    __html: project?.description || "No description available",
-                  }}
-                />
-              </div>
-
-              {/* Stats & Buttons */}
-              <div className="p-6 pt-0 flex flex-col flex-grow space-y-4">
-                {project?.totalRequired > 0 ? (
-                  <>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Progress</span>
-                        <span className="font-semibold">
-                          {project?.completion ?? 0}%
-                        </span>
-                      </div>
-                      <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-emerald-600 transition-all"
-                          style={{ width: `${project?.completion || 0}%` }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-emerald-600 font-semibold">
-                          {formatCurrency(project?.collected ?? 0)}
-                        </span>
-                        <span className="text-gray-600">
-                          of {formatCurrency(project?.totalRequired ?? 0)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4 text-emerald-600" />
-                        <span className="truncate">
-                          {formatNumber(project?.beneficiaries ?? 0)}{" "}
-                          beneficiaries
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4 text-amber-600" />
-                        <span>
-                          {project?.status === "Completed"
-                            ? "Completed"
-                            : `${project?.daysLeft ?? 0} days left`}
-                        </span>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="flex justify-between bg-white p-4">
-                    <div className="flex flex-col items-center font-bold text-center">
-                      <span className="text-xs uppercase text-gray-500">
-                        Total Collected
-                      </span>
-                      <span className="text-lg text-emerald-600">
-                        {formatCurrency(
-                          project?.donationSummary?.totalCollected ?? 0
-                        )}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-center font-bold text-center">
-                      <span className="text-xs uppercase text-gray-500">
-                        Total Donors
-                      </span>
-                      <span className="text-lg text-gray-800">
-                        {project?.donationSummary?.totalDonors ?? 0}
-                      </span>
-                    </div>
+        <>
+          {/* Projects Grid */}
+          <div className="grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]">
+            {filteredProjects.map((project) => (
+              <div
+                key={project?._id}
+                className="overflow-hidden bg-white rounded-xl shadow-sm hover:shadow-xl transition lg:hover:scale-105 flex flex-col"
+              >
+                {/* Image & Share */}
+                <div className="h-48 lg:h-56 relative">
+                  <Image
+                    src={project?.cardImage || project?.mainImage}
+                    alt={project?.title || "Project"}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                  <div className="absolute top-2 right-2">
+                    <ShareButton slug={project?.slug || ""} />
                   </div>
-                )}
+                </div>
 
-                <div className="flex flex-col sm:flex-row gap-2 mt-auto">
-                  {project?.status !== "Completed" && (
-                    <Link
-                      href={
-                        !isSignedIn
-                          ? "/login"
-                          : `/donate/${project?.slug || ""}`
-                      }
-                      className="w-full sm:flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
-                    >
-                      Donate Now
-                    </Link>
+                {/* Title & Description */}
+                <div className="p-6">
+                  <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
+                    {project?.title || "Untitled Project"}
+                  </h3>
+                  <p
+                    className="text-sm text-gray-600 mt-1.5 min-h-[60px] line-clamp-3"
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        project?.description || "No description available",
+                    }}
+                  />
+                </div>
+
+                {/* Stats & Buttons */}
+                <div className="p-6 pt-0 flex flex-col flex-grow space-y-4">
+                  {project?.totalRequired > 0 ? (
+                    <>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Progress</span>
+                          <span className="font-semibold">
+                            {project?.completion ?? 0}%
+                          </span>
+                        </div>
+                        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-emerald-600 transition-all"
+                            style={{ width: `${project?.completion || 0}%` }}
+                          />
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-emerald-600 font-semibold">
+                            {formatCurrency(project?.collected ?? 0)}
+                          </span>
+                          <span className="text-gray-600">
+                            of {formatCurrency(project?.totalRequired ?? 0)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="flex items-center gap-1">
+                          <Users className="h-4 w-4 text-emerald-600" />
+                          <span className="truncate">
+                            {formatNumber(project?.beneficiaries ?? 0)}{" "}
+                            beneficiaries
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4 text-amber-600" />
+                          <span>
+                            {project?.status === "Completed"
+                              ? "Completed"
+                              : `${project?.daysLeft ?? 0} days left`}
+                          </span>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex justify-between bg-white p-4">
+                      <div className="flex flex-col items-center font-bold text-center">
+                        <span className="text-xs uppercase text-gray-500">
+                          Total Collected
+                        </span>
+                        <span className="text-lg text-emerald-600">
+                          {formatCurrency(
+                            project?.donationSummary?.totalCollected ?? 0
+                          )}
+                        </span>
+                      </div>
+                      <div className="flex flex-col items-center font-bold text-center">
+                        <span className="text-xs uppercase text-gray-500">
+                          Total Donors
+                        </span>
+                        <span className="text-lg text-gray-800">
+                          {project?.donationSummary?.totalDonors ?? 0}
+                        </span>
+                      </div>
+                    </div>
                   )}
-                  <Link
-                    href={`/projects/${project?.slug || ""}`}
-                    className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
-                  >
-                    View Details
-                  </Link>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                    {project?.status !== "Completed" && (
+                      <Link
+                        href={
+                          !isSignedIn
+                            ? "/login"
+                            : `/donate/${project?.slug || ""}`
+                        }
+                        className="w-full sm:flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
+                      >
+                        Donate Now
+                      </Link>
+                    )}
+                    <Link
+                      href={`/projects/${project?.slug || ""}`}
+                      className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Infinite scroll loader */}
+          {infiniteScroll && hasMore && (
+            <div
+              ref={loaderRef}
+              className="mt-6 grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]"
+            >
+              {Array.from({ length: infiniteScroll ? initialLimit : 3 }).map((_, i) => (
+                <ProjectCardSkeleton key={`skeleton-${i}`} />
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </section>
   );
-};
-
-export default ProjectCardsSection;
+}
