@@ -584,42 +584,42 @@ export default function DonatePage({ searchParams }) {
         </div>
       </section>
 
-      {/* Recurring Confirmation Popup */}
-      {showRecurringConfirm && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Confirm One-Time Donation
-            </h3>
-            <p className="text-sm text-gray-600 mb-6">
-              You have selected a one-time donation. Would you like to make this
-              a recurring donation for consistent support?
-            </p>
-            <div className="flex justify-end space-x-3">
-              <button
-                onClick={() => {
-                  setShowRecurringConfirm(false);
-                  proceedToPayment();
-                }}
-                className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300"
-              >
-                Continue with One-Time
-              </button>
-              <button
-                onClick={() => {
-                  setIsRecurring(true);
-                  setDonationFrequency("Monthly");
-                  setShowRecurringConfirm(false);
-                  proceedToPayment();
-                }}
-                className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
-              >
-                Make it Recurring
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+     {/* Recurring Confirmation Popup */}
+{showRecurringConfirm && (
+  <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        Confirm One-Time Donation
+      </h3>
+      <p className="text-sm text-gray-600 mb-6">
+        You have selected a one-time donation. Would you like to make this
+        a recurring donation for consistent support?
+      </p>
+      <div className="flex justify-end space-x-3">
+        <button
+          onClick={() => {
+            setShowRecurringConfirm(false);
+            handlePayment(); // Use handlePayment instead of proceedToPayment
+          }}
+          className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300"
+        >
+          Continue with One-Time
+        </button>
+        <button
+          onClick={() => {
+            setIsRecurring(true);
+            setDonationFrequency("Monthly");
+            setShowRecurringConfirm(false);
+            handlePayment(); // Use handlePayment instead of proceedToPayment
+          }}
+          className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+        >
+          Make it Recurring
+        </button>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }
