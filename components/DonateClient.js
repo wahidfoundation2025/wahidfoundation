@@ -89,6 +89,8 @@ export default function DonatePage({ searchParams }) {
     return () => script.remove();
   }, []);
 
+  // Validates inputs; shows the recurring-confirmation modal for one-time
+  // donations, otherwise opens the payment gateway directly.
   const handlePayment = () => {
     if (!isSignedIn) {
       router.push("/login");
@@ -115,11 +117,18 @@ export default function DonatePage({ searchParams }) {
       return;
     }
 
+    openRazorpay(true, donationFrequency);
+  };
+
+  // Opens the Razorpay gateway. `recurring` / `frequency` are passed
+  // explicitly so the modal buttons don't depend on async state updates.
+  const openRazorpay = (recurring, frequency) => {
     if (!isRazorpayReady) {
       alert("Payment system is still loading. Please try again in a moment.");
       return;
     }
 
+    const resolvedFrequency = recurring ? frequency : "One-Time";
     const selectedProject = projects.find((p) => p._id === selectedProjectId);
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
@@ -161,7 +170,7 @@ export default function DonatePage({ searchParams }) {
               paymentId: response.razorpay_payment_id,
               amount: customAmount,
               donationType,
-              donationFrequency: isRecurring ? donationFrequency : "One-Time",
+              donationFrequency: resolvedFrequency,
               projectId: selectedProjectId,
               name,
               email,
@@ -187,8 +196,8 @@ export default function DonatePage({ searchParams }) {
         donationFor,
         dedicatedTo,
         message,
-        isRecurring,
-        donationFrequency,
+        isRecurring: recurring,
+        donationFrequency: resolvedFrequency,
         requestCertificate,
       },
       theme: {
@@ -598,7 +607,7 @@ export default function DonatePage({ searchParams }) {
         <button
           onClick={() => {
             setShowRecurringConfirm(false);
-            handlePayment();
+            openRazorpay(false, "One-Time");
           }}
           className="rounded-full bg-gray-100 px-5 py-2.5 font-semibold text-gray-800 transition hover:bg-gray-200"
         >
@@ -609,7 +618,7 @@ export default function DonatePage({ searchParams }) {
             setIsRecurring(true);
             setDonationFrequency("Monthly");
             setShowRecurringConfirm(false);
-            handlePayment();
+            openRazorpay(true, "Monthly");
           }}
           className="rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-5 py-2.5 font-semibold text-white transition-transform hover:-translate-y-0.5"
         >
