@@ -1,14 +1,17 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher([
-  "/", 
-  "/about", 
-  "/projects", 
-  "/impact", 
-  "/volunteer", 
+  "/",
+  "/about",
+  "/projects",
+  "/impact",
+  "/volunteer",
   "/donate",
-  "/login(.*)", 
-  "/signup(.*)"
+  "/login(.*)",
+  "/signup(.*)",
+  // Razorpay calls this server-to-server (no Clerk session); it is
+  // authenticated via webhook signature verification instead.
+  "/api/razorpay-webhook",
 ]);
 
 export default clerkMiddleware((auth, request) => {
