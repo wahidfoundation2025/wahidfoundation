@@ -334,12 +334,12 @@ export default function Home() {
 
   return (
     <>
-      <head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-        />
-      </head>
+      {/* JSON-LD structured data. Rendered as a bare <script> (not wrapped in
+          <head>) so it is valid flow content and doesn't break hydration. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
 
       <div className="flex flex-col bg-white">
 
