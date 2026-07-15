@@ -17,6 +17,7 @@ import {
   AlertCircle,
   CheckCircle2,
   Clock,
+  ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -127,13 +128,13 @@ export default function ProjectDetailsPage({ slug, projectId }) {
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-600">
-        <p className="text-lg font-medium mb-6 text-red-500">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white text-gray-600">
+        <p className="mb-6 text-lg font-medium text-red-500">
           Failed to load project details. Please try again.
         </p>
         <button
           onClick={() => mutate()}
-          className="px-4 py-2 bg-emerald-600 text-white rounded-md"
+          className="rounded-full bg-emerald-600 px-6 py-2.5 font-semibold text-white"
         >
           Retry
         </button>
@@ -143,13 +144,13 @@ export default function ProjectDetailsPage({ slug, projectId }) {
 
   if (isLoading || !project) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-white text-gray-600">
-        <p className="text-lg font-medium mb-6">Loading project details...</p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-white text-gray-600">
+        <p className="mb-6 text-lg font-medium">Loading project details…</p>
         <div className="flex space-x-2">
           {[0, 1, 2].map((i) => (
             <motion.div
               key={i}
-              className="w-3 h-3 rounded-full bg-emerald-500"
+              className="h-3 w-3 rounded-full bg-emerald-500"
               animate={{ y: [0, -10, 0], opacity: [1, 0.5, 1] }}
               transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.2 }}
             />
@@ -159,557 +160,532 @@ export default function ProjectDetailsPage({ slug, projectId }) {
     );
   }
 
+  const enabledTypes = [
+    "General Donation",
+    "Zakat",
+    "Sadqa",
+    "Interest Earnings",
+  ];
+
   return (
-    <main className="space-y-8 bg-white pb-16 px-4 py-4 lg:px-8">
-      {project?.mainImage && (
-        <div className="relative h-80 w-full overflow-hidden rounded-xl">
-          <Image
-            src={project?.mainImage}
-            alt={project?.title || "Project Image"}
-            className="w-full h-full object-cover"
-            fill
-            priority={true}
-          />
-          <div className="absolute top-4 left-4 text-white flex items-center space-x-2">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            <Link
-              href="/projects"
-              className="text-sm font-medium hover:underline"
-            >
-              Go back to Projects
-            </Link>
-          </div>
+    <main className="bg-gradient-to-b from-emerald-50/40 to-white pb-20 pt-24 sm:pt-28">
+      <div className="container-x px-4 lg:px-8">
+        {/* Back link */}
+        <Link
+          href="/projects"
+          className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700 transition-colors hover:text-emerald-900"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Projects
+        </Link>
 
-          <div className="absolute top-2 right-2">
-            <ShareButton slug={project?.slug} />
-          </div>
-
-          <div className="absolute bottom-4 left-4 text-white space-y-1 px-4 py-3 rounded-xl max-w-[90%] backdrop-blur-sm bg-black/30">
-            <span className="text-xs bg-blue-100 text-blue-800 font-medium px-2 py-0.5 rounded">
-              {project?.category || "Uncategorized"}
-            </span>
-            <h1 className="text-xl lg:text-2xl font-bold leading-tight">
-              {project?.title || "Untitled Project"}
-            </h1>
-            <div className="flex items-center space-x-2 text-sm">
-              <MapPin className="w-4 h-4 text-white" />
-              <span>{project?.location || "Unknown Location"}</span>
+        {/* Hero image */}
+        {project?.mainImage && (
+          <div className="relative h-64 w-full overflow-hidden rounded-3xl sm:h-80 lg:h-[26rem]">
+            <Image
+              src={project?.mainImage}
+              alt={project?.title || "Project Image"}
+              className="h-full w-full object-cover"
+              fill
+              priority={true}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            <div className="absolute right-3 top-3">
+              <ShareButton slug={project?.slug} />
+            </div>
+            <div className="absolute inset-x-0 bottom-0 space-y-2 p-5 text-white sm:p-7">
+              <span className="inline-block rounded-full bg-emerald-500/90 px-3 py-1 text-xs font-semibold text-white">
+                {project?.category || "Uncategorized"}
+              </span>
+              <h1 className="font-display text-2xl font-bold leading-tight sm:text-3xl lg:text-4xl">
+                {project?.title || "Untitled Project"}
+              </h1>
+              <div className="flex items-center gap-2 text-sm text-white/90">
+                <MapPin className="h-4 w-4" />
+                <span>{project?.location || "Unknown Location"}</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="flex justify-center text-center text-gray-800 text-sm divide-x divide-gray-200">
-        <div className="px-4">
-          <p className="text-lg font-bold">{percentageRaised}%</p>
-          <p className="text-xs text-gray-500">Complete</p>
-        </div>
-        <div className="px-4">
-          <p className="text-lg font-bold">{project?.daysLeft || 0}</p>
-          <p className="text-xs text-gray-500">Days Left</p>
-        </div>
-        <div className="px-4">
-          <p className="text-lg font-bold">{project?.beneficiaries || 0}</p>
-          <p className="text-xs text-gray-500">Beneficiaries</p>
-        </div>
-      </div>
-
-      <div className="bg-blue-50 rounded-xl p-6 max-w-xl mx-auto">
-        <div className="flex justify-between items-center mb-2">
-          <p className="text-sm text-gray-600 font-bold">Total Required</p>
-          <p className="text-sm font-semibold text-gray-900">
-            ₹
-            {project?.totalRequired
-              ? project?.totalRequired.toLocaleString()
-              : "0"}
-          </p>
-        </div>
-        <div className="w-full bg-blue-100 h-2 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-[#0f172a] rounded-full"
-            style={{ width: `${percentageRaised}%` }}
-          ></div>
-        </div>
-        <div className="flex justify-between items-center text-sm mt-2">
-          <p className="text-blue-600 font-semibold">
-            ₹{project?.collected ? project?.collected.toLocaleString() : "0"}{" "}
-            raised
-          </p>
-          <p className="text-gray-600">{percentageRaised}% of goal</p>
-        </div>
-      </div>
-
-      <section className="py-8 lg:max-w-6xl lg:mx-auto">
-        {/* Section Heading */}
-        <div className="mb-6 lg:mb-12 lg:text-center">
-          <h2 className="text-2xl font-bold text-emerald-800 mb-2 lg:text-4xl lg:mb-4">
-            Donation Type
-          </h2>
-          <p className="text-sm text-gray-600 lg:text-xl lg:max-w-2xl lg:mx-auto">
-            Select the category that aligns with your intention and Islamic
-            principles
-          </p>
-          <div className="h-1 w-12 bg-amber-500 mt-2 lg:w-24 lg:mx-auto"></div>
-        </div>
-
-        {/* Cards */}
-        {donationCategories.length > 0 ? (
-          <>
-            <div className="max-w-sm mx-auto w-full bg-emerald-50 border border-emerald-100 rounded-xl shadow-sm p-6 space-y-6">
-              {/* Title */}
-              <div className="flex items-center gap-2">
-                <FaHeart className="text-emerald-600 w-5 h-5" />
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Make a Donation
-                </h2>
-              </div>
-
-              {/* Donation Type */}
-              <div className="space-y-2">
-                <p className="text-sm font-medium text-gray-700">
-                  Donation Type
-                </p>
-                <div className="space-y-2 text-sm text-gray-900">
-                  {[
-                    "General Donation",
-                    "Zakat",
-                    "Sadqa",
-                    "Interest Earnings",
-                  ].map((category) => (
-                    <label key={category} className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="donationType"
-                        value={category}
-                        disabled={
-                          !donationCategories.find(
-                            (cat) => cat.title === category
-                          )
-                        }
-                        checked={
-                          checkedDonationType
-                            ? checkedDonationType === category
-                            : checkedCategory === category
-                        }
-                        onChange={(e) => setCheckedDonationType(e.target.value)}
-                      />
-                      {category}
-                    </label>
-                  ))}
+        {/* ---- Two-column layout ---- */}
+        <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:items-start">
+          {/* LEFT — content */}
+          <div className="space-y-8 lg:col-span-2">
+            {/* Stats + progress card */}
+            <div className="card-soft p-6 sm:p-8" style={{ transform: "none" }}>
+              <div className="grid grid-cols-3 divide-x divide-emerald-100 text-center">
+                <div className="px-2">
+                  <p className="font-display text-2xl font-bold text-emerald-700 sm:text-3xl">
+                    {percentageRaised}%
+                  </p>
+                  <p className="text-xs text-gray-500">Complete</p>
+                </div>
+                <div className="px-2">
+                  <p className="font-display text-2xl font-bold text-emerald-700 sm:text-3xl">
+                    {project?.daysLeft || 0}
+                  </p>
+                  <p className="text-xs text-gray-500">Days Left</p>
+                </div>
+                <div className="px-2">
+                  <p className="font-display text-2xl font-bold text-emerald-700 sm:text-3xl">
+                    {project?.beneficiaries || 0}
+                  </p>
+                  <p className="text-xs text-gray-500">Beneficiaries</p>
                 </div>
               </div>
 
-              {/* Donation Amount */}
-              <div className="space-y-2 text-black">
-                <p className="text-sm font-medium text-gray-700">
-                  Donation Amount
-                </p>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount (Min: Rs. 365)"
-                  className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
+              <div className="mt-6 border-t border-emerald-50 pt-5">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-semibold text-gray-600">
+                    Total Required
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">
+                    ₹
+                    {project?.totalRequired
+                      ? project?.totalRequired.toLocaleString()
+                      : "0"}
+                  </p>
+                </div>
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-emerald-100">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-700"
+                    style={{ width: `${percentageRaised}%` }}
+                  ></div>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-sm">
+                  <p className="font-semibold text-emerald-600">
+                    ₹
+                    {project?.collected
+                      ? project?.collected.toLocaleString()
+                      : "0"}{" "}
+                    raised
+                  </p>
+                  <p className="text-gray-600">{percentageRaised}% of goal</p>
+                </div>
               </div>
-
-              {/* Frequency */}
-              <div className="space-y-2 text-black">
-                <p className="text-sm font-medium text-gray-700">Frequency</p>
-                <select
-                  value={frequency}
-                  onChange={(e) => setFrequency(e.target.value)}
-                  className="w-full border border-gray-300 placeholder-zinc-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                >
-                  <option>One Time</option>
-                  <option>Weekly</option>
-                  <option>Monthly</option>
-                  <option>Yearly</option>
-                </select>
-              </div>
-
-              {/* Button */}
-              <Link
-                href={{
-                  pathname: !isSignedIn ? "/login" : `/donate/${slug}`,
-                  query: {
-                    type: checkedDonationType || checkedCategory, // fallback
-                    amount,
-                    frequency,
-                  },
-                }}
-              >
-                <button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded-lg transition duration-300">
-                  Donate
-                </button>
-              </Link>
             </div>
-          </>
-        ) : (
-          <p className="text-center text-gray-600">
-            No donation options available for this project.
-          </p>
-        )}
-      </section>
 
-      <section className="text-black flex flex-col space-y-3 max-w-sm w-full mx-auto p-6 rounded-2xl bg-gray-100">
-        <div className="flex justify-start items-center space-x-3">
-          <span className="mr-2 text-xl">
-            <IoPerson />
-          </span>
-          <h3 className="text-xl">Project Manager</h3>
-        </div>
-
-        <div className="flex flex-col gap-2 items-start justify-between text-gray-700 text-sm text-center md:text-left">
-          <div className="flex flex-col items-start font-medium">
-            <span className="text-gray-400 font-normal">Name</span>
-            <span className="text-sm lg:text-md font-semibold">
-              {project?.projectManager?.name || "Unknown"}
-            </span>
-          </div>
-          <div className="w-full flex justify-between items-center">
-            <div className="flex flex-col items-start font-medium">
-              <span className="text-gray-400 font-normal">Email</span>
-              <span className="text-sm lg:text-md font-semibold">
-                {project?.projectManager?.email || "No email provided"}
-              </span>
-            </div>
-            {project?.projectManager?.email ? (
-              <button className="flex items-center justify-center space-x-2 bg-white border-1 border-gray-200 hover:bg-slate-200 p-2 rounded-lg">
-                <Mail className="w-4 h-4" />
-                <span>
-                  <a
-                    href={`mailto:${project?.projectManager?.email || ""}`}
-                    className="font-semibold"
-                  >
-                    Email
-                  </a>
-                </span>
-              </button>
-            ) : (
-              ""
-            )}
-          </div>
-          <div className="w-full flex justify-between items-center">
-            <div className="flex flex-col items-start font-medium">
-              <span className="text-gray-400 font-normal">Phone</span>
-              <span className="text-sm lg:text-md font-semibold">
-                {project?.projectManager?.phone || "No phone number provided"}
-              </span>
-            </div>
-            {project?.projectManager?.phone ? (
-              <button className="flex items-center justify-center space-x-2 bg-white border-1 border-gray-200 hover:bg-slate-200 p-2 rounded-lg">
-                <Phone className="w-4 h-4" />
-                <span>
-                  <a
-                    href={`tel:${project?.projectManager?.phone || ""}`}
-                    className="font-semibold"
-                  >
-                    Call
-                  </a>
-                </span>
-              </button>
-            ) : (
-              ""
-            )}
-          </div>
-        </div>
-      </section>
-
-      {(project?.impact?.length > 0 || project?.updates?.length > 0) && (
-        <section className="px-4 max-w-sm mx-auto">
-          <div className="flex bg-gray-100 mb-6 rounded-lg p-1">
-            {project?.impact?.length > 0 && (
-              <button
-                className={`flex-1 px-4 cursor-pointer py-2 my-1 text-sm font-medium ${
-                  activeTab === "impact"
-                    ? "bg-white text-blue-600 rounded-sm"
-                    : "text-gray-600 hover:cursor-pointer"
-                }`}
-                onClick={() => setActiveTab("impact")}
-              >
-                Impact
-              </button>
-            )}
-            {project?.description && (
-              <button
-                className={`flex-1 px-4 cursor-pointer py-2 my-1 text-sm font-medium ${
-                  activeTab === "about"
-                    ? "bg-white text-blue-600 rounded-sm"
-                    : "text-gray-600 hover:cursor-pointer"
-                }`}
-                onClick={() => setActiveTab("about")}
-              >
-                About
-              </button>
-            )}
-            {project?.updates?.length > 0 && (
-              <button
-                className={`flex-1 px-4 cursor-pointer py-2 my-1 text-sm font-medium ${
-                  activeTab === "updates"
-                    ? "bg-white text-blue-600 rounded-sm"
-                    : "text-gray-600 hover:cursor-pointer"
-                }`}
-                onClick={() => setActiveTab("updates")}
-              >
-                Updates
-              </button>
-            )}
-          </div>
-
-          {activeTab === "impact" && project?.impact?.length > 0 && (
-            <div className="space-y-4">
-              {project?.impact
-                .slice()
-                .sort((a, b) => {
-                  const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
-                  return (order[a.type] || 99) - (order[b.type] || 99);
-                })
-                .map((impact, idx) => {
-                  let Icon = ImpactIcon;
-                  if (impact.type === "Indirect") Icon = Layers;
-                  if (impact.type === "Long-term") Icon = Calendar;
-
-                  const bgColors = [
-                    "bg-green-100",
-                    "bg-blue-100",
-                    "bg-amber-100",
-                  ];
-                  const iconColors = [
-                    "text-green-500",
-                    "text-blue-500",
-                    "text-amber-500",
-                  ];
-
-                  return (
-                    <div
-                      key={idx}
-                      className={`p-5 rounded-2xl shadow-sm ${
-                        bgColors[idx] || ""
+            {/* Tabs: Impact / About / Updates */}
+            {(project?.impact?.length > 0 ||
+              project?.description ||
+              project?.updates?.length > 0) && (
+              <div className="card-soft p-6 sm:p-8" style={{ transform: "none" }}>
+                <div className="mb-6 flex flex-wrap gap-1 rounded-full bg-emerald-50 p-1">
+                  {project?.impact?.length > 0 && (
+                    <button
+                      className={`flex-1 cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        activeTab === "impact"
+                          ? "bg-white text-emerald-700 shadow-sm"
+                          : "text-gray-600 hover:text-emerald-700"
                       }`}
+                      onClick={() => setActiveTab("impact")}
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="p-3 rounded-full bg-white shadow-sm">
-                          <Icon
-                            className={`w-6 h-6 ${
-                              iconColors[idx] || "text-gray-700"
-                            }`}
-                          />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-semibold text-gray-800">
-                            {impact.type || "Impact Type"} Impact
-                          </h3>
-                          <p className="text-sm text-gray-500">
-                            {impact.title || "Impact Title"}
-                          </p>
+                      Impact
+                    </button>
+                  )}
+                  {project?.description && (
+                    <button
+                      className={`flex-1 cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        activeTab === "about"
+                          ? "bg-white text-emerald-700 shadow-sm"
+                          : "text-gray-600 hover:text-emerald-700"
+                      }`}
+                      onClick={() => setActiveTab("about")}
+                    >
+                      About
+                    </button>
+                  )}
+                  {project?.updates?.length > 0 && (
+                    <button
+                      className={`flex-1 cursor-pointer rounded-full px-4 py-2 text-sm font-semibold transition ${
+                        activeTab === "updates"
+                          ? "bg-white text-emerald-700 shadow-sm"
+                          : "text-gray-600 hover:text-emerald-700"
+                      }`}
+                      onClick={() => setActiveTab("updates")}
+                    >
+                      Updates
+                    </button>
+                  )}
+                </div>
+
+                {activeTab === "impact" && project?.impact?.length > 0 && (
+                  <div className="space-y-4">
+                    {project?.impact
+                      .slice()
+                      .sort((a, b) => {
+                        const order = { Direct: 1, Indirect: 2, "Long-term": 3 };
+                        return (order[a.type] || 99) - (order[b.type] || 99);
+                      })
+                      .map((impact, idx) => {
+                        let Icon = ImpactIcon;
+                        if (impact.type === "Indirect") Icon = Layers;
+                        if (impact.type === "Long-term") Icon = Calendar;
+
+                        const bgColors = [
+                          "bg-emerald-50",
+                          "bg-blue-50",
+                          "bg-amber-50",
+                        ];
+                        const iconColors = [
+                          "text-emerald-600",
+                          "text-blue-500",
+                          "text-amber-500",
+                        ];
+
+                        return (
+                          <div
+                            key={idx}
+                            className={`rounded-2xl p-5 ${bgColors[idx] || "bg-gray-50"}`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="rounded-full bg-white p-3 shadow-sm">
+                                <Icon
+                                  className={`h-6 w-6 ${
+                                    iconColors[idx] || "text-gray-700"
+                                  }`}
+                                />
+                              </div>
+                              <div>
+                                <h3 className="font-display text-lg font-bold text-gray-800">
+                                  {impact.type || "Impact Type"} Impact
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                  {impact.title || "Impact Title"}
+                                </p>
+                              </div>
+                            </div>
+                            <p className="mt-2 text-sm text-gray-700">
+                              {impact.description || "Impact description"}
+                            </p>
+                          </div>
+                        );
+                      })}
+                  </div>
+                )}
+
+                {activeTab === "impact" &&
+                  (!project?.impact || project?.impact?.length === 0) && (
+                    <p className="text-center text-gray-600">
+                      No impact details available.
+                    </p>
+                  )}
+
+                {activeTab === "about" && (
+                  <div className="space-y-6">
+                    <h3 className="font-display text-lg font-bold text-gray-800">
+                      About this Project
+                    </h3>
+                    <div
+                      className="whitespace-pre-line text-sm leading-relaxed text-gray-700"
+                      dangerouslySetInnerHTML={{ __html: project?.description }}
+                    />
+
+                    {/* Timeline */}
+                    {project?.timeline?.length > 0 && (
+                      <div className="space-y-4">
+                        <h3 className="font-display text-lg font-bold text-gray-800">
+                          Project Timeline
+                        </h3>
+                        <div className="space-y-6">
+                          {project?.timeline.map((event, idx) => {
+                            let styles = {
+                              icon: AlertCircle,
+                              badgeBg: "bg-gray-100",
+                              badgeText: "text-gray-700",
+                            };
+
+                            if (event.status === "Completed") {
+                              styles = {
+                                icon: CheckCircle2,
+                                badgeBg: "bg-emerald-100",
+                                badgeText: "text-emerald-700",
+                              };
+                            } else if (event.status === "In Progress") {
+                              styles = {
+                                icon: Clock,
+                                badgeBg: "bg-blue-100",
+                                badgeText: "text-blue-700",
+                              };
+                            }
+
+                            return (
+                              <div key={idx} className="flex items-start gap-3">
+                                <div className="flex flex-col items-center">
+                                  <div
+                                    className={`flex h-6 w-6 items-center justify-center rounded-full ${styles.badgeText}`}
+                                  >
+                                    <styles.icon />
+                                  </div>
+                                  {idx !== project.timeline.length - 1 && (
+                                    <div className="h-full w-0.5 bg-gray-200"></div>
+                                  )}
+                                </div>
+                                <div>
+                                  <h4 className="font-semibold text-gray-800">
+                                    {event.title}
+                                  </h4>
+                                  <p className="text-sm text-gray-500">
+                                    {event.date
+                                      ? new Date(
+                                          event.date
+                                        ).toLocaleDateString()
+                                      : "No date"}
+                                  </p>
+                                  <span
+                                    className={`mt-1 inline-block rounded-full px-2 py-1 text-xs ${styles.badgeBg} ${styles.badgeText}`}
+                                  >
+                                    {event.status}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
-                      <p className="text-sm text-gray-700 mt-2">
-                        {impact.description || "Impact description"}
-                      </p>
-                    </div>
-                  );
-                })}
-            </div>
-          )}
+                    )}
+                  </div>
+                )}
 
-          {activeTab === "impact" &&
-            (!project?.impact || project?.impact?.length === 0) && (
-              <p className="text-center text-gray-600">
-                No impact details available.
-              </p>
+                {activeTab === "updates" && project?.updates?.length > 0 && (
+                  <div className="space-y-4">
+                    {project?.updates.map((update, idx) => (
+                      <div
+                        key={idx}
+                        className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="rounded-full bg-emerald-100 p-3">
+                              <span className="text-xl text-emerald-600">
+                                <PiBookOpenTextFill />
+                              </span>
+                            </div>
+                            <h3 className="font-display text-lg font-bold text-gray-800">
+                              {update.version || "Update Title"}
+                            </h3>
+                          </div>
+                          <p className="text-sm text-gray-500">
+                            {update.date
+                              ? new Date(update.date).toLocaleDateString()
+                              : "Date"}
+                          </p>
+                        </div>
+                        <p className="mt-3 text-sm text-gray-700">
+                          {update.content || "Update description"}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {activeTab === "updates" &&
+                  (!project?.updates || project?.updates.length === 0) && (
+                    <p className="text-center text-gray-600">
+                      No updates available.
+                    </p>
+                  )}
+              </div>
             )}
 
-          {activeTab === "about" && (
-            <div className="space-y-6">
-              <h3 className="font-semibold text-gray-800">
-                About this Project
-              </h3>
+            {/* Project Manager */}
+            <div className="card-soft p-6 sm:p-8" style={{ transform: "none" }}>
+              <div className="mb-4 flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
+                  <IoPerson />
+                </span>
+                <h3 className="font-display text-xl font-bold text-gray-800">
+                  Project Manager
+                </h3>
+              </div>
+
+              <div className="grid gap-4 text-sm sm:grid-cols-2">
+                <div>
+                  <span className="text-gray-400">Name</span>
+                  <p className="font-semibold text-gray-800">
+                    {project?.projectManager?.name || "Unknown"}
+                  </p>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="text-gray-400">Email</span>
+                    <p className="truncate font-semibold text-gray-800">
+                      {project?.projectManager?.email || "Not provided"}
+                    </p>
+                  </div>
+                  {project?.projectManager?.email && (
+                    <a
+                      href={`mailto:${project?.projectManager?.email}`}
+                      className="flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-200 px-3 py-1.5 font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                    >
+                      <Mail className="h-4 w-4" />
+                      Email
+                    </a>
+                  )}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="min-w-0">
+                    <span className="text-gray-400">Phone</span>
+                    <p className="truncate font-semibold text-gray-800">
+                      {project?.projectManager?.phone || "Not provided"}
+                    </p>
+                  </div>
+                  {project?.projectManager?.phone && (
+                    <a
+                      href={`tel:${project?.projectManager?.phone}`}
+                      className="flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-200 px-3 py-1.5 font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                    >
+                      <Phone className="h-4 w-4" />
+                      Call
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT — sticky donation card */}
+          <div className="lg:sticky lg:top-24">
+            {donationCategories.length > 0 ? (
               <div
-                className="text-gray-700 text-sm px-2 whitespace-pre-line"
-                dangerouslySetInnerHTML={{ __html: project?.description }}
-              />
-
-              {/* Timeline */}
-              {project?.timeline?.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="font-semibold text-gray-800">
-                    Project Timeline
+                className="card-soft space-y-5 p-6"
+                style={{ transform: "none" }}
+              >
+                <div className="flex items-center gap-2">
+                  <FaHeart className="h-5 w-5 text-emerald-600" />
+                  <h3 className="font-display text-xl font-bold text-gray-800">
+                    Make a Donation
                   </h3>
-                  <div className="space-y-6">
-                    {project?.timeline.map((event, idx) => {
-                      let styles = {
-                        icon: AlertCircle,
-                        bg: "bg-gray-200",
-                        badgeBg: "bg-gray-200",
-                        badgeText: "text-gray-700",
-                      };
+                </div>
 
-                      if (event.status === "Completed") {
-                        styles = {
-                          icon: CheckCircle2,
-                          bg: "bg-green-100",
-                          badgeBg: "bg-green-100",
-                          badgeText: "text-green-700",
-                        };
-                      } else if (event.status === "In Progress") {
-                        styles = {
-                          icon: Clock,
-                          bg: "bg-blue-100",
-                          badgeBg: "bg-blue-100",
-                          badgeText: "text-blue-700",
-                        };
-                      }
-
+                {/* Donation Type */}
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-700">
+                    Donation Type
+                  </p>
+                  <div className="space-y-2">
+                    {enabledTypes.map((category) => {
+                      const isEnabled = donationCategories.find(
+                        (cat) => cat.title === category
+                      );
+                      const isChecked = checkedDonationType
+                        ? checkedDonationType === category
+                        : checkedCategory === category;
                       return (
-                        <div key={idx} className="flex items-start gap-3">
-                          <div className="flex flex-col items-center">
-                            <div
-                              className={`w-6 h-6 rounded-full ${styles.badgeText} flex items-center justify-center`}
-                            >
-                              <styles.icon />
-                            </div>
-                            {/* vertical line unless last item */}
-                            {idx !== project.timeline.length - 1 && (
-                              <div className="w-0.5 bg-gray-300 h-full"></div>
-                            )}
-                          </div>
-                          <div>
-                            <h4 className="font-medium text-gray-800">
-                              {event.title}
-                            </h4>
-                            <p className="text-sm text-gray-500">
-                              {event.date
-                                ? new Date(event.date).toLocaleDateString()
-                                : "No date"}
-                            </p>
-                            <span
-                              className={`inline-block text-xs mt-1 px-2 py-1 rounded-full ${styles.badgeBg} ${styles.badgeText}`}
-                            >
-                              {event.status}
-                            </span>
-                          </div>
-                        </div>
+                        <label
+                          key={category}
+                          className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-sm transition ${
+                            isChecked
+                              ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                              : "border-gray-200 text-gray-700"
+                          } ${!isEnabled ? "cursor-not-allowed opacity-40" : ""}`}
+                        >
+                          <input
+                            type="radio"
+                            name="donationType"
+                            value={category}
+                            className="accent-emerald-600"
+                            disabled={!isEnabled}
+                            checked={isChecked}
+                            onChange={(e) =>
+                              setCheckedDonationType(e.target.value)
+                            }
+                          />
+                          {category}
+                        </label>
                       );
                     })}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
 
-          {activeTab === "updates" && project?.updates?.length > 0 && (
-            <div className="space-y-4">
-              {project?.updates.map((update, idx) => (
-                <div
-                  key={idx}
-                  className="p-5 rounded-2xl shadow-sm hover:shadow-md transition-shadow bg-white"
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex items-center gap-3">
-                      <div className="p-3 rounded-full bg-blue-100">
-                        <span className="text-blue-600 text-xl">
-                          <PiBookOpenTextFill />
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-800">
-                        {update.version || "Update Title"}
-                      </h3>
-                    </div>
-                    <p className="text-sm text-gray-500">
-                      {update.date
-                        ? new Date(update.date).toLocaleDateString()
-                        : "Date"}
-                    </p>
-                  </div>
-                  <p className="text-sm text-gray-700 mt-3">
-                    {update.content || "Update description"}
+                {/* Donation Amount */}
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-700">
+                    Donation Amount
                   </p>
+                  <input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount (Min: ₹365)"
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
+                  />
                 </div>
-              ))}
-            </div>
-          )}
 
-          {activeTab === "updates" &&
-            (!project?.updates || project?.updates.length === 0) && (
-              <p className="text-center text-gray-600">No updates available.</p>
-            )}
-        </section>
-      )}
-
-      {/* {project.scheme?.length > 0 && (
-        <section className="px-4 lg:max-w-6xl lg:mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-3 flex items-center space-x-2">
-            <Layers className="w-5 h-5" />
-            <span>Project Schemes</span>
-          </h2>
-          <div className="space-y-4">
-            {project.scheme.map((scheme, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-50 p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-lg font-semibold text-gray-800">
-                  {scheme.name || "Untitled Scheme"}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {scheme.description || "No description available."}
-                </p>
-                {scheme.link && (
-                  <a
-                    href={scheme.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline text-sm mt-2 inline-block"
+                {/* Frequency */}
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-gray-700">Frequency</p>
+                  <select
+                    value={frequency}
+                    onChange={(e) => setFrequency(e.target.value)}
+                    className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-black outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                   >
-                    Learn More
-                  </a>
-                )}
+                    <option>One Time</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                    <option>Yearly</option>
+                  </select>
+                </div>
+
+                {/* Button */}
+                <Link
+                  href={{
+                    pathname: !isSignedIn ? "/login" : `/donate/${slug}`,
+                    query: {
+                      type: checkedDonationType || checkedCategory,
+                      amount,
+                      frequency,
+                    },
+                  }}
+                  className="block"
+                >
+                  <button className="w-full rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 py-3 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(5,150,105,0.6)] transition-transform duration-300 hover:-translate-y-0.5">
+                    Donate Now
+                  </button>
+                </Link>
               </div>
-            ))}
+            ) : (
+              <div className="card-soft p-6 text-center text-gray-600" style={{ transform: "none" }}>
+                No donation options available for this project.
+              </div>
+            )}
           </div>
-        </section>
-      )} */}
+        </div>
 
-      {project?.photoGallery?.length > 0 && (
-        <ProjectGallery images={project?.photoGallery} />
-      )}
-
-      {project?.youtubeIframe && (
-        <section className="w-full px-4 my-8 lg:max-w-6xl lg:mx-auto">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-            Project Video
-          </h2>
-          <div className="w-full h-[300px] lg:h-[500px]">
-            <iframe
-              src={
-                project?.youtubeIframe.includes("youtu.be")
-                  ? `https://www.youtube.com/embed/${
-                      project?.youtubeIframe.split("youtu.be/")[1].split("?")[0]
-                    }`
-                  : project?.youtubeIframe
-              }
-              title="Project Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full rounded-xl shadow-lg"
-            ></iframe>
+        {/* Photo Gallery */}
+        {project?.photoGallery?.length > 0 && (
+          <div className="mt-12">
+            <ProjectGallery images={project?.photoGallery} />
           </div>
-        </section>
-      )}
+        )}
+
+        {/* Video */}
+        {project?.youtubeIframe && (
+          <section className="mt-12">
+            <h2 className="mb-5 text-center font-display text-2xl font-bold text-emerald-900">
+              Project Video
+            </h2>
+            <div className="h-[300px] w-full overflow-hidden rounded-3xl shadow-lg lg:h-[500px]">
+              <iframe
+                src={
+                  project?.youtubeIframe.includes("youtu.be")
+                    ? `https://www.youtube.com/embed/${
+                        project?.youtubeIframe
+                          .split("youtu.be/")[1]
+                          .split("?")[0]
+                      }`
+                    : project?.youtubeIframe
+                }
+                title="Project Video"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="h-full w-full"
+              ></iframe>
+            </div>
+          </section>
+        )}
+      </div>
     </main>
   );
 }

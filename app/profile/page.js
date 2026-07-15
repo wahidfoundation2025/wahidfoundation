@@ -9,6 +9,7 @@ export default function ProfilePage() {
   const { user, isLoaded } = useUser();
   const [formData, setFormData] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [donations, setDonations] = useState([]);
   const [loadingDonor, setLoadingDonor] = useState(false);
   const [saving, setSaving] = useState(false);
   const [donorExists, setDonorExists] = useState(false); // NEW
@@ -82,17 +83,23 @@ export default function ProfilePage() {
 
           setFormData(merged);
 
-          if (merged.projectsDonatedTo?.length) {
-            const projectsRes = await fetch("/api/projects");
-            if (projectsRes.ok) {
-              const allProjects = await projectsRes.json();
-              const list = allProjects.projects || allProjects;
-              const donated = list.filter((p) =>
-                merged.projectsDonatedTo.includes(p._id)
-              );
-              setProjects(donated);
-            }
-          }
+          // Backend populates projectsDonatedTo (full project objects) and
+          // donations (full Razorpay transaction records) — use them directly.
+          const donatedProjects = Array.isArray(donorFromDb.projectsDonatedTo)
+            ? donorFromDb.projectsDonatedTo.filter(
+                (p) => p && typeof p === "object"
+              )
+            : [];
+          setProjects(donatedProjects);
+
+          const donationList = Array.isArray(donorFromDb.donations)
+            ? donorFromDb.donations
+                .filter((d) => d && typeof d === "object")
+                .sort(
+                  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                )
+            : [];
+          setDonations(donationList);
         } else if (res.status === 404) {
           setDonorExists(false); // Donor does not exist
         } else {
@@ -161,16 +168,36 @@ export default function ProfilePage() {
     }
   }
 
-  const totalPages = Math.max(1, Math.ceil((projects?.length || 0) / rowsPerPage));
-  const paginatedProjects = (projects || []).slice(
+  // Map project id -> title (projectsDonatedTo is populated by the backend)
+  const projectTitleById = {};
+  (projects || []).forEach((p) => {
+    if (p?._id) projectTitleById[p._id] = p.title;
+  });
+
+  const totalDonated =
+    formData.totalDonated ||
+    (donations || []).reduce((sum, d) => sum + (d?.amount || 0), 0);
+
+  const totalPages = Math.max(
+    1,
+    Math.ceil((donations?.length || 0) / rowsPerPage)
+  );
+  const paginatedDonations = (donations || []).slice(
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
+  const inr = (n) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(n || 0);
   return (
-    <div className="min-h-screen sm:px-10 px-3 flex items-start lg:items-center justify-center pt-6 bg-gray-50 text-black">
-      <section className="bg-white w-full max-w-4xl rounded-xl shadow p-6 md:p-8 space-y-6 mb-10">
+    <div className="flex min-h-screen items-start justify-center bg-gradient-to-b from-emerald-50/50 to-white px-3 pb-24 pt-28 text-black sm:px-10 sm:pt-32">
+      <section className="mb-10 w-full max-w-4xl space-y-6 rounded-3xl border border-emerald-50 bg-white p-6 shadow-[0_24px_60px_-30px_rgba(4,47,34,0.35)] md:p-8">
+        <h1 className="font-display text-2xl font-bold text-emerald-900">My Profile</h1>
         {/* Profile */}
-        <div className="flex flex-col gap-3 items-start md:space-x-6 border-b pb-6">
+        <div className="flex flex-col gap-3 items-start md:space-x-6 border-b border-emerald-50 pb-6">
           <div className="w-full flex flex-row gap-6 sm:mb-4 m-0">
             <div className="w-full flex-1/5 flex flex-col gap-4 justify-between">
               <img
@@ -180,7 +207,7 @@ export default function ProfilePage() {
               />
 
               <SignOutButton>
-                <button className="px-4 py-2 text-sm bg-red-white border border-red-500 text-red-500 hover:text-white rounded-xl hover:bg-red-600 cursor-pointer transition">
+                <button className="cursor-pointer rounded-full border border-red-400 px-4 py-2 text-sm font-semibold text-red-500 transition hover:bg-red-500 hover:text-white">
                   Logout
                 </button>
               </SignOutButton>
@@ -189,7 +216,7 @@ export default function ProfilePage() {
             <div className="w-full flex-4/5 space-y-2">
               <label className="block text-sm font-medium text-gray-700">Full name</label>
               <input
-                className="w-full border p-2 rounded"
+                className="w-full rounded-xl border border-emerald-100 bg-white p-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                 value={formData.name || ""}
                 onChange={(e) => setField("name", e.target.value)}
                 placeholder="Full name"
@@ -197,7 +224,7 @@ export default function ProfilePage() {
 
               <label className="block text-sm font-medium text-gray-700">Email (from Clerk)</label>
               <input
-                className="w-full border p-2 rounded bg-gray-50"
+                className="w-full rounded-xl border border-emerald-100 bg-emerald-50/50 p-2.5 text-gray-500 outline-none"
                 value={formData.email || ""}
                 readOnly
                 title="Email is managed by Clerk; change in account settings."
@@ -207,7 +234,7 @@ export default function ProfilePage() {
 
           <label className="block text-sm font-medium text-gray-700">Phone</label>
           <input
-            className="w-full border p-2 mx-0 rounded"
+            className="w-full rounded-xl border border-emerald-100 bg-white p-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
             value={formData.phoneNumber || ""}
             onChange={(e) => setField("phoneNumber", e.target.value)}
             placeholder="Phone number (optional)"
@@ -215,7 +242,7 @@ export default function ProfilePage() {
 
           <label className="block text-sm font-medium text-gray-700">PAN card</label>
           <input
-            className="w-full border p-2 mx-0 rounded"
+            className="w-full rounded-xl border border-emerald-100 bg-white p-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
             value={formData.pancardNumber || ""}
             onChange={(e) => setField("pancardNumber", e.target.value)}
             placeholder="PAN"
@@ -230,7 +257,7 @@ export default function ProfilePage() {
               <input
                 key={field}
                 placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
-                className="border p-2 rounded"
+                className="rounded-xl border border-emerald-100 bg-white p-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                 value={formData.address?.[field] || ""}
                 onChange={(e) => setField(`address.${field}`, e.target.value)}
               />
@@ -243,7 +270,7 @@ export default function ProfilePage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 disabled:opacity-50"
+            className="rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-6 py-2.5 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(5,150,105,0.6)] transition-transform hover:-translate-y-0.5 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Profile"}
           </button>
@@ -251,38 +278,145 @@ export default function ProfilePage() {
           <p className="text-sm text-gray-500">Email is read-only (managed by Clerk).</p>
         </div>
 
-        {/* Donated Projects */}
+        {/* Donation summary tiles */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 text-center">
+            <div className="font-display text-2xl font-bold text-emerald-700">
+              {inr(totalDonated)}
+            </div>
+            <div className="mt-1 text-xs font-medium text-gray-600">
+              Total Donated
+            </div>
+          </div>
+          <div className="rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 text-center">
+            <div className="font-display text-2xl font-bold text-emerald-700">
+              {donations.length}
+            </div>
+            <div className="mt-1 text-xs font-medium text-gray-600">
+              Donations Made
+            </div>
+          </div>
+          <div className="col-span-2 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 text-center sm:col-span-1">
+            <div className="font-display text-2xl font-bold text-emerald-700">
+              {projects.length || formData.totalProjects || 0}
+            </div>
+            <div className="mt-1 text-xs font-medium text-gray-600">
+              Projects Supported
+            </div>
+          </div>
+        </div>
+
+        {/* Donation / Transaction history */}
         <div>
-          <h2 className="text-xl font-semibold mb-4 text-gray-800">Projects Donated To</h2>
-          {projects.length > 0 ? (
+          <h2 className="mb-4 font-display text-xl font-bold text-emerald-900">
+            Donation History
+          </h2>
+          {donations.length > 0 ? (
             <>
-              <ul className="list-disc pl-6 space-y-2">
-                {paginatedProjects.map((project) => (
-                  <li key={project._id} className="text-gray-700">
-                    <span className="font-medium">{project.title}</span>
-                  </li>
+              {/* Desktop table */}
+              <div className="hidden overflow-x-auto rounded-2xl border border-emerald-50 sm:block">
+                <table className="w-full text-left text-sm">
+                  <thead className="bg-emerald-50/70 text-xs uppercase tracking-wide text-emerald-800">
+                    <tr>
+                      <th className="px-4 py-3 font-semibold">Date</th>
+                      <th className="px-4 py-3 font-semibold">Project</th>
+                      <th className="px-4 py-3 font-semibold">Type</th>
+                      <th className="px-4 py-3 font-semibold">Frequency</th>
+                      <th className="px-4 py-3 text-right font-semibold">Amount</th>
+                      <th className="px-4 py-3 font-semibold">Payment ID</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-emerald-50">
+                    {paginatedDonations.map((d) => (
+                      <tr key={d._id} className="hover:bg-emerald-50/40">
+                        <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+                          {d.createdAt
+                            ? new Date(d.createdAt).toLocaleDateString("en-IN")
+                            : "—"}
+                        </td>
+                        <td className="px-4 py-3 font-medium text-gray-800">
+                          {projectTitleById[d.projectId] ||
+                            d.projectName ||
+                            "General Fund"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-600">
+                          {d.donationType || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-gray-600">
+                          {d.donationFrequency || "One-Time"}
+                        </td>
+                        <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-emerald-700">
+                          {inr(d.amount)}
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-gray-500">
+                          {d.paymentId || "—"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="space-y-3 sm:hidden">
+                {paginatedDonations.map((d) => (
+                  <div
+                    key={d._id}
+                    className="rounded-2xl border border-emerald-50 bg-white p-4 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="font-medium text-gray-800">
+                        {projectTitleById[d.projectId] ||
+                          d.projectName ||
+                          "General Fund"}
+                      </div>
+                      <div className="shrink-0 font-display font-bold text-emerald-700">
+                        {inr(d.amount)}
+                      </div>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                      <span>
+                        {d.createdAt
+                          ? new Date(d.createdAt).toLocaleDateString("en-IN")
+                          : "—"}
+                      </span>
+                      <span>{d.donationType || "—"}</span>
+                      <span>{d.donationFrequency || "One-Time"}</span>
+                    </div>
+                    {d.paymentId && (
+                      <div className="mt-1 font-mono text-[11px] text-gray-400">
+                        {d.paymentId}
+                      </div>
+                    )}
+                  </div>
                 ))}
-              </ul>
+              </div>
 
               {/* Pagination */}
-              <div className="flex items-center justify-between mt-6 text-sm text-gray-600">
+              <div className="mt-6 flex items-center justify-between text-sm text-gray-600">
                 <span>
                   Showing{" "}
-                  {Math.min((currentPage - 1) * rowsPerPage + 1, projects.length)}–
-                  {Math.min(currentPage * rowsPerPage, projects.length)} of {projects.length}
+                  {Math.min(
+                    (currentPage - 1) * rowsPerPage + 1,
+                    donations.length
+                  )}
+                  –{Math.min(currentPage * rowsPerPage, donations.length)} of{" "}
+                  {donations.length}
                 </span>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="p-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-full border border-emerald-100 p-2 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <FaAnglesLeft />
                   </button>
                   <button
-                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(totalPages, p + 1))
+                    }
                     disabled={currentPage === totalPages}
-                    className="p-2 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="rounded-full border border-emerald-100 p-2 hover:bg-emerald-50 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <FaAnglesRight />
                   </button>
@@ -290,7 +424,15 @@ export default function ProfilePage() {
               </div>
             </>
           ) : (
-            <p className="text-gray-500">No projects donated yet.</p>
+            <div className="rounded-2xl border border-dashed border-emerald-200 bg-emerald-50/40 p-8 text-center">
+              <p className="text-gray-500">No donations yet.</p>
+              <a
+                href="/donate"
+                className="mt-3 inline-flex rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-6 py-2.5 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5"
+              >
+                Make your first donation
+              </a>
+            </div>
           )}
         </div>
       </section>

@@ -9,61 +9,62 @@ const defaultNavItems = [
 ];
 
 export default function FooterLinks({ footerData }) {
+  const linkClass =
+    "text-emerald-100/80 transition-colors hover:text-white";
+  const headingClass =
+    "mb-3 text-xs font-bold uppercase tracking-[0.14em] text-emerald-300";
+
   return (
-    <div className="flex md:flex-row flex-col items-start gap-4 sm:gap-10 xl:gap-20 w-full lg:w-auto">
+    <div className="flex w-full flex-col items-start gap-10 sm:flex-row sm:flex-wrap sm:gap-12 xl:gap-20 lg:w-auto">
       {/* Logo */}
-      <div className="flex flex-row items-center gap-2">
-        <img
-          src="/logo.png"
-          alt={`${footerData?.orgName || "Wahid Foundation"} Logo`}
-          className="h-10 w-auto"
-        />
-        <Link href="/" className="flex items-center space-x-1">
-          <span className="text-xl font-bold text-white">
+      <div className="max-w-xs">
+        <Link href="/" className="flex flex-row items-center gap-2">
+          <img
+            src="/logo.png"
+            alt={`${footerData?.orgName || "Wahid Foundation"} Logo`}
+            className="h-10 w-auto"
+          />
+          <span className="font-display text-2xl font-bold text-white">
             {footerData?.orgName || "Wahid"}
           </span>
         </Link>
+        <p className="mt-4 text-sm leading-relaxed text-emerald-100/70">
+          Channeling Zakat &amp; Sadaqah with full transparency to empower
+          backward and minority communities across India.
+        </p>
       </div>
 
       {/* Quick Links */}
-      <div className="flex flex-col gap-2 items-start">
-        <h1 className="text-lg font-semibold mb-2 text-white">Quick Links</h1>
+      <div className="flex flex-col items-start gap-2.5">
+        <h2 className={headingClass}>Quick Links</h2>
         {(footerData?.quickLinks?.length > 0
           ? footerData.quickLinks
           : defaultNavItems
         ).map((item) => (
-          <Link
-            href={item.path}
-            key={item.path}
-            className="text-white hover:underline"
-          >
+          <Link href={item.path} key={item.path} className={linkClass}>
             {item.label}
           </Link>
         ))}
       </div>
 
       {/* Terms */}
-      <div className="flex flex-col gap-2 items-start">
-        <h1 className="text-lg font-semibold mb-2 text-white">Terms</h1>
+      <div className="flex flex-col items-start gap-2.5">
+        <h2 className={headingClass}>Terms</h2>
         {(footerData?.termsLinks || []).map((item) => (
-          <Link
-            href={item.path}
-            key={item.path}
-            className="text-white hover:underline"
-          >
+          <Link href={item.path} key={item.path} className={linkClass}>
             {item.label}
           </Link>
         ))}
       </div>
 
       {/* Volunteering */}
-      <div className="flex flex-col gap-2 items-start">
-        <h1 className="text-lg font-semibold mb-2 text-white">
+      <div className="flex flex-col items-start gap-2.5">
+        <h2 className={headingClass}>
           {footerData?.volunteering?.heading || "Volunteering"}
-        </h1>
+        </h2>
         <Link
           href={footerData?.volunteering?.linkPath || "/volunteer"}
-          className="text-white hover:underline"
+          className={linkClass}
         >
           {footerData?.volunteering?.linkLabel || "Do you want to join?"}
         </Link>

@@ -207,48 +207,46 @@ export default function DonatePage({ searchParams }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-emerald-600 to-emerald-700 text-white">
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-800 via-emerald-800 to-emerald-950 text-white">
         <div
-          className="absolute inset-0 opacity-10 bg-center bg-cover"
+          className="absolute inset-0 opacity-15 bg-center bg-cover"
           style={{
             backgroundImage:
               "url('https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80')",
-            backgroundBlendMode: "overlay",
           }}
         />
-        <div className="relative px-5 py-12 lg:py-20">
-          <div className="max-w-md mx-auto space-y-6 lg:max-w-4xl lg:space-y-10">
-            <div className="space-y-2 lg:text-center lg:space-y-6">
-              <h1 className="text-4xl font-bold leading-tight tracking-tight lg:text-6xl lg:leading-tight">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="relative px-5 pb-14 pt-32 lg:pb-20 lg:pt-44">
+          <div className="mx-auto max-w-4xl space-y-8">
+            <div className="space-y-4 text-center">
+              <span className="eyebrow justify-center text-emerald-200">
+                <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+                Give with intention
+              </span>
+              <h1 className="font-display text-4xl font-bold leading-tight tracking-tight lg:text-6xl">
                 Make Your Donation
               </h1>
-              <p className="text-emerald-50 text-lg leading-relaxed lg:text-2xl lg:max-w-3xl lg:mx-auto lg:leading-relaxed">
+              <p className="mx-auto max-w-3xl text-lg leading-relaxed text-emerald-50/90 lg:text-2xl">
                 Your generosity creates lasting change. Every rupee counts in
                 building a better tomorrow.
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 lg:max-w-2xl lg:mx-auto lg:p-8 lg:gap-8 lg:rounded-2xl">
+            <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4 rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-md lg:gap-8 lg:p-8">
               <div className="text-center">
-                <div className="text-2xl font-bold mb-1 lg:text-4xl lg:mb-2">
-                  10K+
-                </div>
-                <div className="text-xs text-emerald-100 lg:text-base">
+                <div className="font-display text-2xl font-bold lg:text-4xl">10K+</div>
+                <div className="mt-1 text-xs text-emerald-100 lg:text-base">
                   Active Donors
                 </div>
               </div>
-              <div className="text-center border-x border-white/20">
-                <div className="text-2xl font-bold mb-1 lg:text-4xl lg:mb-2">
-                  25K+
-                </div>
-                <div className="text-xs text-emerald-100 lg:text-base">
+              <div className="border-x border-white/20 text-center">
+                <div className="font-display text-2xl font-bold lg:text-4xl">25K+</div>
+                <div className="mt-1 text-xs text-emerald-100 lg:text-base">
                   Lives Impacted
                 </div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold mb-1 lg:text-4xl lg:mb-2">
-                  14
-                </div>
-                <div className="text-xs text-emerald-100 lg:text-base">
+                <div className="font-display text-2xl font-bold lg:text-4xl">14</div>
+                <div className="mt-1 text-xs text-emerald-100 lg:text-base">
                   States Reached
                 </div>
               </div>
@@ -257,10 +255,13 @@ export default function DonatePage({ searchParams }) {
         </div>
       </section>
 
-      {/* Project Selection */}
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        <div className="bg-white border rounded-xl shadow p-6 space-y-4">
-          <div className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+      <div className="container-x max-w-6xl py-10">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)] lg:items-start">
+          {/* RIGHT column: form (first on mobile) */}
+          <div className="order-1 space-y-6 lg:order-2">
+            {/* Project Selection */}
+            <div className="card-soft space-y-4 p-6" style={{ transform: "none" }}>
+          <div className="flex items-center space-x-2 font-display text-lg font-bold text-gray-900">
             <Heart className="h-5 w-5 text-emerald-600" />
             <span>Select Project</span>
           </div>
@@ -270,7 +271,7 @@ export default function DonatePage({ searchParams }) {
           <select
             value={selectedProjectId}
             onChange={(e) => setSelectedProjectId(e.target.value)}
-            className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200 text-black"
+            className="h-11 w-full rounded-xl border border-emerald-100 bg-white px-4 text-black outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
           >
             {projects?.map((project) => (
               <option key={project._id} value={project._id}>
@@ -278,15 +279,13 @@ export default function DonatePage({ searchParams }) {
               </option>
             ))}
           </select>
-        </div>
-      </section>
+            </div>
 
-      {/* Cards Section */}
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-6">
+            {/* Donation Type + Dedication */}
+            <div className="grid gap-6 md:grid-cols-2">
           {/* Choose Donation Type */}
-          <div className="flex-1 bg-white border rounded-xl shadow p-6 space-y-4">
-            <div className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+          <div className="card-soft space-y-4 p-6" style={{ transform: "none" }}>
+            <div className="flex items-center space-x-2 font-display text-lg font-bold text-gray-900">
               <Heart className="h-5 w-5 text-emerald-600" />
               <span>Choose Donation Type</span>
             </div>
@@ -341,8 +340,8 @@ export default function DonatePage({ searchParams }) {
           </div>
 
           {/* Donation Dedication */}
-          <div className="flex-1 bg-white border rounded-xl shadow p-6 space-y-4">
-            <div className="flex items-center space-x-2 text-lg font-semibold text-gray-900">
+          <div className="card-soft flex-1 space-y-4 p-6" style={{ transform: "none" }}>
+            <div className="flex items-center space-x-2 font-display text-lg font-bold text-gray-900">
               <Users className="h-5 w-5 text-emerald-600" />
               <span>Donation Dedication</span>
             </div>
@@ -384,7 +383,7 @@ export default function DonatePage({ searchParams }) {
                 </label>
                 <input
                   type="text"
-                  className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200"
+                  className="h-11 w-full rounded-xl border border-emerald-100 bg-white px-4 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                   placeholder={
                     donationFor === "family"
                       ? "Enter family member name"
@@ -401,23 +400,20 @@ export default function DonatePage({ searchParams }) {
               </label>
               <textarea
                 rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:ring-emerald-200"
+                className="w-full rounded-xl border border-emerald-100 bg-white px-4 py-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                 placeholder="Add a personal message or prayer..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
             </div>
           </div>
-        </div>
-      </section>
+            </div>
 
-      {/* Choose Amount */}
-      <section className="max-w-6xl mx-auto px-4 py-12">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 p-6 bg-white border rounded-xl shadow-sm space-y-4">
+            {/* Choose Amount */}
+            <div className="card-soft space-y-4 p-6" style={{ transform: "none" }}>
             <div className="flex items-center space-x-3">
               <IndianRupee className="h-6 w-6 text-emerald-600" />
-              <h2 className="text-lg font-semibold text-gray-900">
+              <h2 className="font-display text-lg font-bold text-gray-900">
                 Choose Your Amount
               </h2>
             </div>
@@ -461,10 +457,10 @@ export default function DonatePage({ searchParams }) {
                 <button
                   key={amount}
                   onClick={() => setCustomAmount(amount)}
-                  className={`py-2 px-4 rounded-lg border text-sm font-semibold hover:border-emerald-300 hover:bg-emerald-50 ${
+                  className={`rounded-full border px-4 py-2.5 text-sm font-semibold transition hover:border-emerald-300 hover:bg-emerald-50 ${
                     customAmount === amount
-                      ? "bg-emerald-100 border-emerald-400"
-                      : "border-gray-300"
+                      ? "border-emerald-400 bg-emerald-100 text-emerald-800"
+                      : "border-gray-200"
                   }`}
                 >
                   ₹{amount.toLocaleString()}
@@ -480,7 +476,7 @@ export default function DonatePage({ searchParams }) {
                 min={365}
                 value={customAmount}
                 onChange={(e) => setCustomAmount(Number(e.target.value))}
-                className="w-full h-10 px-3 rounded border border-gray-300 focus:outline-none focus:ring focus:ring-emerald-200"
+                className="h-11 w-full rounded-xl border border-emerald-100 bg-white px-4 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
               />
               <p className="text-xs text-gray-500 mt-1">
                 Minimum donation: ₹365
@@ -524,13 +520,13 @@ export default function DonatePage({ searchParams }) {
                 </div>
               </div>
             )}
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Donation Summary */}
-      <section className="max-w-xl mx-auto mt-12  bg-green-50 p-6 rounded-2xl shadow-sm">
-        <h2 className="text-center text-xl font-semibold text-green-800 mb-6">
+          {/* LEFT column: Donation Summary (bottom on mobile, sticky left on desktop) */}
+          <div className="order-2 lg:order-1 lg:sticky lg:top-24">
+            <div className="rounded-[2rem] bg-gradient-to-br from-emerald-50 to-emerald-100/60 p-6 shadow-sm sm:p-8">
+        <h2 className="mb-6 text-center font-display text-2xl font-bold text-emerald-900">
           Donation Summary
         </h2>
         <div className="space-y-3 text-sm text-gray-700">
@@ -569,9 +565,9 @@ export default function DonatePage({ searchParams }) {
         </div>
         <button
           onClick={handlePayment}
-          className="w-full mt-6 py-3 rounded-xl bg-emerald-600 text-white font-semibold flex items-center justify-center hover:bg-emerald-700 transition"
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 py-3.5 font-semibold text-white shadow-[0_12px_28px_-12px_rgba(5,150,105,0.7)] transition-transform hover:-translate-y-0.5"
         >
-          <span className="mr-2">💚</span>
+          <Heart className="h-4 w-4" fill="currentColor" />
           Proceed to Payment →
         </button>
         <div className="mt-4 text-center text-xs text-gray-500 flex items-center justify-center space-x-2">
@@ -582,26 +578,29 @@ export default function DonatePage({ searchParams }) {
           />
           <span>Secure payment powered by Razorpay</span>
         </div>
-      </section>
+            </div>
+          </div>
+        </div>
+      </div>
 
      {/* Recurring Confirmation Popup */}
 {showRecurringConfirm && (
   <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-    <div className="bg-white p-6 rounded-xl shadow-lg max-w-md w-full">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+    <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+      <h3 className="mb-4 font-display text-xl font-bold text-gray-900">
         Confirm One-Time Donation
       </h3>
-      <p className="text-sm text-gray-600 mb-6">
+      <p className="mb-6 text-sm text-gray-600">
         You have selected a one-time donation. Would you like to make this
         a recurring donation for consistent support?
       </p>
-      <div className="flex justify-end space-x-3">
+      <div className="flex flex-col justify-end gap-3 sm:flex-row">
         <button
           onClick={() => {
             setShowRecurringConfirm(false);
-            handlePayment(); // Use handlePayment instead of proceedToPayment
+            handlePayment();
           }}
-          className="px-4 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300"
+          className="rounded-full bg-gray-100 px-5 py-2.5 font-semibold text-gray-800 transition hover:bg-gray-200"
         >
           Continue with One-Time
         </button>
@@ -610,9 +609,9 @@ export default function DonatePage({ searchParams }) {
             setIsRecurring(true);
             setDonationFrequency("Monthly");
             setShowRecurringConfirm(false);
-            handlePayment(); // Use handlePayment instead of proceedToPayment
+            handlePayment();
           }}
-          className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700"
+          className="rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-5 py-2.5 font-semibold text-white transition-transform hover:-translate-y-0.5"
         >
           Make it Recurring
         </button>

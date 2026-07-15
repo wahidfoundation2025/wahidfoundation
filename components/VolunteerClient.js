@@ -122,32 +122,40 @@ export const VolunteerPage = () => {
       return (
         <div
           key={opportunity._id || index}
-          className="rounded-lg border bg-white p-5 shadow-sm flex flex-col gap-2"
+          className="card-soft flex flex-col gap-2 p-6"
         >
-          <div className="flex items-center gap-2 mb-2">
-            <Icon className="h-6 w-6 text-emerald-700" />
-            <span className="font-semibold text-emerald-700">
+          <div className="mb-2 flex items-center gap-3">
+            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-100 text-emerald-700">
+              <Icon className="h-5 w-5" />
+            </span>
+            <span className="font-display text-lg font-bold text-emerald-900">
               {opportunity.title}
             </span>
           </div>
-          <div className="text-sm text-gray-500 mb-1">
+          <div className="text-sm font-medium text-emerald-600">
             Time commitment: {opportunity.commitment}
           </div>
-          <div className="text-gray-700">{opportunity.description}</div>
+          <div className="text-sm leading-relaxed text-gray-600">
+            {opportunity.description}
+          </div>
         </div>
       );
     });
   }, [oppLoading, opportunities]);
 
   return (
-    <div className="bg-white text-gray-800">
-      <div className="container px-4 py-8 max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-emerald-50/50 to-white text-gray-800">
+      <div className="container-x max-w-4xl px-4 pb-16 pt-32 sm:pt-40">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-emerald-800 mb-3">
+        <div className="mb-12 text-center">
+          <span className="eyebrow justify-center">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Join Us
+          </span>
+          <h1 className="mt-3 font-display text-4xl font-bold text-emerald-900 md:text-5xl">
             Become a Volunteer
           </h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="mx-auto mt-4 max-w-2xl text-base text-gray-600 sm:text-lg">
             Join our community of passionate volunteers and help create positive
             impact across India. Whether you can give a few hours or a few days,
             your time and skills can change lives.
@@ -155,18 +163,18 @@ export const VolunteerPage = () => {
         </div>
 
         {/* Opportunities */}
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-emerald-700 mb-6">
+        <div className="mb-14">
+          <h2 className="mb-6 font-display text-2xl font-bold text-emerald-900">
             Current Volunteer Opportunities
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             {renderedOpportunities}
           </div>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-emerald-50 p-6 rounded-lg">
-          <h2 className="text-2xl font-semibold text-emerald-700 mb-6">
+        <div className="rounded-[2rem] bg-gradient-to-br from-emerald-50 to-emerald-100/50 p-6 sm:p-10">
+          <h2 className="mb-6 font-display text-2xl font-bold text-emerald-900">
             Volunteer Registration
           </h2>
           <form onSubmit={handleSubmit}>
@@ -190,7 +198,7 @@ export const VolunteerPage = () => {
                     value={formData[field]}
                     onChange={handleChange}
                     required
-                    className="w-full bg-white border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="w-full rounded-xl border border-emerald-100 bg-white px-4 py-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                   />
                 </div>
               ))}
@@ -210,7 +218,7 @@ export const VolunteerPage = () => {
                 value={formData.skills}
                 onChange={handleChange}
                 required
-                className="w-full border bg-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="w-full rounded-xl border border-emerald-100 bg-white px-4 py-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -228,14 +236,14 @@ export const VolunteerPage = () => {
                 value={formData.message}
                 onChange={handleChange}
                 required
-                className="w-full border bg-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="w-full rounded-xl border border-emerald-100 bg-white px-4 py-2.5 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-2 rounded transition-all disabled:opacity-60"
+              className="btn-primary w-full disabled:opacity-60 sm:w-auto"
             >
               {loading ? "Submitting..." : "Submit Application"}
             </button>
@@ -243,17 +251,14 @@ export const VolunteerPage = () => {
         </div>
 
         {/* Donation CTA */}
-        <div className="mt-10 text-center mb-12">
-          <h2 className="text-xl font-semibold text-emerald-700 mb-2">
+        <div className="mb-6 mt-12 text-center">
+          <h2 className="mb-2 font-display text-2xl font-bold text-emerald-900">
             Other Ways to Help
           </h2>
-          <p className="mb-4">
+          <p className="mb-5 text-gray-600">
             Can't volunteer your time? Consider making a donation instead.
           </p>
-          <a
-            href="/donate"
-            className="inline-block border border-emerald-600 text-emerald-600 font-semibold px-6 py-2 rounded hover:bg-emerald-50 transition-all"
-          >
+          <a href="/donate" className="btn-outline">
             Make a Donation
           </a>
         </div>

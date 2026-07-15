@@ -29,19 +29,26 @@ export default function BlogsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      {/* ✅ Hero Section */}
-      <section className="bg-emerald-600 text-white py-32 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">Our Blog</h1>
-        <p className="text-lg md:text-xl max-w-2xl mx-auto">
-          “Knowledge is power. Sharing it is the first step towards change.” ✨
-        </p>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-800 via-emerald-800 to-emerald-950 px-4 pb-20 pt-36 text-center text-white lg:pt-44">
+        <div className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
+        <div className="relative">
+          <span className="eyebrow justify-center text-emerald-200">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
+            Stories &amp; Insights
+          </span>
+          <h1 className="mt-3 font-display text-4xl font-bold md:text-5xl">Our Blog</h1>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-emerald-50/90">
+            Knowledge is power. Sharing it is the first step towards change.
+          </p>
+        </div>
       </section>
 
-      {/* ✅ Blog Cards */}
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      {/* Blog Cards */}
+      <section className="container-x max-w-7xl py-16">
         {loading ? (
-          <p className="text-center text-gray-500">Loading blogs…</p>
+          <p className="text-center text-emerald-400 animate-pulse">Loading blogs…</p>
         ) : blogs.length === 0 ? (
           <p className="text-center text-gray-500">No blogs found.</p>
         ) : (
@@ -49,44 +56,43 @@ export default function BlogsPage() {
             {blogs.map((blog) => (
               <div
                 key={blog._id}
-                className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col"
+                className="card-soft group flex flex-col overflow-hidden"
               >
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
                   <Image
                     src={blog.imageUrl || "/placeholder.png"}
-                    alt={blog.title} fill
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    alt={blog.title}
+                    fill
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   {blog.category && (
-                    <div className="absolute top-2 left-2 bg-emerald-100 text-emerald-800 text-xs font-semibold px-3 py-1 rounded-full">
+                    <div className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
                       {blog.category}
                     </div>
                   )}
                 </div>
 
                 {/* Content */}
-                <div className="p-5 flex flex-col flex-1">
-                  <h2 className="text-lg font-semibold text-gray-800 line-clamp-2">
+                <div className="flex flex-1 flex-col p-6">
+                  <h2 className="line-clamp-2 font-display text-lg font-bold text-emerald-900">
                     {blog.title}
                   </h2>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="mt-1 text-sm text-gray-500">
                     {new Date(blog.createdAt).toLocaleDateString()}
                   </p>
 
-                  {/* Preview of HTML content */}
                   <div
-                    className="text-sm text-gray-600 mt-3 line-clamp-3"
+                    className="mt-3 line-clamp-3 text-sm text-gray-600"
                     dangerouslySetInnerHTML={{
                       __html: JSON.stringify(blog.content),
                     }}
                   ></div>
 
-                  {/* Read More */}
-                  <div className="mt-auto pt-4">
+                  <div className="mt-auto pt-5">
                     <Link
                       href={`/blogs/${blog._id}`}
-                      className="inline-block bg-emerald-600 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-emerald-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_8px_18px_-8px_rgba(5,150,105,0.6)] transition-transform hover:-translate-y-0.5"
                     >
                       Read More →
                     </Link>

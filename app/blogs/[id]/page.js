@@ -74,9 +74,9 @@ export default async function BlogDetail({ params }) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      {blog.imageUrl && (
-        <div className="relative w-full h-80 md:h-[500px] overflow-hidden">
+    <div className="min-h-screen bg-white text-gray-900">
+      {blog.imageUrl ? (
+        <div className="relative h-80 w-full overflow-hidden md:h-[500px]">
           <Image
             src={blog.imageUrl}
             alt={blog.imageAlt || blog.title}
@@ -85,7 +85,10 @@ export default async function BlogDetail({ params }) {
             sizes="100vw"
             className="object-cover"
           />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         </div>
+      ) : (
+        <div className="pt-28" />
       )}
 
       {blog.categories?.length > 0 && (
@@ -114,8 +117,8 @@ export default async function BlogDetail({ params }) {
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <h1 className="text-3xl md:text-4xl font-bold mb-3 text-center">
+      <div className="max-w-4xl mx-auto px-4 py-10">
+        <h1 className="mb-3 text-center font-display text-3xl font-bold text-emerald-900 md:text-4xl">
           {blog.title}
         </h1>
         <div className="text-sm text-gray-500 text-center mb-8">

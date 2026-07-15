@@ -2,10 +2,10 @@
 
 export default function PolicyPage() {
   return (
-    <div className="bg-white px-4 py-6  mb-12 text-gray-800">
-      <h1 className="text-3xl font-bold text-emerald-700 mb-4">Privacy Policy</h1>
-      <p className="mb-6">At Wahid Foundation, we value your trust and are committed to protecting your personal information. This Privacy Policy outlines how we collect, store, and use your data.</p>
-      <ol className="list-decimal list-inside space-y-4">
+    <div className="container-x max-w-3xl bg-white px-4 pb-20 pt-32 text-gray-700 sm:pt-40">
+      <h1 className="mb-4 font-display text-4xl font-bold text-emerald-900">Privacy Policy</h1>
+      <p className="mb-6 leading-relaxed">At Wahid Foundation, we value your trust and are committed to protecting your personal information. This Privacy Policy outlines how we collect, store, and use your data.</p>
+      <ol className="list-decimal list-inside space-y-4 marker:font-semibold marker:text-emerald-700">
         <li>
           <strong>Information We Collect</strong>
           <ul className="list-disc ml-8 mt-1 space-y-1">

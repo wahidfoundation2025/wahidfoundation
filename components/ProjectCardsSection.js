@@ -188,30 +188,35 @@ export default function ProjectCardsSection({
             {filteredProjects.map((project) => (
               <div
                 key={project?._id}
-                className="overflow-hidden bg-white rounded-xl shadow-sm hover:shadow-xl transition lg:hover:scale-105 flex flex-col"
+                className="card-soft group flex flex-col overflow-hidden"
               >
                 {/* Image & Share */}
-                <div className="h-48 lg:h-56 relative">
+                <div className="relative h-48 overflow-hidden lg:h-56">
                   <Image
                     src={project?.cardImage || project?.mainImage}
                     alt={project?.title || "Project"}
                     fill
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                     sizes="(max-width: 768px) 100vw, 50vw"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                  <div className="absolute top-2 right-2">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
+                  {project?.status === "Completed" && (
+                    <span className="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-emerald-700 shadow-sm backdrop-blur-sm">
+                      Completed
+                    </span>
+                  )}
+                  <div className="absolute right-3 top-3">
                     <ShareButton slug={project?.slug || ""} />
                   </div>
                 </div>
 
                 {/* Title & Description */}
-                <div className="p-6">
-                  <h3 className="text-xl text-emerald-800 font-semibold min-h-[56px]">
+                <div className="p-6 pb-3">
+                  <h3 className="min-h-[56px] font-display text-xl font-bold text-emerald-900">
                     {project?.title || "Untitled Project"}
                   </h3>
                   <p
-                    className="text-sm text-gray-600 mt-1.5 min-h-[60px] line-clamp-3"
+                    className="mt-1.5 line-clamp-3 min-h-[60px] text-sm leading-relaxed text-gray-600"
                     dangerouslySetInnerHTML={{
                       __html:
                         project?.description || "No description available",
@@ -288,7 +293,7 @@ export default function ProjectCardsSection({
                   )}
 
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-2 mt-auto">
+                  <div className="mt-auto flex flex-col gap-2 pt-1 sm:flex-row">
                     {project?.status !== "Completed" && (
                       <Link
                         href={
@@ -296,14 +301,14 @@ export default function ProjectCardsSection({
                             ? "/login"
                             : `/donate/${project?.slug || ""}`
                         }
-                        className="w-full sm:flex-1 text-center bg-emerald-600 text-white py-2 px-4 rounded-lg hover:bg-emerald-700 font-semibold"
+                        className="w-full rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-[0_8px_18px_-8px_rgba(5,150,105,0.6)] transition-transform hover:-translate-y-0.5 sm:flex-1"
                       >
                         Donate Now
                       </Link>
                     )}
                     <Link
                       href={`/projects/${project?.slug || ""}`}
-                      className="w-full sm:flex-1 text-center border border-emerald-600 text-emerald-600 py-2 px-4 rounded-lg hover:bg-emerald-50 font-semibold"
+                      className="w-full rounded-full border border-emerald-200 px-4 py-2.5 text-center text-sm font-semibold text-emerald-700 transition-colors hover:bg-emerald-50 sm:flex-1"
                     >
                       View Details
                     </Link>

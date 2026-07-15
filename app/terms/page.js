@@ -2,12 +2,12 @@
 
 export default function TermsPage() {
   return (
-    <div className="px-4 py-6 text-gray-800 bg-white mb-12 text-justify">
-      <h1 className="text-3xl font-bold text-emerald-700 mb-4">Terms &amp; Conditions</h1>
+    <div className="container-x max-w-3xl bg-white px-4 pb-20 pt-32 text-justify text-gray-700 sm:pt-40">
+      <h1 className="mb-4 text-left font-display text-4xl font-bold text-emerald-900">Terms &amp; Conditions</h1>
       <p className="mb-2"><strong>Organization:</strong> Wahid Foundation</p>
       <p className="mb-2"><strong>Website:</strong> <a href="https://www.wahid.org.in" className="text-emerald-600 underline" target="_blank" rel="noopener noreferrer">www.wahid.org.in</a></p>
       <p className="mb-6">Welcome to Wahid Foundation. By accessing our website or using our services, you agree to comply with the following Terms &amp; Conditions. Please read them carefully before making donations or using our platform.</p>
-      <ol className="list-decimal list-inside space-y-4">
+      <ol className="list-decimal list-inside space-y-4 marker:font-semibold marker:text-emerald-700">
         <li>
           <strong>About Wahid Foundation</strong>
           <p className="mt-1 ml-4">Wahid Foundation is a registered not-for-profit organization based in India. We work for the social, educational, and economic empowerment of marginalized, backward, and minority communities across India, without discrimination.</p>

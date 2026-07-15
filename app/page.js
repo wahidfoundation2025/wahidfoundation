@@ -7,6 +7,7 @@ import ProjectCardsSection from "../components/ProjectCardsSection";
 import Link from "next/link";
 import MobileDonationCategories from "../components/donationtype";
 import useResponsiveLimit from "./hooks/useResponsiveLimit";
+import { ArrowRight } from "lucide-react";
 
 async function getHeroData() {
   try {
@@ -344,59 +345,76 @@ export default function Home() {
 
         <HeroSection hero={heroData} />
 
-        {(() => {
-          const limit = useResponsiveLimit();
-          console.log(limit);
-          return <ProjectCardsSection initialLimit={limit} infiniteScroll={false} />;
-        })()}
-
-        <div className="py-10 w-full flex justify-center">
-          <Link
-            href="/projects"
-            className="w-full mx-4 max-w-md lg:w-auto text-center px-6 lg:px-12 py-4 border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 font-semibold transition-all duration-200 active:scale-[0.98] rounded-lg"
-          >
-            See Our Projects
-          </Link>
-        </div>
-
-        <div className="border-t border-gray-100">
-          <ImpactStats />
-        </div>
-
-        <section className="py-20 px-5 lg:py-40 lg:px-8 bg-gradient-to-br from-amber-50 to-amber-100 text-center border-y border-amber-100">
-          <div className="max-w-sm mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
-            <div className="w-16 h-1 bg-amber-300 rounded-full mx-auto lg:w-24"></div>
-            <p className="italic text-amber-900 font-medium text-base leading-relaxed lg:text-xl lg:leading-relaxed">
-              {quote?.text ||
-                '"Whoever saves one life - it is as if he had saved mankind entirely."'}
+        {/* Featured projects */}
+        <section className="container-x">
+          <div className="mx-auto max-w-2xl text-center">
+            <span className="eyebrow">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Where your giving goes
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-bold text-emerald-900 sm:text-4xl">
+              Featured Causes
+            </h2>
+            <p className="mt-3 text-gray-600">
+              Real projects, transparent impact. Choose a cause close to your
+              heart and start giving today.
             </p>
-            <p className="text-sm text-amber-700 lg:text-base">
-              {quote?.reference || "— Surah Al-Ma'idah 5:32"}
-            </p>
-            <div className="w-16 h-1 bg-amber-300 rounded-full mx-auto lg:w-24"></div>
           </div>
         </section>
 
-        <div className="border-b border-gray-100">
-          <MobileDonationCategories />
+        {(() => {
+          const limit = useResponsiveLimit();
+          return <ProjectCardsSection initialLimit={limit} infiniteScroll={false} />;
+        })()}
+
+        <div className="flex w-full justify-center pb-16 pt-4">
+          <Link href="/projects" className="btn-outline mx-4">
+            See All Projects
+            <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
 
-        <section className="py-20 px-5 lg:py-40 lg:px-8 text-center bg-gradient-to-br from-emerald-50 to-emerald-100">
-          <div className="max-w-md mx-auto lg:max-w-2xl space-y-4 lg:space-y-6">
-            <h2 className="text-2xl font-bold text-emerald-800 lg:text-3xl">
-              Ready to Make a Difference?
-            </h2>
-            <p className="text-gray-600 text-base leading-relaxed lg:text-lg lg:leading-relaxed">
-              Start with just ₹1 per day and join thousands of donors in
-              creating lasting change.
+        <ImpactStats />
+
+        {/* Quote */}
+        <section className="relative overflow-hidden bg-gradient-to-br from-emerald-900 via-emerald-800 to-emerald-950 px-5 py-24 text-center lg:py-32">
+          <div className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-amber-400/10 blur-3xl" />
+          <div className="relative mx-auto max-w-3xl space-y-6">
+            <div className="mx-auto text-5xl leading-none text-amber-300/80 font-display">“</div>
+            <p className="font-display text-2xl font-medium italic leading-relaxed text-white lg:text-3xl lg:leading-relaxed">
+              {quote?.text ||
+                "Whoever saves one life — it is as if he had saved mankind entirely."}
             </p>
-            <div className="lg:flex lg:justify-center">
-              <Link
-                href="/projects/general-sadqa-fund"
-                className="w-full lg:w-auto text-center px-6 lg:px-12 py-3 bg-emerald-600 hover:bg-emerald-700 shadow-lg hover:shadow-xl text-white text-lg font-semibold rounded-md transition-all duration-200 active:scale-[0.98] mt-2 inline-flex items-center justify-center"
-              >
-                Donate Now
-              </Link>
+            <p className="text-sm font-medium tracking-wide text-emerald-200 lg:text-base">
+              {quote?.reference || "— Surah Al-Ma'idah 5:32"}
+            </p>
+          </div>
+        </section>
+
+        <MobileDonationCategories />
+
+        {/* Final CTA */}
+        <section className="container-x py-20 lg:py-28">
+          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-50 to-emerald-100 px-6 py-16 text-center shadow-sm lg:px-8 lg:py-20">
+            <div className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-emerald-200/50 blur-2xl" />
+            <div className="relative mx-auto max-w-2xl space-y-5">
+              <h2 className="font-display text-3xl font-bold text-emerald-900 lg:text-4xl">
+                Ready to Make a Difference?
+              </h2>
+              <p className="text-base leading-relaxed text-gray-600 lg:text-lg">
+                Start with just ₹1 per day and join thousands of donors in
+                creating lasting change.
+              </p>
+              <div className="flex justify-center pt-2">
+                <Link
+                  href="/projects/general-sadqa-fund"
+                  className="btn-primary w-full text-lg sm:w-auto"
+                >
+                  Donate Now
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
+              </div>
             </div>
           </div>
         </section>

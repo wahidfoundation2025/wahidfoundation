@@ -1,23 +1,26 @@
 // app/layout.js
 import { ClerkProvider } from "@clerk/nextjs";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import Headers from "../components/navbar";
 import FooterNav from "../components/footer/FooterNav";
 import "./globals.css";
 import Script from "next/script";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Elegant, warm display serif for headings
+const fraunces = Fraunces({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  style: ["normal", "italic"],
+  variable: "--font-fraunces",
+  display: "swap",
 });
 
-import { Poppins } from "next/font/google";
-
-const poppins = Poppins({
+// Clean, modern humanist sans for body & UI
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-poppins",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+  display: "swap",
 });
 
 export const metadata = {
@@ -81,10 +84,10 @@ export default function RootLayout({ children }) {
           </Script>
         </head>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable}`}
+          className={`${fraunces.variable} ${jakarta.variable} antialiased`}
         >
           <Headers />
-          {children}
+          <main className="min-h-screen">{children}</main>
           <FooterNav />
         </body>
       </html>

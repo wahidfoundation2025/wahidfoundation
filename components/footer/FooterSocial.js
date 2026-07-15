@@ -13,7 +13,7 @@ export default function FooterSocial({ socialLinks }) {
           href={socialLinks.facebook}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-2xl text-white hover:text-gray-200"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg text-white transition-colors hover:bg-white/20 hover:text-amber-300"
         >
           <FaFacebook />
         </a>
@@ -23,7 +23,7 @@ export default function FooterSocial({ socialLinks }) {
           href={socialLinks.instagram}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-2xl text-white hover:text-gray-200"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg text-white transition-colors hover:bg-white/20 hover:text-amber-300"
         >
           <LuInstagram />
         </a>
@@ -33,7 +33,7 @@ export default function FooterSocial({ socialLinks }) {
           href={socialLinks.linkedin}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-2xl text-white hover:text-gray-200"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg text-white transition-colors hover:bg-white/20 hover:text-amber-300"
         >
           <IoLogoLinkedin />
         </a>
@@ -43,7 +43,7 @@ export default function FooterSocial({ socialLinks }) {
           href={socialLinks.twitter}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-2xl text-white hover:text-gray-200"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg text-white transition-colors hover:bg-white/20 hover:text-amber-300"
         >
           <RiTwitterXFill />
         </a>
@@ -53,7 +53,7 @@ export default function FooterSocial({ socialLinks }) {
           href={socialLinks.youtube}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-2xl text-white hover:text-gray-200"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg text-white transition-colors hover:bg-white/20 hover:text-amber-300"
         >
           <FaYoutube />
         </a>
