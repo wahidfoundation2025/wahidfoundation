@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState(null);
   const [projects, setProjects] = useState([]);
   const [donations, setDonations] = useState([]);
+  const [cancelingId, setCancelingId] = useState(null);
   const [loadingDonor, setLoadingDonor] = useState(false);
   const [saving, setSaving] = useState(false);
   const [donorExists, setDonorExists] = useState(false); // NEW
@@ -168,6 +169,40 @@ export default function ProfilePage() {
     }
   }
 
+  async function handleCancelSubscription(subscriptionId) {
+    if (
+      !confirm(
+        "Cancel this recurring donation? Future auto-payments will stop."
+      )
+    )
+      return;
+    setCancelingId(subscriptionId);
+    try {
+      const res = await fetch("/api/cancel-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subscriptionId }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setDonations((prev) =>
+          prev.map((d) =>
+            d.subscriptionId === subscriptionId
+              ? { ...d, subscriptionStatus: "cancelled" }
+              : d
+          )
+        );
+      } else {
+        alert(data.error || "Failed to cancel subscription.");
+      }
+    } catch (e) {
+      console.error("Cancel error", e);
+      alert("Failed to cancel subscription.");
+    } finally {
+      setCancelingId(null);
+    }
+  }
+
   // Map project id -> title (projectsDonatedTo is populated by the backend)
   const projectTitleById = {};
   (projects || []).forEach((p) => {
@@ -192,6 +227,20 @@ export default function ProfilePage() {
       currency: "INR",
       maximumFractionDigits: 0,
     }).format(n || 0);
+
+  // One entry per recurring subscription (latest charge represents it).
+  const subscriptions = [];
+  const seenSub = new Set();
+  for (const d of donations) {
+    if (d.subscriptionId && !seenSub.has(d.subscriptionId)) {
+      seenSub.add(d.subscriptionId);
+      subscriptions.push(d);
+    }
+  }
+  const isSubActive = (status) =>
+    !["cancelled", "completed", "expired"].includes(
+      (status || "active").toLowerCase()
+    );
   return (
     <div className="flex min-h-screen items-start justify-center bg-gradient-to-b from-emerald-50/50 to-white px-3 pb-24 pt-28 text-black sm:px-10 sm:pt-32">
       <section className="mb-10 w-full max-w-4xl space-y-6 rounded-3xl border border-emerald-50 bg-white p-6 shadow-[0_24px_60px_-30px_rgba(4,47,34,0.35)] md:p-8">
@@ -305,6 +354,69 @@ export default function ProfilePage() {
             </div>
           </div>
         </div>
+
+        {/* Recurring subscriptions */}
+        {subscriptions.length > 0 && (
+          <div>
+            <h2 className="mb-4 font-display text-xl font-bold text-emerald-900">
+              Recurring Donations
+            </h2>
+            <div className="space-y-3">
+              {subscriptions.map((s) => {
+                const active = isSubActive(s.subscriptionStatus);
+                return (
+                  <div
+                    key={s.subscriptionId}
+                    className="flex flex-col gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-display font-bold text-emerald-900">
+                          {inr(s.amount)}
+                        </span>
+                        <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                          {s.donationFrequency || "Recurring"}
+                        </span>
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                            active
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-gray-200 text-gray-600"
+                          }`}
+                        >
+                          {active ? "Active" : "Cancelled"}
+                        </span>
+                      </div>
+                      <p className="mt-1 truncate text-sm text-gray-600">
+                        {projectTitleById[s.projectId] || "General Fund"}
+                        {s.donationType ? ` · ${s.donationType}` : ""}
+                      </p>
+                      <p className="mt-0.5 text-xs text-gray-400">
+                        Started{" "}
+                        {s.createdAt
+                          ? new Date(s.createdAt).toLocaleDateString("en-IN")
+                          : "—"}
+                      </p>
+                    </div>
+                    {active && (
+                      <button
+                        onClick={() =>
+                          handleCancelSubscription(s.subscriptionId)
+                        }
+                        disabled={cancelingId === s.subscriptionId}
+                        className="shrink-0 rounded-full border border-red-300 px-5 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-500 hover:text-white disabled:opacity-50"
+                      >
+                        {cancelingId === s.subscriptionId
+                          ? "Cancelling…"
+                          : "Cancel"}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Donation / Transaction history */}
         <div>

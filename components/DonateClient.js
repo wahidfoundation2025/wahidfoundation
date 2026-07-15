@@ -120,16 +120,113 @@ export default function DonatePage({ searchParams }) {
     openRazorpay(true, donationFrequency);
   };
 
+  // Persists a successful donation to the backend.
+  const saveDonation = async (extra) => {
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: customAmount,
+          donationType,
+          projectId: selectedProjectId,
+          name,
+          email,
+          dedicatedTo,
+          message,
+          requestCertificate,
+          ...extra,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => console.log("Donation saved:", data))
+        .catch((err) => console.error("Failed to save donation:", err));
+    } catch (err) {
+      console.error("Failed to save donation:", err);
+    }
+  };
+
   // Opens the Razorpay gateway. `recurring` / `frequency` are passed
   // explicitly so the modal buttons don't depend on async state updates.
-  const openRazorpay = (recurring, frequency) => {
+  // One-time -> single-charge checkout. Recurring -> a Razorpay Subscription
+  // (UPI Autopay / e-mandate) so future cycles are auto-debited.
+  const openRazorpay = async (recurring, frequency) => {
     if (!isRazorpayReady) {
       alert("Payment system is still loading. Please try again in a moment.");
       return;
     }
 
-    const resolvedFrequency = recurring ? frequency : "One-Time";
     const selectedProject = projects.find((p) => p._id === selectedProjectId);
+    const commonNotes = {
+      projectId: selectedProjectId,
+      donationType,
+      donationFor,
+      dedicatedTo,
+      message,
+      requestCertificate: String(requestCertificate),
+      name,
+      email,
+    };
+
+    // ---------------- Recurring (Subscription / Autopay) ----------------
+    if (recurring) {
+      let subscriptionId;
+      try {
+        const res = await fetch("/api/create-subscription", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: customAmount,
+            frequency,
+            notes: { ...commonNotes, donationFrequency: frequency },
+          }),
+        });
+        const data = await res.json();
+        if (!res.ok || !data.subscriptionId) {
+          console.error("Subscription creation failed:", data);
+          alert(
+            data?.error ||
+              "Could not set up the recurring donation. Please try again."
+          );
+          return;
+        }
+        subscriptionId = data.subscriptionId;
+      } catch (err) {
+        console.error("Subscription request error:", err);
+        alert("Could not set up the recurring donation. Please try again.");
+        return;
+      }
+
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
+        subscription_id: subscriptionId,
+        name: "Wahid Foundation",
+        description: `${frequency} donation for ${
+          selectedProject?.title || "General Fund"
+        }`,
+        handler: async (response) => {
+          // Subscriptions are auto-captured by Razorpay — no manual capture.
+          await saveDonation({
+            paymentId: response.razorpay_payment_id,
+            subscriptionId:
+              response.razorpay_subscription_id || subscriptionId,
+            donationFrequency: frequency,
+          });
+          alert(
+            "Recurring donation set up successfully! Future payments will be auto-debited via your approved mandate."
+          );
+        },
+        prefill: { name, email },
+        notes: { ...commonNotes, donationFrequency: frequency },
+        theme: { color: "#059669" },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+      return;
+    }
+
+    // ---------------- One-Time (single charge) ----------------
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
       amount: customAmount * 100,
@@ -138,10 +235,6 @@ export default function DonatePage({ searchParams }) {
       description: `Donation for ${selectedProject?.title || "General Fund"}`,
       handler: async (response) => {
         console.log("Payment success:", response);
-        alert(
-          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
-        );
-
         try {
           // 1️⃣ Capture the payment via backend
           const captureRes = await fetch("/api/capture-payment", {
@@ -160,49 +253,21 @@ export default function DonatePage({ searchParams }) {
             return;
           }
 
-          console.log("Payment captured:", captureData);
-
           // 2️⃣ Save donation record in your DB
-          await fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              paymentId: response.razorpay_payment_id,
-              amount: customAmount,
-              donationType,
-              donationFrequency: resolvedFrequency,
-              projectId: selectedProjectId,
-              name,
-              email,
-              dedicatedTo,
-              message,
-              requestCertificate,
-            }),
-          })
-            .then((res) => res.json())
-            .then((data) => console.log("Donation saved:", data))
-            .catch((err) => console.error("Failed to save donation:", err));
+          await saveDonation({
+            paymentId: response.razorpay_payment_id,
+            donationFrequency: "One-Time",
+          });
+          alert(
+            `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+          );
         } catch (err) {
           console.error("Error during capture or save:", err);
         }
       },
-      prefill: {
-        name: name,
-        email: email,
-      },
-      notes: {
-        projectId: selectedProjectId,
-        donationType,
-        donationFor,
-        dedicatedTo,
-        message,
-        isRecurring: recurring,
-        donationFrequency: resolvedFrequency,
-        requestCertificate,
-      },
-      theme: {
-        color: "#059669",
-      },
+      prefill: { name, email },
+      notes: { ...commonNotes, donationFrequency: "One-Time" },
+      theme: { color: "#059669" },
     };
 
     const rzp = new window.Razorpay(options);
