@@ -55,6 +55,7 @@ export default function ProjectCardsSection({
   const [hasMore, setHasMore] = useState(true);
   const { isSignedIn } = useUser();
   const observerRef = useRef(null);
+  const sentinelRef = useRef(null);
   const hasMoreRef = useRef(hasMore);
   const loadingRef = useRef(loading);
   useEffect(() => {
@@ -125,32 +126,45 @@ export default function ProjectCardsSection({
     return () => controller.abort();
   }, [page, initialLimit]);
 
-  // Infinite scroll: callback ref attaches the observer when the sentinel
-  // mounts. Reads live values from refs so it isn't recreated on each render
-  // (which would re-fire immediately and chain-load every page at once).
+  // Infinite scroll. The observer reads live values from refs, so it isn't
+  // recreated on every render. We re-attach it after each load completes so
+  // that if the sentinel is still in view (short content / tall screens) it
+  // continues loading the next page until all projects are shown.
+  const attachObserver = useCallback(() => {
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+      observerRef.current = null;
+    }
+    const node = sentinelRef.current;
+    if (!node || !infiniteScroll) return;
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMoreRef.current &&
+          !loadingRef.current
+        ) {
+          setPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "300px", threshold: 0 }
+    );
+    observerRef.current.observe(node);
+  }, [infiniteScroll]);
+
+  // Callback ref: store the sentinel node and (re)attach the observer.
   const loaderRef = useCallback(
     (node) => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-        observerRef.current = null;
-      }
-      if (!node || !infiniteScroll) return;
-      observerRef.current = new IntersectionObserver(
-        (entries) => {
-          if (
-            entries[0].isIntersecting &&
-            hasMoreRef.current &&
-            !loadingRef.current
-          ) {
-            setPage((prev) => prev + 1);
-          }
-        },
-        { rootMargin: "200px", threshold: 0 }
-      );
-      observerRef.current.observe(node);
+      sentinelRef.current = node;
+      attachObserver();
     },
-    [infiniteScroll]
+    [attachObserver]
   );
+
+  // Re-evaluate after each load finishes and when the list grows.
+  useEffect(() => {
+    if (!loading && infiniteScroll && hasMore) attachObserver();
+  }, [loading, hasMore, projects.length, infiniteScroll, attachObserver]);
 
   // Filtering
   const filteredProjects = useMemo(() => {

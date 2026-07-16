@@ -80,17 +80,17 @@ function Projects({ title }) {
       {/* Filter Section */}
       <section className="container-x">
         <div className="card-soft mb-4 p-4 sm:p-6" style={{ transform: "none" }}>
-          <div className="flex flex-col gap-4 lg:flex-row md:items-center md:justify-between">
-            {/* Search */}
-            <div className="flex min-w-full flex-row gap-2 lg:min-w-0">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+            {/* Search (grows) + mobile filter toggle */}
+            <div className="flex w-full gap-2 lg:flex-1">
               <div className="relative flex-1">
-                <Search className="absolute left-3.5 top-3.5 h-5 w-5 text-emerald-400" />
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-emerald-400" />
                 <input
                   type="text"
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Search projects by name, description, or location..."
-                  className="w-full rounded-full border border-emerald-100 bg-emerald-50/40 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 sm:text-base lg:w-auto"
+                  className="w-full rounded-full border border-emerald-100 bg-emerald-50/40 py-3 pl-11 pr-4 text-sm outline-none transition focus:border-emerald-300 focus:bg-white focus:ring-2 focus:ring-emerald-500/20 sm:text-base"
                 />
               </div>
 
@@ -103,55 +103,51 @@ function Projects({ title }) {
               </button>
             </div>
 
-            {/* Filters */}
+            {/* Filters (auto width on desktop) */}
             <div
               className={`${
-                showFilters ? "flex md:flex" : "hidden md:flex"
-              } w-full flex-col gap-3 sm:flex-row`}
+                showFilters ? "flex" : "hidden"
+              } w-full flex-col gap-3 sm:flex-row md:flex lg:w-auto`}
             >
               {/* Category Filter */}
-              <div className="flex flex-1 items-center gap-2">
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="flex-1 cursor-pointer appearance-none rounded-full border border-emerald-100 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
-                >
-                  <option value="all">All Categories</option>
-                  {categories.map((cat) => (
-                    <option key={cat._id} value={cat.name}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full cursor-pointer appearance-none rounded-full border border-emerald-100 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 sm:w-44"
+              >
+                <option value="all">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
 
               {/* Donation Filter */}
-              <div className="flex flex-1 items-center gap-2">
-                <select
-                  value={donationTypeFilter}
-                  onChange={(e) => setDonationTypeFilter(e.target.value)}
-                  className="flex-1 cursor-pointer appearance-none rounded-full border border-emerald-100 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
-                >
-                  {donationTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type === "all"
-                        ? "All Donation Types"
-                        : type === "zakat"
-                        ? "Zakat Eligible"
-                        : type === "interest_earnings"
-                        ? "Interest Earnings"
-                        : type === "sadqa"
-                        ? "Sadqa"
-                        : "General"}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                value={donationTypeFilter}
+                onChange={(e) => setDonationTypeFilter(e.target.value)}
+                className="w-full cursor-pointer appearance-none rounded-full border border-emerald-100 bg-white px-4 py-3 text-sm outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20 sm:w-52"
+              >
+                {donationTypes.map((type) => (
+                  <option key={type} value={type}>
+                    {type === "all"
+                      ? "All Donation Types"
+                      : type === "zakat"
+                      ? "Zakat Eligible"
+                      : type === "interest_earnings"
+                      ? "Interest Earnings"
+                      : type === "sadqa"
+                      ? "Sadqa"
+                      : "General"}
+                  </option>
+                ))}
+              </select>
 
               {/* Clear Filters */}
               <button
                 onClick={handleClearFilters}
-                className="flex-1 cursor-pointer rounded-full bg-emerald-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-950"
+                className="cursor-pointer rounded-full bg-emerald-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-950"
               >
                 <span className="hidden md:block">Clear All Filters</span>
                 <span className="block md:hidden">Clear</span>
