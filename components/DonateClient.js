@@ -231,43 +231,47 @@ export default function DonatePage({ searchParams }) {
     }
 
     // ---------------- One-Time (single charge) ----------------
+    // Create a Razorpay Order with auto-capture so the payment is captured
+    // automatically on success (no fragile manual capture step).
+    let orderId;
+    try {
+      const orderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: customAmount,
+          notes: { ...commonNotes, donationFrequency: "One-Time" },
+        }),
+      });
+      const orderData = await orderRes.json();
+      if (!orderRes.ok || !orderData.orderId) {
+        console.error("Order creation failed:", orderData);
+        alert(
+          orderData?.error || "Could not start the payment. Please try again."
+        );
+        return;
+      }
+      orderId = orderData.orderId;
+    } catch (err) {
+      console.error("Order request error:", err);
+      alert("Could not start the payment. Please try again.");
+      return;
+    }
+
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
-      amount: customAmount * 100,
-      currency: "INR",
+      order_id: orderId,
       name: "Wahid Foundation",
       description: `Donation for ${selectedProject?.title || "General Fund"}`,
       handler: async (response) => {
-        console.log("Payment success:", response);
-        try {
-          // 1️⃣ Capture the payment via backend
-          const captureRes = await fetch("/api/capture-payment", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              paymentId: response.razorpay_payment_id,
-              amount: customAmount,
-            }),
-          });
-
-          const captureData = await captureRes.json();
-          if (!captureRes.ok) {
-            console.error("Capture failed:", captureData);
-            alert("Payment capture failed! Please contact support.");
-            return;
-          }
-
-          // 2️⃣ Save donation record in your DB
-          await saveDonation({
-            paymentId: response.razorpay_payment_id,
-            donationFrequency: "One-Time",
-          });
-          alert(
-            `Payment successful! Payment ID: ${response.razorpay_payment_id}`
-          );
-        } catch (err) {
-          console.error("Error during capture or save:", err);
-        }
+        // Auto-captured by Razorpay — just record the donation.
+        await saveDonation({
+          paymentId: response.razorpay_payment_id,
+          donationFrequency: "One-Time",
+        });
+        alert(
+          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+        );
       },
       prefill: { name, email },
       notes: { ...commonNotes, donationFrequency: "One-Time" },

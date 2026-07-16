@@ -14,7 +14,8 @@ export async function POST(req) {
     }
 
     // Razorpay creds from env
-    const keyId = process.env.RAZORPAY_KEY_ID;
+    const keyId =
+      process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY;
     const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
     const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");

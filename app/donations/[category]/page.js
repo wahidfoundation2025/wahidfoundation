@@ -76,10 +76,12 @@ export default function DonatePage() {
     fetchProjects();
   }, []);
 
-  // Razorpay Payment Handler
-  const handlePayment = () => {
-    if (!customAmount || customAmount < 365) {
-      alert("Please enter a valid donation amount (minimum ₹365).");
+  // Razorpay Payment Handler (auto-capture via Orders API)
+  const handlePayment = async () => {
+    const sp = projects.find((p) => p._id === selectedProjectId);
+    const minAmount = sp?.minDonationAmount || 365;
+    if (!customAmount || customAmount < minAmount) {
+      alert(`Please enter a valid donation amount (minimum ₹${minAmount}).`);
       return;
     }
 
@@ -93,26 +95,43 @@ export default function DonatePage() {
       return;
     }
 
-    // Load Razorpay SDK
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.async = true;
-    document.body.appendChild(script);
+    const resolvedFrequency = isRecurring ? donationFrequency : "One-Time";
 
-    script.onload = () => {
+    // Create an auto-capture order so the payment is captured automatically.
+    let orderId;
+    try {
+      const orderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: customAmount,
+          notes: {
+            projectId: selectedProjectId,
+            donationType,
+            donationFrequency: resolvedFrequency,
+          },
+        }),
+      });
+      const orderData = await orderRes.json();
+      if (!orderRes.ok || !orderData.orderId) {
+        alert(orderData?.error || "Could not start the payment. Please try again.");
+        return;
+      }
+      orderId = orderData.orderId;
+    } catch (err) {
+      alert("Could not start the payment. Please try again.");
+      return;
+    }
+
+    const openCheckout = () => {
       const selectedProject = projects.find((p) => p._id === selectedProjectId);
       const options = {
-        key: "rzp_live_lfzYuYY8Jv6NQG", // Replace with your Razorpay Key ID
-        amount: customAmount * 100, // Amount in paise
-        currency: "INR",
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY,
+        order_id: orderId,
         name: "Wahid Foundation",
         description: `Donation for ${selectedProject?.title || "General Fund"}`,
-        image: "https://cdn.razorpay.com/logo.svg", // Optional: Your logo
+        image: "https://cdn.razorpay.com/logo.svg",
         handler: function (response) {
-          alert(
-            `Payment successful! Payment ID: ${response.razorpay_payment_id}`
-          );
-          // Optionally, send payment details to your backend
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/save-donation`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -120,7 +139,7 @@ export default function DonatePage() {
               paymentId: response.razorpay_payment_id,
               amount: customAmount,
               donationType,
-              donationFrequency: isRecurring ? donationFrequency : "One-Time",
+              donationFrequency: resolvedFrequency,
               projectId: selectedProjectId,
               name,
               email,
@@ -133,11 +152,11 @@ export default function DonatePage() {
             .then((res) => res.json())
             .then((data) => console.log("Donation saved:", data))
             .catch((err) => console.error("Failed to save donation:", err));
+          alert(
+            `Payment successful! Payment ID: ${response.razorpay_payment_id}`
+          );
         },
-        prefill: {
-          name: name,
-          email: email,
-        },
+        prefill: { name, email },
         notes: {
           projectId: selectedProjectId,
           donationType,
@@ -145,21 +164,26 @@ export default function DonatePage() {
           dedicatedTo,
           message,
           isRecurring,
-          donationFrequency,
+          donationFrequency: resolvedFrequency,
           requestCertificate,
         },
-        theme: {
-          color: "#059669", // Emerald-600
-        },
+        theme: { color: "#059669" },
       };
-
       const rzp = new window.Razorpay(options);
       rzp.open();
     };
 
-    script.onerror = () => {
-      alert("Failed to load Razorpay SDK. Please try again later.");
-    };
+    if (typeof window !== "undefined" && window.Razorpay) {
+      openCheckout();
+    } else {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.async = true;
+      script.onload = openCheckout;
+      script.onerror = () =>
+        alert("Failed to load Razorpay SDK. Please try again later.");
+      document.body.appendChild(script);
+    }
   };
 
   if (projects.length === 0) {
@@ -173,6 +197,7 @@ export default function DonatePage() {
   const selectedProject = projects.find((p) => p._id === selectedProjectId);
   const donationTypes =
     selectedProject?.donationOptions?.filter((opt) => opt.isEnabled) || [];
+  const minAmount = selectedProject?.minDonationAmount || 365;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
@@ -424,7 +449,7 @@ export default function DonatePage() {
                   ))}
                 </div>
                 <p className="text-sm text-gray-500">
-                  The minimum donation amount is ₹365 regardless of frequency.
+                  The minimum donation amount is ₹{minAmount} regardless of frequency.
                 </p>
               </div>
             )}
@@ -493,17 +518,17 @@ export default function DonatePage() {
             </div>
             <div className="mt-4 text-black">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Custom Amount (Min ₹365)
+                Custom Amount (Min ₹{minAmount})
               </label>
               <input
                 type="number"
-                min={365}
+                min={minAmount}
                 value={customAmount}
                 onChange={(e) => setCustomAmount(Number(e.target.value))}
                 className="h-11 w-full rounded-xl border border-emerald-100 bg-white px-4 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Minimum donation: ₹365
+                Minimum donation: ₹{minAmount}
               </p>
             </div>
             <div className="mt-6 border-t pt-4">
