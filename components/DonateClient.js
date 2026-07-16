@@ -62,7 +62,7 @@ export default function DonatePage({ searchParams }) {
   const email = user?.emailAddresses[0]?.emailAddress || "";
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects?status=Active`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects?status=Active&limit=100`, {
       next: { revalidate: 3600 },
     })
       .then((res) => res.json())
