@@ -108,8 +108,10 @@ export default function DonatePage({ searchParams }) {
       return;
     }
 
-    if (!customAmount || customAmount < 365) {
-      alert("Please enter a valid donation amount (minimum ₹365).");
+    const sp = projects.find((p) => p._id === selectedProjectId);
+    const minAmount = sp?.minDonationAmount || 365;
+    if (!customAmount || customAmount < minAmount) {
+      alert(`Please enter a valid donation amount (minimum ₹${minAmount}).`);
       return;
     }
 
@@ -279,6 +281,7 @@ export default function DonatePage({ searchParams }) {
   const selectedProject = projects.find((p) => p._id === selectedProjectId);
   const donationTypes =
     selectedProject?.donationOptions?.filter((opt) => opt.isEnabled) || [];
+  const minAmount = selectedProject?.minDonationAmount || 365;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
@@ -545,17 +548,17 @@ export default function DonatePage({ searchParams }) {
             </div>
             <div className="mt-4 text-black">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Custom Amount (Min ₹365)
+                Custom Amount (Min ₹{minAmount})
               </label>
               <input
                 type="number"
-                min={365}
+                min={minAmount}
                 value={customAmount}
                 onChange={(e) => setCustomAmount(Number(e.target.value))}
                 className="h-11 w-full rounded-xl border border-emerald-100 bg-white px-4 outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Minimum donation: ₹365
+                Minimum donation: ₹{minAmount}
               </p>
             </div>
             <label className="flex items-start space-x-3 mt-4 cursor-pointer">

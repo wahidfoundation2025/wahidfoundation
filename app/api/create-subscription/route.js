@@ -20,9 +20,9 @@ export async function POST(req) {
     const { amount, frequency, notes } = body;
 
     const numericAmount = Number(amount);
-    if (!numericAmount || numericAmount < 365) {
+    if (!numericAmount || numericAmount < 1) {
       return NextResponse.json(
-        { error: "Invalid amount (minimum ₹365)." },
+        { error: "Invalid amount." },
         { status: 400 }
       );
     }

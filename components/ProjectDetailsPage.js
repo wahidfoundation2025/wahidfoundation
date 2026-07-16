@@ -608,7 +608,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount (Min: ₹365)"
+                    placeholder={`Enter amount (Min: ₹${project?.minDonationAmount || 365})`}
                     className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                   />
                 </div>
