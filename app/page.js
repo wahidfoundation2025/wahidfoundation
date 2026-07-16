@@ -345,6 +345,29 @@ export default function Home() {
 
         <HeroSection hero={heroData} />
 
+        {/* Emergency projects — only renders if any project is flagged emergency */}
+        <ProjectCardsSection
+          emergencyOnly
+          hideWhenEmpty
+          infiniteScroll={false}
+          initialLimit={6}
+          header={
+            <div className="container-x mb-8 w-full text-center">
+              <span className="eyebrow justify-center text-red-600">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-red-500" />
+                Urgent Appeal
+              </span>
+              <h2 className="mt-3 font-display text-3xl font-bold text-red-700 sm:text-4xl">
+                Emergency Projects
+              </h2>
+              <p className="mx-auto mt-3 max-w-2xl text-gray-600">
+                These causes need immediate support. Your contribution right now
+                makes a critical, time-sensitive difference.
+              </p>
+            </div>
+          }
+        />
+
         {/* Featured projects */}
         <section className="container-x">
           <div className="mx-auto max-w-2xl text-center">

@@ -48,6 +48,9 @@ export default function ProjectCardsSection({
   donationTypeFilter = "all",
   infiniteScroll = false, // homepage=false, projects page=true
   initialLimit = 4, // how many to load per API call
+  emergencyOnly = false, // only fetch projects flagged as emergency
+  hideWhenEmpty = false, // render nothing if there are no matching projects
+  header = null, // optional heading block shown above the grid
 }) {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -75,7 +78,9 @@ export default function ProjectCardsSection({
 
         const [projectsRes, donationsRes] = await Promise.all([
           fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/projects?limit=${initialLimit}&page=${page}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/projects?limit=${initialLimit}&page=${page}${
+              emergencyOnly ? "&emergency=true" : ""
+            }`,
             { signal: controller.signal }
           ),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/summary`, {
@@ -203,8 +208,14 @@ export default function ProjectCardsSection({
     });
   }, [projects, searchTerm, categoryFilter, donationTypeFilter]);
 
+  // Optional section (e.g. emergency): render nothing unless there are matches.
+  // While loading, filteredProjects is empty, so the section simply appears
+  // once matching projects arrive — no skeleton flash for an empty section.
+  if (hideWhenEmpty && filteredProjects.length === 0) return null;
+
   return (
     <section className="flex flex-col items-center w-full px-4 py-4 sm:px-12 text-gray-900">
+      {header}
       {loading && page === 1 ? (
         <div className="grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]">
           {Array.from({ length: infiniteScroll ? initialLimit : 3 }).map(
