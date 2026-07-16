@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import ProjectCardsSection from "./ProjectCardsSection";
 import { Filter, Search } from "lucide-react";
 
-import useResponsiveLimit from "../app/hooks/useResponsiveLimit";
 import useDebounce from "../app/hooks/useDebounce";
 
 function Projects({ title }) {
@@ -159,18 +158,13 @@ function Projects({ title }) {
 
       {/* Project Cards */}
       <section className="w-full pb-20">
-        {(() => {
-          const responsiveLimit = useResponsiveLimit();
-          return (
-            <ProjectCardsSection
-              searchTerm={debouncedSearch}
-              categoryFilter={categoryFilter}
-              donationTypeFilter={donationTypeFilter}
-              initialLimit={responsiveLimit}
-              infiniteScroll={true}
-            />
-          );
-        })()}
+        <ProjectCardsSection
+          searchTerm={debouncedSearch}
+          categoryFilter={categoryFilter}
+          donationTypeFilter={donationTypeFilter}
+          initialLimit={60}
+          infiniteScroll={false}
+        />
       </section>
     </div>
   );
