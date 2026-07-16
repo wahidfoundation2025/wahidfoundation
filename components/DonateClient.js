@@ -13,6 +13,19 @@ import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { getReferralCode } from "./ReferralTracker";
 
+// Minimum donation per frequency. A project may set a lower minDonationAmount
+// (e.g. a Rs.1 test project), in which case the lower value is honoured.
+const FREQUENCY_MIN = {
+  "One-Time": 50,
+  Weekly: 20,
+  Monthly: 100,
+  Yearly: 365,
+};
+const getMinAmount = (frequency, projectMin) => {
+  const freqMin = FREQUENCY_MIN[frequency] ?? 50;
+  return projectMin != null ? Math.min(freqMin, projectMin) : freqMin;
+};
+
 export default function DonatePage({ searchParams }) {
   const { projectId, type, amount, frequency } = searchParams;
   const { isSignedIn, user } = useUser();
@@ -117,9 +130,12 @@ export default function DonatePage({ searchParams }) {
     }
 
     const sp = projects.find((p) => p._id === selectedProjectId);
-    const minAmount = sp?.minDonationAmount || 365;
+    const freq = isRecurring ? donationFrequency : "One-Time";
+    const minAmount = getMinAmount(freq, sp?.minDonationAmount);
     if (!customAmount || customAmount < minAmount) {
-      alert(`Please enter a valid donation amount (minimum ₹${minAmount}).`);
+      alert(
+        `Minimum ${freq === "One-Time" ? "one-time" : freq.toLowerCase()} donation is ₹${minAmount}.`
+      );
       return;
     }
 
@@ -299,7 +315,10 @@ export default function DonatePage({ searchParams }) {
   const selectedProject = projects.find((p) => p._id === selectedProjectId);
   const donationTypes =
     selectedProject?.donationOptions?.filter((opt) => opt.isEnabled) || [];
-  const minAmount = selectedProject?.minDonationAmount || 365;
+  const minAmount = getMinAmount(
+    isRecurring ? donationFrequency : "One-Time",
+    selectedProject?.minDonationAmount
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-emerald-50 to-white">
