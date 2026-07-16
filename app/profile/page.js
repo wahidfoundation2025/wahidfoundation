@@ -64,50 +64,43 @@ export default function ProfilePage() {
 
     (async () => {
       setLoadingDonor(true);
-      try {
-        const email = clerkInitial.email;
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donors/${email}`);
+      const email = clerkInitial.email;
 
+      // 1) Donor record — used for the editable profile fields only.
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/donors/${email}`
+        );
         if (res.ok) {
           const donorFromDb = await res.json();
-          setDonorExists(true); // Donor exists
-
-          const merged = {
+          setDonorExists(true);
+          setFormData({
             ...clerkInitial,
             ...donorFromDb,
-            address: {
-              ...clerkInitial.address,
-              ...(donorFromDb.address || {})
-            },
-            projectsDonatedTo: donorFromDb.projectsDonatedTo || []
-          };
-
-          setFormData(merged);
-
-          // Backend populates projectsDonatedTo (full project objects) and
-          // donations (full Razorpay transaction records) — use them directly.
-          const donatedProjects = Array.isArray(donorFromDb.projectsDonatedTo)
-            ? donorFromDb.projectsDonatedTo.filter(
-                (p) => p && typeof p === "object"
-              )
-            : [];
-          setProjects(donatedProjects);
-
-          const donationList = Array.isArray(donorFromDb.donations)
-            ? donorFromDb.donations
-                .filter((d) => d && typeof d === "object")
-                .sort(
-                  (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                )
-            : [];
-          setDonations(donationList);
+            address: { ...clerkInitial.address, ...(donorFromDb.address || {}) },
+            projectsDonatedTo: donorFromDb.projectsDonatedTo || [],
+          });
         } else if (res.status === 404) {
-          setDonorExists(false); // Donor does not exist
-        } else {
-          console.warn("Unexpected response fetching donor:", res.status);
+          setDonorExists(false);
         }
       } catch (err) {
         console.error("Error fetching donor:", err);
+      }
+
+      // 2) Donations by email — robust source of truth for the history,
+      //    independent of donor linking (includes every recurring charge).
+      try {
+        const dres = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/donations/by-email/${encodeURIComponent(
+            email
+          )}`
+        );
+        if (dres.ok) {
+          const list = await dres.json();
+          setDonations(Array.isArray(list) ? list : []);
+        }
+      } catch (err) {
+        console.error("Error fetching donations:", err);
       } finally {
         setLoadingDonor(false);
       }
@@ -203,15 +196,53 @@ export default function ProfilePage() {
     }
   }
 
-  // Map project id -> title (projectsDonatedTo is populated by the backend)
-  const projectTitleById = {};
-  (projects || []).forEach((p) => {
-    if (p?._id) projectTitleById[p._id] = p.title;
-  });
+  const inr = (n) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 0,
+    }).format(n || 0);
 
-  const totalDonated =
-    formData.totalDonated ||
-    (donations || []).reduce((sum, d) => sum + (d?.amount || 0), 0);
+  // Each donation from /donations/by-email carries a projectTitle.
+  const titleFor = (d) => d?.projectTitle || d?.projectName || "General Fund";
+
+  // Stats across every transaction (one-time + each recurring auto-charge).
+  const totalDonated = (donations || []).reduce(
+    (sum, d) => sum + (d?.amount || 0),
+    0
+  );
+  const distinctProjects = new Set(
+    (donations || []).map((d) => String(d?.projectId || "")).filter(Boolean)
+  ).size;
+
+  // Group recurring charges by subscription: one card per subscription with
+  // its frequency, status, number of charges and total collected so far.
+  const subMap = new Map();
+  for (const d of donations) {
+    if (!d.subscriptionId) continue;
+    const g = subMap.get(d.subscriptionId);
+    if (!g) {
+      // donations are newest-first, so the first seen is the latest charge.
+      subMap.set(d.subscriptionId, {
+        latest: d,
+        chargesCount: 1,
+        totalCharged: d.amount || 0,
+      });
+    } else {
+      g.chargesCount += 1;
+      g.totalCharged += d.amount || 0;
+    }
+  }
+  const subscriptions = Array.from(subMap.values()).map((g) => ({
+    ...g.latest,
+    chargesCount: g.chargesCount,
+    totalCharged: g.totalCharged,
+  }));
+
+  const isSubActive = (status) =>
+    !["cancelled", "completed", "expired", "halted"].includes(
+      (status || "active").toLowerCase()
+    );
 
   const totalPages = Math.max(
     1,
@@ -221,26 +252,6 @@ export default function ProfilePage() {
     (currentPage - 1) * rowsPerPage,
     currentPage * rowsPerPage
   );
-  const inr = (n) =>
-    new Intl.NumberFormat("en-IN", {
-      style: "currency",
-      currency: "INR",
-      maximumFractionDigits: 0,
-    }).format(n || 0);
-
-  // One entry per recurring subscription (latest charge represents it).
-  const subscriptions = [];
-  const seenSub = new Set();
-  for (const d of donations) {
-    if (d.subscriptionId && !seenSub.has(d.subscriptionId)) {
-      seenSub.add(d.subscriptionId);
-      subscriptions.push(d);
-    }
-  }
-  const isSubActive = (status) =>
-    !["cancelled", "completed", "expired"].includes(
-      (status || "active").toLowerCase()
-    );
   return (
     <div className="flex min-h-screen items-start justify-center bg-gradient-to-b from-emerald-50/50 to-white px-3 pb-24 pt-28 text-black sm:px-10 sm:pt-32">
       <section className="mb-10 w-full max-w-4xl space-y-6 rounded-3xl border border-emerald-50 bg-white p-6 shadow-[0_24px_60px_-30px_rgba(4,47,34,0.35)] md:p-8">
@@ -347,7 +358,7 @@ export default function ProfilePage() {
           </div>
           <div className="col-span-2 rounded-2xl border border-emerald-100 bg-emerald-50/60 p-5 text-center sm:col-span-1">
             <div className="font-display text-2xl font-bold text-emerald-700">
-              {projects.length || formData.totalProjects || 0}
+              {distinctProjects}
             </div>
             <div className="mt-1 text-xs font-medium text-gray-600">
               Projects Supported
@@ -388,11 +399,13 @@ export default function ProfilePage() {
                         </span>
                       </div>
                       <p className="mt-1 truncate text-sm text-gray-600">
-                        {projectTitleById[s.projectId] || "General Fund"}
+                        {titleFor(s)}
                         {s.donationType ? ` · ${s.donationType}` : ""}
                       </p>
                       <p className="mt-0.5 text-xs text-gray-400">
-                        Started{" "}
+                        {s.chargesCount} payment
+                        {s.chargesCount === 1 ? "" : "s"} ·{" "}
+                        {inr(s.totalCharged)} collected · started{" "}
                         {s.createdAt
                           ? new Date(s.createdAt).toLocaleDateString("en-IN")
                           : "—"}
@@ -447,15 +460,25 @@ export default function ProfilePage() {
                             : "—"}
                         </td>
                         <td className="px-4 py-3 font-medium text-gray-800">
-                          {projectTitleById[d.projectId] ||
-                            d.projectName ||
-                            "General Fund"}
+                          {titleFor(d)}
                         </td>
                         <td className="px-4 py-3 text-gray-600">
                           {d.donationType || "—"}
                         </td>
-                        <td className="px-4 py-3 text-gray-600">
-                          {d.donationFrequency || "One-Time"}
+                        <td className="px-4 py-3">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                              d.donationFrequency &&
+                              d.donationFrequency !== "One-Time"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-gray-100 text-gray-600"
+                            }`}
+                          >
+                            {!d.donationFrequency ||
+                            d.donationFrequency === "One-Time"
+                              ? "One-Time"
+                              : `Recurring · ${d.donationFrequency}`}
+                          </span>
                         </td>
                         <td className="whitespace-nowrap px-4 py-3 text-right font-semibold text-emerald-700">
                           {inr(d.amount)}
@@ -478,22 +501,30 @@ export default function ProfilePage() {
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="font-medium text-gray-800">
-                        {projectTitleById[d.projectId] ||
-                          d.projectName ||
-                          "General Fund"}
+                        {titleFor(d)}
                       </div>
                       <div className="shrink-0 font-display font-bold text-emerald-700">
                         {inr(d.amount)}
                       </div>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-500">
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
                       <span>
                         {d.createdAt
                           ? new Date(d.createdAt).toLocaleDateString("en-IN")
                           : "—"}
                       </span>
                       <span>{d.donationType || "—"}</span>
-                      <span>{d.donationFrequency || "One-Time"}</span>
+                      <span
+                        className={`rounded-full px-2 py-0.5 font-semibold ${
+                          d.donationFrequency && d.donationFrequency !== "One-Time"
+                            ? "bg-emerald-100 text-emerald-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {!d.donationFrequency || d.donationFrequency === "One-Time"
+                          ? "One-Time"
+                          : `Recurring · ${d.donationFrequency}`}
+                      </span>
                     </div>
                     {d.paymentId && (
                       <div className="mt-1 font-mono text-[11px] text-gray-400">

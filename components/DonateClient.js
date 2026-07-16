@@ -32,6 +32,7 @@ export default function DonatePage({ searchParams }) {
   const [customAmount, setCustomAmount] = useState(amount ?? 365);
   const [donationType, setDonationType] = useState(type ?? "Zakat");
   const [showRecurringConfirm, setShowRecurringConfirm] = useState(false);
+  const [success, setSuccess] = useState(null); // { amount, project, frequency, paymentId }
   const quickAmounts = [1000, 2500, 5000, 10000, 15000, 25000];
   const impact = isRecurring
     ? {
@@ -89,6 +90,13 @@ export default function DonatePage({ searchParams }) {
     // remove script on unmount
     return () => script.remove();
   }, []);
+
+  // After a successful donation, auto-return to the homepage.
+  useEffect(() => {
+    if (!success) return;
+    const t = setTimeout(() => router.push("/"), 6000);
+    return () => clearTimeout(t);
+  }, [success, router]);
 
   // Validates inputs; shows the recurring-confirmation modal for one-time
   // donations, otherwise opens the payment gateway directly.
@@ -216,9 +224,12 @@ export default function DonatePage({ searchParams }) {
               response.razorpay_subscription_id || subscriptionId,
             donationFrequency: frequency,
           });
-          alert(
-            "Recurring donation set up successfully! Future payments will be auto-debited via your approved mandate."
-          );
+          setSuccess({
+            amount: customAmount,
+            project: selectedProject?.title || "General Fund",
+            frequency,
+            paymentId: response.razorpay_payment_id,
+          });
         },
         prefill: { name, email },
         notes: { ...commonNotes, donationFrequency: frequency },
@@ -269,9 +280,12 @@ export default function DonatePage({ searchParams }) {
           paymentId: response.razorpay_payment_id,
           donationFrequency: "One-Time",
         });
-        alert(
-          `Payment successful! Payment ID: ${response.razorpay_payment_id}`
-        );
+        setSuccess({
+          amount: customAmount,
+          project: selectedProject?.title || "General Fund",
+          frequency: "One-Time",
+          paymentId: response.razorpay_payment_id,
+        });
       },
       prefill: { name, email },
       notes: { ...commonNotes, donationFrequency: "One-Time" },
@@ -702,6 +716,82 @@ export default function DonatePage({ searchParams }) {
     </div>
   </div>
 )}
+
+      {/* Success modal */}
+      {success && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center bg-emerald-950/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-2xl animate-fade-up">
+            {/* Animated green tick */}
+            <div className="success-circle mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500">
+              <svg viewBox="0 0 52 52" className="h-11 w-11">
+                <path
+                  className="success-check"
+                  fill="none"
+                  stroke="#fff"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M14 27 l8 8 l16 -18"
+                />
+              </svg>
+            </div>
+
+            <h2 className="mt-6 font-display text-3xl font-bold text-emerald-900">
+              Thank You!
+            </h2>
+            <p className="mt-2 text-gray-600">
+              Your donation was successful. May your generosity be rewarded.
+            </p>
+
+            <div className="mt-6 space-y-2 rounded-2xl bg-emerald-50/70 p-5 text-left">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Amount</span>
+                <span className="font-display text-xl font-bold text-emerald-700">
+                  ₹{success.amount}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Project</span>
+                <span className="max-w-[60%] truncate text-right text-sm font-semibold text-gray-800">
+                  {success.project}
+                </span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-500">Type</span>
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                    success.frequency === "One-Time"
+                      ? "bg-gray-200 text-gray-700"
+                      : "bg-emerald-600 text-white"
+                  }`}
+                >
+                  {success.frequency === "One-Time"
+                    ? "One-Time"
+                    : `Recurring · ${success.frequency}`}
+                </span>
+              </div>
+              {success.paymentId && (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">Payment ID</span>
+                  <span className="font-mono text-xs text-gray-500">
+                    {success.paymentId}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => router.push("/")}
+              className="btn-primary mt-6 w-full justify-center"
+            >
+              Back to Home
+            </button>
+            <p className="mt-3 text-xs text-gray-400">
+              Redirecting you to the homepage…
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
