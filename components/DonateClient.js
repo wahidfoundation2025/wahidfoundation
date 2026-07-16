@@ -530,9 +530,7 @@ export default function DonatePage({ searchParams }) {
                       name="frequency"
                       value={freq}
                       checked={
-                        freq === "One-Time"
-                          ? !isRecurring
-                          : donationFrequency === freq
+                        freq === (isRecurring ? donationFrequency : "One-Time")
                       }
                       onChange={() => {
                         if (freq === "One-Time") {
