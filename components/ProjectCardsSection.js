@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { Users, Calendar } from "lucide-react";
@@ -54,7 +54,15 @@ export default function ProjectCardsSection({
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const { isSignedIn } = useUser();
-  const loaderRef = useRef(null);
+  const observerRef = useRef(null);
+  const hasMoreRef = useRef(hasMore);
+  const loadingRef = useRef(loading);
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   // Fetch data
   useEffect(() => {
@@ -117,22 +125,32 @@ export default function ProjectCardsSection({
     return () => controller.abort();
   }, [page, initialLimit]);
 
-  // Infinite scroll observer
-  useEffect(() => {
-    if (!infiniteScroll || !loaderRef.current) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loading) {
-          setPage((prev) => prev + 1);
-        }
-      },
-      { threshold: 1 }
-    );
-
-    observer.observe(loaderRef.current);
-    return () => observer.disconnect();
-  }, [infiniteScroll, hasMore, loading]);
+  // Infinite scroll: callback ref attaches the observer when the sentinel
+  // mounts. Reads live values from refs so it isn't recreated on each render
+  // (which would re-fire immediately and chain-load every page at once).
+  const loaderRef = useCallback(
+    (node) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+        observerRef.current = null;
+      }
+      if (!node || !infiniteScroll) return;
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (
+            entries[0].isIntersecting &&
+            hasMoreRef.current &&
+            !loadingRef.current
+          ) {
+            setPage((prev) => prev + 1);
+          }
+        },
+        { rootMargin: "200px", threshold: 0 }
+      );
+      observerRef.current.observe(node);
+    },
+    [infiniteScroll]
+  );
 
   // Filtering
   const filteredProjects = useMemo(() => {
@@ -318,15 +336,18 @@ export default function ProjectCardsSection({
             ))}
           </div>
 
-          {/* Infinite scroll loader */}
+          {/* Infinite scroll: skeletons only while a page is actually loading,
+              plus a lightweight sentinel that triggers the next page. */}
           {infiniteScroll && hasMore && (
-            <div
-              ref={loaderRef}
-              className="mt-6 grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]"
-            >
-              {Array.from({ length: infiniteScroll ? initialLimit : 3 }).map((_, i) => (
-                <ProjectCardSkeleton key={`skeleton-${i}`} />
-              ))}
+            <div className="mt-6 w-full">
+              {loading && (
+                <div className="grid w-full md:gap-8 gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(330px,1fr))] [grid-template-columns:repeat(auto-fit,minmax(290px,1fr))]">
+                  {Array.from({ length: initialLimit }).map((_, i) => (
+                    <ProjectCardSkeleton key={`skeleton-${i}`} />
+                  ))}
+                </div>
+              )}
+              <div ref={loaderRef} aria-hidden className="h-8 w-full" />
             </div>
           )}
         </>
