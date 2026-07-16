@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import Headers from "../components/navbar";
 import FooterNav from "../components/footer/FooterNav";
+import ReferralTracker from "../components/ReferralTracker";
 import "./globals.css";
 import Script from "next/script";
 
@@ -86,6 +87,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${fraunces.variable} ${jakarta.variable} antialiased`}
         >
+          <ReferralTracker />
           <Headers />
           <main className="min-h-screen">{children}</main>
           <FooterNav />

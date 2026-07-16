@@ -15,6 +15,7 @@ import {
   IndianRupee,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
+import { getReferralCode } from "../../../components/ReferralTracker";
 
 export default function DonatePage() {
 
@@ -126,6 +127,7 @@ export default function DonatePage() {
               dedicatedTo,
               message,
               requestCertificate,
+              influencerCode: getReferralCode() || undefined,
             }),
           })
             .then((res) => res.json())

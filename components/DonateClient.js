@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+import { getReferralCode } from "./ReferralTracker";
 
 export default function DonatePage({ searchParams }) {
   const { projectId, type, amount, frequency } = searchParams;
@@ -135,6 +136,7 @@ export default function DonatePage({ searchParams }) {
           dedicatedTo,
           message,
           requestCertificate,
+          influencerCode: getReferralCode() || undefined,
           ...extra,
         }),
       })
