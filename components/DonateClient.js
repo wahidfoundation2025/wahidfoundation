@@ -47,26 +47,16 @@ export default function DonatePage({ searchParams }) {
   const [showRecurringConfirm, setShowRecurringConfirm] = useState(false);
   const [success, setSuccess] = useState(null); // { amount, project, frequency, paymentId }
   const quickAmounts = [1000, 2500, 5000, 10000, 15000, 25000];
+  // Convert the chosen amount+frequency into a yearly total, then derive the
+  // equivalent weekly / monthly / yearly contribution.
+  const PER_YEAR = { Weekly: 52, Monthly: 12, Yearly: 1 };
+  const annualTotal =
+    (Number(customAmount) || 0) * (PER_YEAR[donationFrequency] || 1);
   const impact = isRecurring
     ? {
-        Monthly:
-          donationFrequency === "Monthly"
-            ? customAmount
-            : donationFrequency === "Yearly"
-            ? (customAmount / 12).toFixed(0)
-            : (customAmount * 4).toFixed(0),
-        Weekly:
-          donationFrequency === "Weekly"
-            ? customAmount
-            : donationFrequency === "Monthly"
-            ? (customAmount / 4).toFixed(0)
-            : (customAmount * 13).toFixed(0),
-        Yearly:
-          donationFrequency === "Yearly"
-            ? customAmount
-            : donationFrequency === "Monthly"
-            ? (customAmount * 12).toFixed(0)
-            : (customAmount * 52).toFixed(0),
+        Weekly: (annualTotal / 52).toFixed(0),
+        Monthly: (annualTotal / 12).toFixed(0),
+        Yearly: annualTotal.toFixed(0),
       }
     : {};
   const [donationFor, setDonationFor] = useState("self");
