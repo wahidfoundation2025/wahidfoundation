@@ -34,7 +34,7 @@ export default function DonatePage({ searchParams }) {
   const [isRazorpayReady, setIsRazorpayReady] = useState(false);
 
   const [isRecurring, setIsRecurring] = useState(
-    frequency != "One-Time" ? true : false
+    Boolean(frequency) && frequency !== "One-Time"
   );
   const [donationFrequency, setDonationFrequency] = useState(
     frequency ?? "One-Time"
