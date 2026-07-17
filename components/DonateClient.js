@@ -94,9 +94,17 @@ export default function DonatePage({ searchParams }) {
     return () => script.remove();
   }, []);
 
-  // After a successful donation, auto-return to the homepage.
+  // After a successful donation: fire the payment-success tracking event
+  // (for conversion pixels), then auto-return to the homepage.
   useEffect(() => {
     if (!success) return;
+    try {
+      window.dispatchEvent(
+        new CustomEvent("wf:payment-success", { detail: success })
+      );
+    } catch {
+      /* ignore */
+    }
     const t = setTimeout(() => router.push("/"), 6000);
     return () => clearTimeout(t);
   }, [success, router]);
