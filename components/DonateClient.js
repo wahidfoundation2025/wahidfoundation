@@ -12,19 +12,7 @@ import {
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { getReferralCode } from "./ReferralTracker";
-
-// Minimum donation per frequency. A project may set a lower minDonationAmount
-// (e.g. a Rs.1 test project), in which case the lower value is honoured.
-const FREQUENCY_MIN = {
-  "One-Time": 50,
-  Weekly: 20,
-  Monthly: 100,
-  Yearly: 365,
-};
-const getMinAmount = (frequency, projectMin) => {
-  const freqMin = FREQUENCY_MIN[frequency] ?? 50;
-  return projectMin != null ? Math.min(freqMin, projectMin) : freqMin;
-};
+import { getMinAmount } from "./donationMin";
 
 export default function DonatePage({ searchParams }) {
   const { projectId, type, amount, frequency } = searchParams;

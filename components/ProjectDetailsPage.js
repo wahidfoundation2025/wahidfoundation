@@ -20,6 +20,8 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { getMinAmount } from "./donationMin";
 import { motion } from "framer-motion";
 import { IoPerson } from "react-icons/io5";
 import { FaHeart } from "react-icons/fa6";
@@ -40,10 +42,12 @@ const cleanHtml = (html) =>
 
 export default function ProjectDetailsPage({ slug, projectId }) {
   const { isSignedIn } = useUser();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("impact");
   const [checkedDonationType, setCheckedDonationType] = useState();
   const [amount, setAmount] = useState("");
-  const [frequency, setFrequency] = useState("One Time");
+  // Must match the donate page's values exactly ("One-Time", not "One Time").
+  const [frequency, setFrequency] = useState("One-Time");
 
   const {
     data: projectRaw,
@@ -172,6 +176,31 @@ export default function ProjectDetailsPage({ slug, projectId }) {
     "Sadqa",
     "Interest Earnings",
   ];
+
+  // Same minimum rules as the donate page (frequency-based, project can lower it).
+  const minAmount = getMinAmount(frequency, project?.minDonationAmount);
+
+  const handleDonate = () => {
+    if (!isSignedIn) {
+      router.push("/login");
+      return;
+    }
+    const amt = Number(amount);
+    if (!amt || amt < minAmount) {
+      alert(
+        `Minimum ${
+          frequency === "One-Time" ? "one-time" : frequency.toLowerCase()
+        } donation is ₹${minAmount}.`
+      );
+      return;
+    }
+    const params = new URLSearchParams({
+      type: checkedDonationType || checkedCategory || "",
+      amount: String(amt),
+      frequency,
+    });
+    router.push(`/donate/${slug}?${params.toString()}`);
+  };
 
   return (
     <main className="bg-gradient-to-b from-emerald-50/40 to-white pb-20 pt-24 sm:pt-28">
@@ -616,7 +645,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                     type="number"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
-                    placeholder={`Enter amount (Min: ₹${project?.minDonationAmount || 365})`}
+                    placeholder={`Enter amount (Min: ₹${minAmount})`}
                     className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-black outline-none transition placeholder:text-gray-400 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                   />
                 </div>
@@ -629,29 +658,23 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                     onChange={(e) => setFrequency(e.target.value)}
                     className="w-full rounded-xl border border-gray-200 px-3.5 py-2.5 text-sm text-black outline-none transition focus:border-emerald-300 focus:ring-2 focus:ring-emerald-500/20"
                   >
-                    <option>One Time</option>
-                    <option>Weekly</option>
-                    <option>Monthly</option>
-                    <option>Yearly</option>
+                    <option value="One-Time">One Time</option>
+                    <option value="Weekly">Weekly</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Yearly">Yearly</option>
                   </select>
                 </div>
 
                 {/* Button */}
-                <Link
-                  href={{
-                    pathname: !isSignedIn ? "/login" : `/donate/${slug}`,
-                    query: {
-                      type: checkedDonationType || checkedCategory,
-                      amount,
-                      frequency,
-                    },
-                  }}
-                  className="block"
+                <button
+                  onClick={handleDonate}
+                  className="w-full rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 py-3 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(5,150,105,0.6)] transition-transform duration-300 hover:-translate-y-0.5"
                 >
-                  <button className="w-full rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 py-3 font-semibold text-white shadow-[0_10px_24px_-10px_rgba(5,150,105,0.6)] transition-transform duration-300 hover:-translate-y-0.5">
-                    Donate Now
-                  </button>
-                </Link>
+                  Donate Now
+                </button>
+                <p className="text-center text-xs text-gray-400">
+                  Minimum {frequency === "One-Time" ? "one-time" : frequency.toLowerCase()} donation: ₹{minAmount}
+                </p>
               </div>
             ) : (
               <div className="card-soft p-6 text-center text-gray-600" style={{ transform: "none" }}>
