@@ -32,6 +32,12 @@ import Image from "next/image";
 const ProjectGallery = dynamic(() => import("./PhotoGallery"), { ssr: false });
 const fetcher = (url) => fetch(url).then((res) => res.json());
 
+// The rich-text editor emits &nbsp; between every word, which prevents line
+// wrapping and makes long descriptions overflow their container. Convert
+// non-breaking spaces back to normal spaces so text wraps naturally.
+const cleanHtml = (html) =>
+  (html || "").replace(/&nbsp;/gi, " ").replace(/ /g, " ");
+
 export default function ProjectDetailsPage({ slug, projectId }) {
   const { isSignedIn } = useUser();
   const [activeTab, setActiveTab] = useState("impact");
@@ -211,7 +217,7 @@ export default function ProjectDetailsPage({ slug, projectId }) {
         {/* ---- Two-column layout ---- */}
         <div className="mt-8 grid gap-8 lg:grid-cols-3 lg:items-start">
           {/* LEFT — content */}
-          <div className="space-y-8 lg:col-span-2">
+          <div className="min-w-0 space-y-8 lg:col-span-2">
             {/* Stats + progress card */}
             <div className="card-soft p-6 sm:p-8" style={{ transform: "none" }}>
               <div className="grid grid-cols-3 divide-x divide-emerald-100 text-center">
@@ -378,8 +384,10 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                       About this Project
                     </h3>
                     <div
-                      className="whitespace-pre-line text-sm leading-relaxed text-gray-700"
-                      dangerouslySetInnerHTML={{ __html: project?.description }}
+                      className="break-words text-sm leading-relaxed text-gray-700 [&_p]:mb-3"
+                      dangerouslySetInnerHTML={{
+                        __html: cleanHtml(project?.description),
+                      }}
                     />
 
                     {/* Timeline */}

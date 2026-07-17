@@ -8,6 +8,10 @@ import Image from "next/image";
 
 import ShareButton from "./ShareButton";
 
+// The rich-text editor emits &nbsp; between words, which blocks line wrapping.
+const cleanHtml = (html) =>
+  (html || "").replace(/&nbsp;/gi, " ").replace(/ /g, " ");
+
 // Utils
 const formatCurrency = (amount) =>
   new Intl.NumberFormat("en-IN", {
@@ -259,10 +263,11 @@ export default function ProjectCardsSection({
                     {project?.title || "Untitled Project"}
                   </h3>
                   <p
-                    className="mt-1.5 line-clamp-3 min-h-[60px] text-sm leading-relaxed text-gray-600"
+                    className="mt-1.5 line-clamp-3 min-h-[60px] break-words text-sm leading-relaxed text-gray-600"
                     dangerouslySetInnerHTML={{
                       __html:
-                        project?.description || "No description available",
+                        cleanHtml(project?.description) ||
+                        "No description available",
                     }}
                   />
                 </div>
