@@ -4,8 +4,8 @@ import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import Headers from "../components/navbar";
 import FooterNav from "../components/footer/FooterNav";
 import ReferralTracker from "../components/ReferralTracker";
+import TrackingScripts from "../components/TrackingScripts";
 import "./globals.css";
-import Script from "next/script";
 
 // Elegant, warm display serif for headings
 const fraunces = Fraunces({
@@ -70,23 +70,10 @@ export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
       <html lang="en">
-        <head>
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-MDPL2JC1H2"
-            strategy="afterInteractive"
-          />
-          <Script id="google-analytics" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-MDPL2JC1H2');
-            `}
-          </Script>
-        </head>
         <body
           className={`${fraunces.variable} ${jakarta.variable} antialiased`}
         >
+          <TrackingScripts />
           <ReferralTracker />
           <Headers />
           <main className="min-h-screen">{children}</main>
