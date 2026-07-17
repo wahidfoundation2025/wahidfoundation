@@ -177,6 +177,9 @@ export default function ProjectDetailsPage({ slug, projectId }) {
     "Interest Earnings",
   ];
 
+  // Projects without a fundraising target shouldn't show a "₹0 goal / 0%" bar.
+  const hasTarget = Number(project?.totalRequired) > 0;
+
   // Same minimum rules as the donate page (frequency-based, project can lower it).
   const minAmount = getMinAmount(frequency, project?.minDonationAmount);
 
@@ -249,13 +252,19 @@ export default function ProjectDetailsPage({ slug, projectId }) {
           <div className="min-w-0 space-y-8 lg:col-span-2">
             {/* Stats + progress card */}
             <div className="card-soft p-6 sm:p-8" style={{ transform: "none" }}>
-              <div className="grid grid-cols-3 divide-x divide-emerald-100 text-center">
-                <div className="px-2">
-                  <p className="font-display text-2xl font-bold text-emerald-700 sm:text-3xl">
-                    {percentageRaised}%
-                  </p>
-                  <p className="text-xs text-gray-500">Complete</p>
-                </div>
+              <div
+                className={`grid ${
+                  hasTarget ? "grid-cols-3" : "grid-cols-2"
+                } divide-x divide-emerald-100 text-center`}
+              >
+                {hasTarget && (
+                  <div className="px-2">
+                    <p className="font-display text-2xl font-bold text-emerald-700 sm:text-3xl">
+                      {percentageRaised}%
+                    </p>
+                    <p className="text-xs text-gray-500">Complete</p>
+                  </div>
+                )}
                 <div className="px-2">
                   <p className="font-display text-2xl font-bold text-emerald-700 sm:text-3xl">
                     {project?.daysLeft || 0}
@@ -271,33 +280,43 @@ export default function ProjectDetailsPage({ slug, projectId }) {
               </div>
 
               <div className="mt-6 border-t border-emerald-50 pt-5">
-                <div className="mb-2 flex items-center justify-between">
-                  <p className="text-sm font-semibold text-gray-600">
-                    Total Required
-                  </p>
-                  <p className="text-sm font-bold text-gray-900">
-                    ₹
-                    {project?.totalRequired
-                      ? project?.totalRequired.toLocaleString()
-                      : "0"}
-                  </p>
-                </div>
-                <div className="h-2.5 w-full overflow-hidden rounded-full bg-emerald-100">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-700"
-                    style={{ width: `${percentageRaised}%` }}
-                  ></div>
-                </div>
-                <div className="mt-2 flex items-center justify-between text-sm">
-                  <p className="font-semibold text-emerald-600">
-                    ₹
-                    {project?.collected
-                      ? project?.collected.toLocaleString()
-                      : "0"}{" "}
-                    raised
-                  </p>
-                  <p className="text-gray-600">{percentageRaised}% of goal</p>
-                </div>
+                {hasTarget ? (
+                  <>
+                    <div className="mb-2 flex items-center justify-between">
+                      <p className="text-sm font-semibold text-gray-600">
+                        Total Required
+                      </p>
+                      <p className="text-sm font-bold text-gray-900">
+                        ₹{Number(project.totalRequired).toLocaleString("en-IN")}
+                      </p>
+                    </div>
+                    <div className="h-2.5 w-full overflow-hidden rounded-full bg-emerald-100">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-700"
+                        style={{ width: `${percentageRaised}%` }}
+                      ></div>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between text-sm">
+                      <p className="font-semibold text-emerald-600">
+                        ₹{Number(project?.collected || 0).toLocaleString("en-IN")}{" "}
+                        raised
+                      </p>
+                      <p className="text-gray-600">
+                        {percentageRaised}% of goal
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  // No fixed target on this project — show what's raised only.
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-semibold text-gray-600">
+                      Total Raised
+                    </p>
+                    <p className="font-display text-lg font-bold text-emerald-700">
+                      ₹{Number(project?.collected || 0).toLocaleString("en-IN")}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
