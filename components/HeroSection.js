@@ -61,7 +61,7 @@ export default function HeroSection({ hero }) {
             ) : (
               <>
                 <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-emerald-50 backdrop-blur-sm animate-fade-up">
-                  Lasting change
+                  Rs.1 a Day, Lasting Change
                 </span>
 
                 <h1 className="mt-6 font-display text-4xl font-800 font-bold leading-[1.08] text-white sm:text-5xl lg:text-6xl animate-fade-up">
@@ -75,14 +75,14 @@ export default function HeroSection({ hero }) {
                 <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row animate-fade-up">
                   <Link
                     href="/donate"
-                    className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-8 py-4 text-base font-bold text-emerald-700 shadow-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl active:scale-[0.98] sm:w-60"
+                    className="group inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border border-transparent bg-white px-8 text-base font-bold text-emerald-700 shadow-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-2xl active:scale-[0.98] sm:w-72"
                   >
                     {hero?.ctaText || "Donate Now"}
                     <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
                   </Link>
                   <Link
                     href="/projects"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-white/5 px-8 py-4 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/15 sm:w-60"
+                    className="inline-flex h-14 w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-white/5 px-8 text-base font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/15 sm:w-72"
                   >
                     Explore Projects
                   </Link>
