@@ -61,6 +61,15 @@ export default function ProjectDetailsPage({ slug, projectId }) {
     fetcher
   );
 
+  // Public (non-anonymous) donors for this project — name + total amount.
+  const { data: donorsData } = useSWR(
+    projectId
+      ? `${process.env.NEXT_PUBLIC_API_URL}/donations/by-project/${projectId}`
+      : null,
+    fetcher
+  );
+  const donors = Array.isArray(donorsData?.donors) ? donorsData.donors : [];
+
   const project = projectRaw
     ? {
         ...projectRaw,
@@ -556,47 +565,63 @@ export default function ProjectDetailsPage({ slug, projectId }) {
                 </h3>
               </div>
 
-              <div className="grid gap-4 text-sm sm:grid-cols-2">
-                <div>
-                  <span className="text-gray-400">Name</span>
-                  <p className="font-semibold text-gray-800">
-                    {project?.projectManager?.name || "Unknown"}
-                  </p>
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <span className="text-gray-400">Email</span>
-                    <p className="truncate font-semibold text-gray-800">
-                      {project?.projectManager?.email || "Not provided"}
-                    </p>
+              {/* One row per field, with a fixed-width action column so every
+                  button lines up on the same vertical edge. */}
+              <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-100">
+                {[
+                  {
+                    label: "Name",
+                    value: project?.projectManager?.name,
+                    fallback: "Unknown",
+                    Icon: IoPerson,
+                  },
+                  {
+                    label: "Email",
+                    value: project?.projectManager?.email,
+                    fallback: "Not provided",
+                    Icon: Mail,
+                    href: project?.projectManager?.email
+                      ? `mailto:${project.projectManager.email}`
+                      : null,
+                    action: "Email",
+                  },
+                  {
+                    label: "Phone",
+                    value: project?.projectManager?.phone,
+                    fallback: "Not provided",
+                    Icon: Phone,
+                    href: project?.projectManager?.phone
+                      ? `tel:${project.projectManager.phone}`
+                      : null,
+                    action: "Call",
+                  },
+                ].map(({ label, value, fallback, Icon, href, action }) => (
+                  <div
+                    key={label}
+                    className="flex items-center gap-3 px-4 py-3.5"
+                  >
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-50 text-gray-500">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <span className="block text-xs text-gray-400">
+                        {label}
+                      </span>
+                      <p className="truncate text-sm font-semibold text-gray-800">
+                        {value || fallback}
+                      </p>
+                    </div>
+                    {href && (
+                      <a
+                        href={href}
+                        className="flex w-[86px] shrink-0 items-center justify-center gap-1.5 rounded-full border border-emerald-200 px-3 py-1.5 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-50"
+                      >
+                        <Icon className="h-3.5 w-3.5" />
+                        {action}
+                      </a>
+                    )}
                   </div>
-                  {project?.projectManager?.email && (
-                    <a
-                      href={`mailto:${project?.projectManager?.email}`}
-                      className="flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-200 px-3 py-1.5 font-semibold text-emerald-700 transition hover:bg-emerald-50"
-                    >
-                      <Mail className="h-4 w-4" />
-                      Email
-                    </a>
-                  )}
-                </div>
-                <div className="flex items-center justify-between gap-2">
-                  <div className="min-w-0">
-                    <span className="text-gray-400">Phone</span>
-                    <p className="truncate font-semibold text-gray-800">
-                      {project?.projectManager?.phone || "Not provided"}
-                    </p>
-                  </div>
-                  {project?.projectManager?.phone && (
-                    <a
-                      href={`tel:${project?.projectManager?.phone}`}
-                      className="flex shrink-0 items-center gap-1.5 rounded-full border border-emerald-200 px-3 py-1.5 font-semibold text-emerald-700 transition hover:bg-emerald-50"
-                    >
-                      <Phone className="h-4 w-4" />
-                      Call
-                    </a>
-                  )}
-                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -702,6 +727,40 @@ export default function ProjectDetailsPage({ slug, projectId }) {
             )}
           </div>
         </div>
+
+        {/* Our Donors — public (non-anonymous) contributors */}
+        {donors.length > 0 && (
+          <section className="mt-12">
+            <div className="mb-5 text-center">
+              <h2 className="font-display text-2xl font-bold text-emerald-900">
+                Our Donors
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Thank you to everyone supporting this project.
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {donors.map((donor, idx) => (
+                <div
+                  key={`${donor.name}-${idx}`}
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-100 bg-white px-4 py-3 shadow-sm"
+                >
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-sm font-bold text-emerald-700">
+                      {(donor.name || "?").trim().charAt(0).toUpperCase()}
+                    </span>
+                    <span className="truncate text-sm font-semibold text-gray-800">
+                      {donor.name}
+                    </span>
+                  </div>
+                  <span className="shrink-0 text-sm font-bold text-emerald-700">
+                    ₹{Number(donor.amount || 0).toLocaleString("en-IN")}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Photo Gallery */}
         {project?.photoGallery?.length > 0 && (

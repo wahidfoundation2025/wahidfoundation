@@ -56,6 +56,7 @@ export async function POST(req) {
           email: notes.email || payment.email || "",
           dedicatedTo: notes.dedicatedTo,
           message: notes.message,
+          isAnonymous: notes.isAnonymous,
         }),
       });
     } else if (

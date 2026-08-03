@@ -20,6 +20,8 @@ export default function DonatePage({ searchParams }) {
   const router = useRouter();
 
   const [isRazorpayReady, setIsRazorpayReady] = useState(false);
+  // Admin-configurable hero content for the donate page.
+  const [donateHero, setDonateHero] = useState(null);
 
   const [isRecurring, setIsRecurring] = useState(
     Boolean(frequency) && frequency !== "One-Time"
@@ -27,7 +29,9 @@ export default function DonatePage({ searchParams }) {
   const [donationFrequency, setDonationFrequency] = useState(
     frequency ?? "One-Time"
   );
-  const [requestCertificate, setRequestCertificate] = useState(false);
+  // Donor chooses whether their name appears in the public donor list on the
+  // project page. Defaults to public.
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(projectId);
   const [customAmount, setCustomAmount] = useState(amount ?? 365);
@@ -67,6 +71,15 @@ export default function DonatePage({ searchParams }) {
       })
       .catch((err) => console.error("Failed to fetch projects:", err));
   }, [projectId]);
+
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/donateherosection`, {
+      cache: "no-store",
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((d) => setDonateHero(d))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -147,7 +160,7 @@ export default function DonatePage({ searchParams }) {
           email,
           dedicatedTo,
           message,
-          requestCertificate,
+          isAnonymous,
           influencerCode: getReferralCode() || undefined,
           ...extra,
         }),
@@ -177,7 +190,7 @@ export default function DonatePage({ searchParams }) {
       donationFor,
       dedicatedTo,
       message,
-      requestCertificate: String(requestCertificate),
+      isAnonymous: String(isAnonymous),
       name,
       email,
     };
@@ -323,33 +336,39 @@ export default function DonatePage({ searchParams }) {
             <div className="space-y-4 text-center">
               <span className="eyebrow justify-center text-emerald-200">
                 <span className="h-1.5 w-1.5 rounded-full bg-amber-300" />
-                Give with intention
+                {donateHero?.eyebrow || "Give with intention"}
               </span>
               <h1 className="font-display text-4xl font-bold leading-tight tracking-tight lg:text-6xl">
-                Make Your Donation
+                {donateHero?.title || "Make Your Donation"}
               </h1>
               <p className="mx-auto max-w-3xl text-lg leading-relaxed text-emerald-50/90 lg:text-2xl">
-                Your generosity creates lasting change. Every rupee counts in
-                building a better tomorrow.
+                {donateHero?.subtitle ||
+                  "Your generosity creates lasting change. Every rupee counts in building a better tomorrow."}
               </p>
             </div>
             <div className="mx-auto grid max-w-2xl grid-cols-3 gap-4 rounded-3xl border border-white/15 bg-white/10 p-6 backdrop-blur-md lg:gap-8 lg:p-8">
               <div className="text-center">
-                <div className="font-display text-2xl font-bold lg:text-4xl">10K+</div>
+                <div className="font-display text-2xl font-bold lg:text-4xl">
+                  {donateHero?.stats?.activeDonors?.value || "10K+"}
+                </div>
                 <div className="mt-1 text-xs text-emerald-100 lg:text-base">
-                  Active Donors
+                  {donateHero?.stats?.activeDonors?.label || "Active Donors"}
                 </div>
               </div>
               <div className="border-x border-white/20 text-center">
-                <div className="font-display text-2xl font-bold lg:text-4xl">25K+</div>
+                <div className="font-display text-2xl font-bold lg:text-4xl">
+                  {donateHero?.stats?.livesImpacted?.value || "25K+"}
+                </div>
                 <div className="mt-1 text-xs text-emerald-100 lg:text-base">
-                  Lives Impacted
+                  {donateHero?.stats?.livesImpacted?.label || "Lives Impacted"}
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-display text-2xl font-bold lg:text-4xl">14</div>
+                <div className="font-display text-2xl font-bold lg:text-4xl">
+                  {donateHero?.stats?.statesReached?.value || "14"}
+                </div>
                 <div className="mt-1 text-xs text-emerald-100 lg:text-base">
-                  States Reached
+                  {donateHero?.stats?.statesReached?.label || "States Reached"}
                 </div>
               </div>
             </div>
@@ -582,23 +601,48 @@ export default function DonatePage({ searchParams }) {
                 Minimum donation: ₹{minAmount}
               </p>
             </div>
-            <label className="flex items-start space-x-3 mt-4 cursor-pointer">
-              <input
-                type="checkbox"
-                className="mt-1 scale-125 accent-emerald-600"
-                checked={requestCertificate}
-                onChange={() => setRequestCertificate(!requestCertificate)}
-              />
-              <div>
-                <p className="font-medium text-gray-900">
-                  Generate Tax Exemption Certificate
-                </p>
-                <p className="text-sm text-gray-600">
-                  Request an official tax exemption certificate for your
-                  donation that can be used for tax deductions
-                </p>
+            <div className="mt-4 space-y-2">
+              <p className="font-medium text-gray-900">Donor Visibility</p>
+              <p className="text-sm text-gray-600">
+                Choose whether your name appears in the public list of donors on
+                the project page.
+              </p>
+              <div className="space-y-2">
+                {[
+                  {
+                    value: false,
+                    label: "Show my name publicly",
+                    desc: "Your name (only) will be shown alongside your donation.",
+                  },
+                  {
+                    value: true,
+                    label: "Donate anonymously",
+                    desc: "Your name will be hidden from the public donor list.",
+                  },
+                ].map((option) => (
+                  <label
+                    key={String(option.value)}
+                    className={`flex cursor-pointer items-start space-x-3 rounded-xl border p-3 ${
+                      isAnonymous === option.value
+                        ? "border-emerald-300 bg-emerald-50"
+                        : "border-gray-200 hover:border-emerald-200 hover:bg-emerald-50/50"
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="donorVisibility"
+                      className="mt-1 h-4 w-4 accent-emerald-600"
+                      checked={isAnonymous === option.value}
+                      onChange={() => setIsAnonymous(option.value)}
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">{option.label}</p>
+                      <p className="text-sm text-gray-600">{option.desc}</p>
+                    </div>
+                  </label>
+                ))}
               </div>
-            </label>
+            </div>
             {isRecurring && (
               <div className="mt-6 border-t pt-4">
                 <h3 className="font-semibold text-gray-800 mb-2">
@@ -657,9 +701,9 @@ export default function DonatePage({ searchParams }) {
             </span>
           </div>
           <div className="grid grid-cols-2 bg-white rounded-lg px-4 py-2">
-            <span className="text-gray-500 truncate">Tax Certificate</span>
+            <span className="text-gray-500 truncate">Visibility</span>
             <span className="font-medium text-right truncate">
-              {requestCertificate ? "Requested" : "Not requested"}
+              {isAnonymous ? "Anonymous" : "Public"}
             </span>
           </div>
         </div>

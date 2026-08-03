@@ -14,7 +14,9 @@ async function getHeroData() {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/homeherosection`,
       {
-        cache: "force-cache",
+        // Admin-editable content — always fetch fresh so stats/hero edits
+        // reflect on the site without a rebuild.
+        cache: "no-store",
       }
     );
     if (!res.ok) return null;
@@ -341,7 +343,7 @@ export default function Home() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
       />
 
-      <div className="flex flex-col bg-white">
+      <div className="flex flex-col gap-y-10 bg-white lg:gap-y-16">
 
         <HeroSection hero={heroData} />
 

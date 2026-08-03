@@ -32,14 +32,15 @@ const Impact = () => {
     async function fetchContent() {
       try {
         const [heroRes, storiesRes, categoriesRes] = await Promise.all([
+          // Admin-editable content — fetch fresh so CMS edits show immediately.
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/impactherosection`, {
-            cache: "force-cache",
+            cache: "no-store",
           }),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/impact-stories`, {
-            cache: "force-cache",
+            cache: "no-store",
           }),
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/impactcategories`, {
-            cache: "force-cache",
+            cache: "no-store",
           }),
         ]);
 
@@ -70,7 +71,12 @@ const Impact = () => {
     }
   }, [tabContent, activeTab]);
 
-  const visibleStories = showAllStories ? stories : stories.slice(0, 2);
+  // Show up to 3 stories by default; the "View More" button only appears when
+  // there are more stories than that truncation limit.
+  const STORY_LIMIT = 3;
+  const visibleStories = showAllStories
+    ? stories
+    : stories.slice(0, STORY_LIMIT);
 
   return (
     <div className="flex flex-col bg-white">
@@ -308,14 +314,16 @@ const Impact = () => {
               })
             )}
           </div>
-          <div className="lg:flex lg:justify-center lg:mt-12">
-            <button
-              onClick={() => setShowAllStories(!showAllStories)}
-              className="btn-outline mt-6 w-full lg:mt-0 lg:w-auto"
-            >
-              {showAllStories ? "Show Less Stories" : "View More Stories"}
-            </button>
-          </div>
+          {stories.length > STORY_LIMIT && (
+            <div className="lg:flex lg:justify-center lg:mt-12">
+              <button
+                onClick={() => setShowAllStories(!showAllStories)}
+                className="btn-outline mt-6 w-full lg:mt-0 lg:w-auto"
+              >
+                {showAllStories ? "Show Less Stories" : "View More Stories"}
+              </button>
+            </div>
+          )}
         </div>
       </section>
 
